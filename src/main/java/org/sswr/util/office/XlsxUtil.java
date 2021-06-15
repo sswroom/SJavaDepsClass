@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.sswr.util.data.ByteTool;
 import org.sswr.util.data.DateTimeUtil;
 import org.sswr.util.media.ImageUtil;
 import org.sswr.util.unit.Distance;
@@ -34,6 +35,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xddf.usermodel.PresetColor;
 import org.apache.poi.xddf.usermodel.XDDFColor;
+import org.apache.poi.xddf.usermodel.XDDFColorRgbBinary;
 import org.apache.poi.xddf.usermodel.XDDFLineProperties;
 import org.apache.poi.xddf.usermodel.XDDFShapeProperties;
 import org.apache.poi.xddf.usermodel.XDDFSolidFillProperties;
@@ -48,6 +50,9 @@ import org.apache.poi.xddf.usermodel.chart.XDDFDataSource;
 import org.apache.poi.xddf.usermodel.chart.XDDFLineChartData;
 import org.apache.poi.xddf.usermodel.chart.XDDFNumericalDataSource;
 import org.apache.poi.xddf.usermodel.chart.XDDFValueAxis;
+import org.apache.poi.xddf.usermodel.text.XDDFTextBody;
+import org.apache.poi.xddf.usermodel.text.XDDFTextParagraph;
+import org.apache.poi.xddf.usermodel.text.XDDFTextRun;
 import org.apache.poi.xssf.usermodel.IndexedColorMap;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFChart;
@@ -55,6 +60,7 @@ import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFDrawing;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFSimpleShape;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class XlsxUtil {
@@ -123,6 +129,32 @@ public class XlsxUtil {
 		anchor.setDx2((int)Distance.convert(dUnit, DistanceUnit.DU_EMU, x + w));
 		anchor.setDy2((int)Distance.convert(dUnit, DistanceUnit.DU_EMU, y + h));*/
 		drawing.createPicture(anchor, pictureIndex);
+	}
+
+	public static void addWordArt(Sheet sheet, String text, int fontColor, int borderColor, DistanceUnit dUnit, double x, double y, double w, double h)
+	{
+		if (sheet instanceof XSSFSheet)
+		{
+			Drawing<?> drawing = sheet.createDrawingPatriarch();
+			ClientAnchor anchor = createAnchor(sheet, dUnit, x, y, w, h);
+			XSSFDrawing xssfDrawing = (XSSFDrawing)drawing;
+			XSSFSimpleShape shape = xssfDrawing.createSimpleShape((XSSFClientAnchor)anchor);
+			shape.setText(text);
+			XDDFTextBody body = shape.getTextBody();
+			XDDFTextParagraph p = body.getParagraph(0);
+			XDDFTextRun r = p.getTextRuns().get(0);
+			byte []c = new byte[4];
+			ByteTool.writeMInt32(c, 0, fontColor);
+			r.setFontColor(new XDDFColorRgbBinary(c));
+			r.setFontSize(20.0);
+			XDDFLineProperties line = new XDDFLineProperties();
+			XDDFSolidFillProperties lineFill = new XDDFSolidFillProperties();
+			line.setWidth(0.5);
+			ByteTool.writeMInt32(c, 0, borderColor);
+			lineFill.setColor(new XDDFColorRgbBinary(c));
+			line.setFillProperties(lineFill);
+			r.setLineProperties(line);
+		}
 	}
 
 	public static double getColumnWidthInch(Sheet sheet, int colIndex)
