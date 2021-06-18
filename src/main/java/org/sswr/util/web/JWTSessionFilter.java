@@ -24,6 +24,31 @@ public class JWTSessionFilter extends GenericFilterBean
 		this.sessMgr = sessMgr;
 	}
 
+	public JWTSession getSession(ServletRequest request)
+	{
+		if (request instanceof HttpServletRequest)
+		{
+			HttpServletRequest req = (HttpServletRequest)request;
+			JWTSession sess = null;
+			String tokenHdr = req.getHeader("X-Token");
+			if (tokenHdr != null)
+			{
+				sess = this.sessMgr.getSession(tokenHdr);
+			}
+			if (sess == null)
+			{
+				Map<String, Object> params = HttpUtil.parseParams(req, null);
+				Object token;;
+				if ((token = params.get("Token")) != null || (token = params.get("token")) != null)
+				{
+					sess = this.sessMgr.getSession(token.toString());
+				}
+			}
+			return sess;
+		}
+		return null;	
+	}
+
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
 	{
@@ -31,28 +56,10 @@ public class JWTSessionFilter extends GenericFilterBean
 		Authentication authentication = securityContext.getAuthentication();
 		if (authentication == null || !authentication.getClass().equals(JWTSessionAuthentication.class))
 		{
-			if (request instanceof HttpServletRequest)
+			JWTSession sess = getSession(request);
+			if (sess != null)
 			{
-				HttpServletRequest req = (HttpServletRequest)request;
-				JWTSession sess = null;
-				String tokenHdr = req.getHeader("X-Token");
-				if (tokenHdr != null)
-				{
-					sess = this.sessMgr.getSession(tokenHdr);
-				}
-				if (sess == null)
-				{
-					Map<String, Object> params = HttpUtil.parseParams(req, null);
-					Object token = params.get("Token");
-					if (token != null)
-					{
-						sess = this.sessMgr.getSession(token.toString());
-					}
-				}
-				if (sess != null)
-				{
-					securityContext.setAuthentication(new JWTSessionAuthentication(sess));
-				}
+				securityContext.setAuthentication(new JWTSessionAuthentication(sess));
 			}
 		}
 		chain.doFilter(request, response);
