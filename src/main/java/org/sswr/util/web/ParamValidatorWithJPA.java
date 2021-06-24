@@ -37,7 +37,7 @@ public class ParamValidatorWithJPA extends ParamValidator
 					this.errMsg = this.funcName + ": "+entityCls.getSimpleName()+".getStatus does not returning correct type: "+varValue;
 					setRespStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 					this.logger.logMessage(this.errMsg, LogLevel.ERROR);
-					this.errVarName = entityCls.getSimpleName();
+					this.errVarDispName = entityCls.getSimpleName();
 					this.errVarValue = varValue;
 					this.errFuncDesc = entityCls.getSimpleName()+".getStatus does not returning correct type";
 					return true;
@@ -53,7 +53,7 @@ public class ParamValidatorWithJPA extends ParamValidator
 							this.errMsg = this.funcName + ": "+entityCls.getSimpleName()+" already exist: "+varValue;
 							setRespStatus(HttpServletResponse.SC_BAD_REQUEST);
 							this.logger.logMessage(this.errMsg, LogLevel.ERROR);
-							this.errVarName = entityCls.getSimpleName();
+							this.errVarDispName = entityCls.getSimpleName();
 							this.errVarValue = varValue;
 							this.errFuncDesc = entityCls.getSimpleName()+" already exist: "+varValue;
 							return true;
@@ -66,7 +66,7 @@ public class ParamValidatorWithJPA extends ParamValidator
 							this.errMsg = this.funcName + ": "+entityCls.getSimpleName()+" already exist: "+varValue;
 							setRespStatus(HttpServletResponse.SC_BAD_REQUEST);
 							this.logger.logMessage(this.errMsg, LogLevel.ERROR);
-							this.errVarName = entityCls.getSimpleName();
+							this.errVarDispName = entityCls.getSimpleName();
 							this.errVarValue = varValue;
 							this.errFuncDesc = entityCls.getSimpleName()+" already exist: "+varValue;
 							return true;
@@ -82,7 +82,7 @@ public class ParamValidatorWithJPA extends ParamValidator
 			this.errMsg = this.funcName + ": Method "+repo.getClass().getSimpleName()+"."+findFunc+"(String) not found";
 			setRespStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			this.logger.logMessage(this.errMsg, LogLevel.ERROR);
-			this.errVarName = varName;
+			this.errVarDispName = varName;
 			this.errVarValue = varValue;
 			this.errFuncDesc = "Method "+repo.getClass().getSimpleName()+"."+findFunc+"(String) not found";
 			return true;
@@ -98,7 +98,7 @@ public class ParamValidatorWithJPA extends ParamValidator
 			this.errMsg = this.funcName + ": "+cls.getSimpleName()+" not found: "+id;
 			setRespStatus(HttpServletResponse.SC_BAD_REQUEST);
 			this.logger.logMessage(this.errMsg, LogLevel.ERROR);
-			this.errVarName = cls.getSimpleName();
+			this.errVarDispName = cls.getSimpleName();
 			this.errVarValue = ""+id;
 			this.errFuncDesc = cls.getSimpleName()+" "+id+" not found";
 			return null;
@@ -113,7 +113,7 @@ public class ParamValidatorWithJPA extends ParamValidator
 					this.errMsg = this.funcName + ": "+cls.getSimpleName()+".getStatus does not returning correct type: "+id;
 					setRespStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 					this.logger.logMessage(this.errMsg, LogLevel.ERROR);
-					this.errVarName = cls.getSimpleName();
+					this.errVarDispName = cls.getSimpleName();
 					this.errVarValue = ""+id;
 					this.errFuncDesc = cls.getSimpleName()+".getStatus does not returning correct type";
 					return null;
@@ -125,7 +125,7 @@ public class ParamValidatorWithJPA extends ParamValidator
 						this.errMsg = this.funcName + ": "+cls.getSimpleName()+" not found: "+id;
 						setRespStatus(HttpServletResponse.SC_BAD_REQUEST);
 						this.logger.logMessage(this.errMsg, LogLevel.ERROR);
-						this.errVarName = cls.getSimpleName();
+						this.errVarDispName = cls.getSimpleName();
 						this.errVarValue = ""+id;
 						this.errFuncDesc = cls.getSimpleName()+" "+id+" is "+checkingStatus.toString();
 						return null;
@@ -138,7 +138,7 @@ public class ParamValidatorWithJPA extends ParamValidator
 						this.errMsg = this.funcName + ": "+cls.getSimpleName()+" not found: "+id;
 						setRespStatus(HttpServletResponse.SC_BAD_REQUEST);
 						this.logger.logMessage(this.errMsg, LogLevel.ERROR);
-						this.errVarName = cls.getSimpleName();
+						this.errVarDispName = cls.getSimpleName();
 						this.errVarValue = ""+id;
 						this.errFuncDesc = cls.getSimpleName()+" "+id+" is not "+checkingStatus.toString();
 						return null;
@@ -151,7 +151,7 @@ public class ParamValidatorWithJPA extends ParamValidator
 				this.errMsg = this.funcName + ": "+cls.getSimpleName()+" does not have getStatus: "+id;
 				setRespStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				this.logger.logMessage(this.errMsg, LogLevel.ERROR);
-				this.errVarName = cls.getSimpleName();
+				this.errVarDispName = cls.getSimpleName();
 				this.errVarValue = ""+id;
 				this.errFuncDesc = cls.getSimpleName()+" does not have getStatus";
 				return null;
