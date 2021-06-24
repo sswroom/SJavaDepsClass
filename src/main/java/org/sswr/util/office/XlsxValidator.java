@@ -65,7 +65,11 @@ public class XlsxValidator {
 			int j = this.headers.length;
 			while (i < j)
 			{
-				if ((cell = row.getCell(i)) == null || cell.getCellType() != CellType.STRING || !cell.getStringCellValue().toUpperCase().startsWith(this.headers[i].toUpperCase()))
+				if (StringUtil.isNullOrEmpty(this.headers[i]))
+				{
+
+				}
+				else if ((cell = row.getCell(i)) == null || cell.getCellType() != CellType.STRING || !cell.getStringCellValue().toUpperCase().startsWith(this.headers[i].toUpperCase()))
 				{
 					this.lastError = "Column \""+this.headers[i]+"\" not found, in file is \""+getCellAsString(row, i)+"\"";
 					return;
