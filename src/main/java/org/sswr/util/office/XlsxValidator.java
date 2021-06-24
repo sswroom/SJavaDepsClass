@@ -27,11 +27,17 @@ public class XlsxValidator {
 	String headers[];
 	String lastError;
 	boolean fileValid;
+	int headerRow;
 	int nextRowInd;
 	XSSFRow currRow;
 	boolean trimStr;
 
 	public XlsxValidator(InputStream stm, String headers[])
+	{
+		this(stm, headers, 0);
+	}
+
+	public XlsxValidator(InputStream stm, String headers[], int headerRow)
 	{
 		try
 		{
@@ -39,6 +45,7 @@ public class XlsxValidator {
 			this.lastError = null;
 			this.headers = headers;
 			this.trimStr = false;
+			this.headerRow = headerRow;
 			this.wb = new XSSFWorkbook(stm);
 			this.sheet = wb.getSheetAt(0);
 			if (this.sheet == null)
@@ -47,7 +54,7 @@ public class XlsxValidator {
 				return;
 			}
 
-			XSSFRow row = this.sheet.getRow(0);
+			XSSFRow row = this.sheet.getRow(headerRow);
 			XSSFCell cell;
 			if (row == null)
 			{
@@ -65,7 +72,7 @@ public class XlsxValidator {
 				}
 				i++;
 			}
-			this.nextRowInd = 1;
+			this.nextRowInd = this.headerRow + 1;
 			this.fileValid = true;
 		}
 		catch (IOException ex)
@@ -86,7 +93,7 @@ public class XlsxValidator {
 			return false;
 		}
 
-		XSSFRow row = this.sheet.getRow(0);
+		XSSFRow row = this.sheet.getRow(this.headerRow);
 		XSSFCell cell;
 		if (row == null)
 		{
@@ -105,7 +112,7 @@ public class XlsxValidator {
 			i++;
 		}
 		this.headers = headers;
-		this.nextRowInd = 1;
+		this.nextRowInd = this.headerRow + 1;
 		this.fileValid = true;
 		return true;
 	}
@@ -119,7 +126,7 @@ public class XlsxValidator {
 	{
 		if (!this.fileValid)
 			return false;
-		this.nextRowInd = 1;
+		this.nextRowInd = this.headerRow + 1;
 		this.currRow = null;
 		return true;
 	}
