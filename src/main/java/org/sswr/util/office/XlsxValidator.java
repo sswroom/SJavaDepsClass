@@ -435,8 +435,12 @@ public class XlsxValidator {
 
 			}
 		}
+		else if (cell.getCellType() == CellType.BLANK)
+		{
+			return null;
+		}
 		String v = getCellDisp(index);
-		if (v == null)
+		if (StringUtil.isNullOrEmpty(v))
 			return null;
 		try
 		{
