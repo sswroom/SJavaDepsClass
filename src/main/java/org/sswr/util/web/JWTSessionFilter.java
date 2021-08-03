@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
+import org.sswr.util.basic.ThreadVar;
 
 
 public class JWTSessionFilter extends GenericFilterBean
@@ -54,14 +55,17 @@ public class JWTSessionFilter extends GenericFilterBean
 	{
 		SecurityContext securityContext = SecurityContextHolder.getContext();
 		Authentication authentication = securityContext.getAuthentication();
+		String userName = null;
 		if (authentication == null || !authentication.getClass().equals(JWTSessionAuthentication.class))
 		{
 			JWTSession sess = getSession(request);
 			if (sess != null)
 			{
+				userName = sess.getUserName();
 				securityContext.setAuthentication(new JWTSessionAuthentication(sess));
 			}
 		}
+		ThreadVar.set("User", userName);
 		chain.doFilter(request, response);
 	}
 }
