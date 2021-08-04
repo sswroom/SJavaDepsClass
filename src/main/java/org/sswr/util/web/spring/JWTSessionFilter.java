@@ -1,6 +1,8 @@
 package org.sswr.util.web.spring;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.FilterChain;
@@ -18,14 +20,20 @@ import org.sswr.util.web.HttpUtil;
 import org.sswr.util.web.JWTSession;
 import org.sswr.util.web.JWTSessionManager;
 
-
 public class JWTSessionFilter extends GenericFilterBean
 {
+	private List<String> ignorePaths;
 	private JWTSessionManager sessMgr;
 	public JWTSessionFilter(JWTSessionManager sessMgr)
 	{
 		super();
 		this.sessMgr = sessMgr;
+		this.ignorePaths = new ArrayList<String>();
+	}
+
+	public void ignorePath(String path)
+	{
+		this.ignorePaths.add(path);
 	}
 
 	public JWTSession getSession(ServletRequest request)
@@ -33,6 +41,15 @@ public class JWTSessionFilter extends GenericFilterBean
 		if (request instanceof HttpServletRequest)
 		{
 			HttpServletRequest req = (HttpServletRequest)request;
+			String path = req.getRequestURI();
+			int i = this.ignorePaths.size();
+			while (i-- > 0)
+			{
+				if (path.startsWith(this.ignorePaths.get(i)))
+				{
+					return null;
+				}
+			}
 			JWTSession sess = null;
 			String tokenHdr = req.getHeader("X-Token");
 			if (tokenHdr != null)
