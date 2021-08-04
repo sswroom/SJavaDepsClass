@@ -1,4 +1,4 @@
-package org.sswr.util.web;
+package org.sswr.util.web.spring;
 
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
@@ -11,6 +11,7 @@ import org.sswr.util.basic.ThreadVar;
 import org.sswr.util.db.DBUpdateHandler;
 import org.sswr.util.db.DBUtil;
 import org.sswr.util.io.ActionFileStore;
+import org.sswr.util.web.AuditModel;
 
 @Component
 public class ActionLogger implements DBUpdateHandler

@@ -1,4 +1,4 @@
-package org.sswr.util.web;
+package org.sswr.util.web.spring;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.sswr.util.data.DataTools;
+import org.sswr.util.web.JWTSession;
 
 public class JWTSessionAuthentication implements Authentication
 {

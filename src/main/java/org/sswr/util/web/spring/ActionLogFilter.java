@@ -1,4 +1,4 @@
-package org.sswr.util.web;
+package org.sswr.util.web.spring;
 
 import java.io.IOException;
 

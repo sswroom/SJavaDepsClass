@@ -1,4 +1,4 @@
-package org.sswr.util.web;
+package org.sswr.util.web.spring;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.sswr.util.io.LogLevel;
 import org.sswr.util.io.LogTool;
+import org.sswr.util.web.ParamValidator;
 
 public class ParamValidatorWithJPA extends ParamValidator
 {

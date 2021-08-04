@@ -1,4 +1,4 @@
-package org.sswr.util.web;
+package org.sswr.util.web.spring;
 
 import java.io.IOException;
 import java.util.Map;
@@ -14,6 +14,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
 import org.sswr.util.basic.ThreadVar;
+import org.sswr.util.web.HttpUtil;
+import org.sswr.util.web.JWTSession;
+import org.sswr.util.web.JWTSessionManager;
 
 
 public class JWTSessionFilter extends GenericFilterBean
