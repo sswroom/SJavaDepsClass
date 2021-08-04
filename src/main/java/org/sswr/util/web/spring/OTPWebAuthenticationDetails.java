@@ -8,10 +8,10 @@ public class OTPWebAuthenticationDetails extends WebAuthenticationDetails
 {
     private String verificationCode;
 
-    public OTPWebAuthenticationDetails(HttpServletRequest request)
+    public OTPWebAuthenticationDetails(HttpServletRequest request, String otpCodeField)
 	{
         super(request);
-        this.verificationCode = request.getParameter("otp");
+        this.verificationCode = request.getParameter(otpCodeField);
     }
 
     public String getVerificationCode()

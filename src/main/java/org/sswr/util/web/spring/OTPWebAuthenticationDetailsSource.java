@@ -7,9 +7,16 @@ import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
 public class OTPWebAuthenticationDetailsSource implements AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails>
 {
+	private String otpCodeField;
+
+	public OTPWebAuthenticationDetailsSource(String otpCodeField)
+	{
+		this.otpCodeField = otpCodeField;
+	}
+
     @Override
     public WebAuthenticationDetails buildDetails(HttpServletRequest context)
 	{
-        return new OTPWebAuthenticationDetails(context);
+        return new OTPWebAuthenticationDetails(context, otpCodeField);
     }
 }
