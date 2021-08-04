@@ -15,7 +15,8 @@ import javax.mail.internet.MimeMessage;
 
 import org.sswr.util.io.LogTool;
 
-public class EmailControl {
+public class SMTPEmailControl implements EmailControl
+{
 	private Properties props;
 	private Authenticator auth;
 	private String username;
@@ -23,7 +24,7 @@ public class EmailControl {
 	private String smtpFrom;
 	private LogTool logger;
 
-	public EmailControl(String smtpHost, Integer smtpPort, boolean tls, String username, String password, String smtpFrom, LogTool logger)
+	public SMTPEmailControl(String smtpHost, Integer smtpPort, boolean tls, String username, String password, String smtpFrom, LogTool logger)
 	{
 		this.props = new Properties();
 		if (tls)
@@ -41,7 +42,7 @@ public class EmailControl {
 		if (this.username != null && this.username.length() > 0 && this.password != null && this.password.length() > 0)
 		{
 			this.props.put("mail.smtp.auth", "true");
-			auth = new javax.mail.Authenticator() {
+			auth = new Authenticator() {
 				protected PasswordAuthentication getPasswordAuthentication() {
 					return new PasswordAuthentication(username, password);
 				}
