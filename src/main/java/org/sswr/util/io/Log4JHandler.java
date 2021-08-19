@@ -53,6 +53,7 @@ public class Log4JHandler implements LogHandler
 	public static LogTool createLogTool(Class<?> cls)
 	{
 		LogTool log = new LogTool();
+		log.skipStarted();
 		log.addLogHandler(new Log4JHandler(LoggerFactory.getLogger(cls)), LogLevel.RAW);
 		return log;
 	}
