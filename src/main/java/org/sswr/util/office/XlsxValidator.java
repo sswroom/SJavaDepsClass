@@ -422,6 +422,7 @@ public class XlsxValidator {
 		XSSFCell cell = this.currRow.getCell(index);
 		if (cell == null)
 		{
+			this.lastError = this.headers[index] + " is required";
 			return null;
 		}
 		else if (cell.getCellType() == CellType.NUMERIC)
