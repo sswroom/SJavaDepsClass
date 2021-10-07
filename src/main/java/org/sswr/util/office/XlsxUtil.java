@@ -1084,4 +1084,15 @@ public class XlsxUtil {
 		}
 		return lineCnt * fontSize * 0.018 + 0.02;
 	}
+
+	public static double calcCellHeight(String s,double fontSize, Sheet sheet, int firstCol, int lastCol)
+	{
+		double totalWidth = 0;
+		while (firstCol <= lastCol)
+		{
+			totalWidth += XlsxUtil.getColumnWidthInch(sheet, firstCol);
+			firstCol++;
+		}
+		return calcCellHeight(s, fontSize, totalWidth);
+	}
 }
