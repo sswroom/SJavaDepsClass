@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.sswr.util.data.ByteTool;
 import org.sswr.util.data.DateTimeUtil;
+import org.sswr.util.data.StringUtil;
 import org.sswr.util.media.ImageUtil;
 import org.sswr.util.unit.Distance;
 import org.sswr.util.unit.Distance.DistanceUnit;
@@ -1036,5 +1037,51 @@ public class XlsxUtil {
 		{
 
 		}
+	}
+
+	private  static int calcLineCnt(String s, double fontSize, double cellWidthInch)
+	{
+		int lineCharCnt = (int)(cellWidthInch / fontSize / 0.0066);
+		int sLen = s.length();
+		int ret = 0;
+		while (sLen > lineCharCnt)
+		{
+			sLen -= lineCharCnt;
+			ret++;
+		}
+		return ret + 1;
+	}
+
+	public static double calcCellHeight(String s, double fontSize, double cellWidthInch)
+	{
+		int lineCnt;
+		if (StringUtil.isNullOrEmpty(s))
+		{
+			lineCnt = 1;
+		}
+		else
+		{
+			lineCnt = 0;
+			int i = s.indexOf("\r");
+			while (i >= 0)
+			{
+				lineCnt += calcLineCnt(s.substring(0, i), fontSize, cellWidthInch);
+				s = s.substring(i + 1);
+				if (s.startsWith("\n"))
+				{
+					s.substring(1);
+				}
+				if (s.length() <= 0)
+				{
+					break;
+				}
+				i = s.indexOf("\r");
+			}
+			if (s.length() > 0)
+			{
+				lineCnt += calcLineCnt(s, fontSize, cellWidthInch);
+			}
+		}
+		return lineCnt * fontSize * 0.018 + 0.02;
 	}
 }
