@@ -26,7 +26,7 @@ public class ActionLogger implements DBUpdateHandler
 
     public ActionLogger()
     {
-        DBUtil.setUpdateHandler(this);
+        DBUtil.addUpdateHandler(this);
     }
 
     @PostLoad
