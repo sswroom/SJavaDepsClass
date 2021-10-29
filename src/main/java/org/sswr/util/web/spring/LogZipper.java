@@ -4,12 +4,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +34,7 @@ public class LogZipper
 
 	@Autowired
 	private ProjectConfig cfg;
-//
+
 	@Scheduled(fixedRate = 5000)
 	public void checkLogFiles() {
 		if (cfg.enableLogZipper())
@@ -50,7 +53,6 @@ public class LogZipper
 
 	private void logArchive()
 	{
-//		File actionLogDir = new File(getTruePath(actionLogPath));
 		HashMap<Integer, Integer> timeMap = new HashMap<Integer, Integer>();
 		int iDate = this.lastExecYear * 10000 + this.lastExecMonth * 100 + this.lastExecDay;
 		List<String> logPaths = cfg.getLogPathsToZip();
@@ -74,7 +76,50 @@ public class LogZipper
 			File zipFile = new File(zipMonthDir.getPath() + File.separator + fileDate + ".zip");
 			try
 			{
+				ZipFile in = null;
+				try
+				{
+					if (zipFile.exists())
+					{
+						File tempFile = new File(zipMonthDir.getPath() + File.separator + "temp.zip");
+						tempFile.delete();
+						zipFile.renameTo(tempFile);
+						zipFile = new File(zipMonthDir.getPath() + File.separator + fileDate + ".zip");
+						in = new ZipFile(tempFile);
+					}
+				}
+				catch (IOException ex)
+				{
+
+				}
+
 				ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFile));
+				if (in != null)
+				{
+					byte[] buff = new byte[2048];
+					Enumeration<? extends ZipEntry> entries = in.entries();
+					while (entries.hasMoreElements())
+					{
+						ZipEntry e = entries.nextElement();
+						out.putNextEntry(e);
+						if (!e.isDirectory())
+						{
+							InputStream stm = in.getInputStream(e);
+							while (true)
+							{
+								i = stm.read(buff);
+								if (i <= 0)
+								{
+									break;
+								}
+								out.write(buff, 0, i);
+							}
+						}
+						out.closeEntry();
+					}
+					in.close();
+					new File(zipMonthDir.getPath() + File.separator + "temp.zip").delete();
+				}
 				i = 0;
 				while (i < j)
 				{
@@ -137,6 +182,61 @@ public class LogZipper
 		}
 	}
 
+	private void logZipDateFile(ZipOutputStream zip, File file, int fileDate, String filePath)
+	{
+		int m;
+		m = file.getName().indexOf(".");
+		if (m >= 8)
+		{
+			boolean opened = false;
+			try
+			{
+				int iDate = Integer.parseInt(file.getName().substring(m - 8, m));
+				if (iDate == fileDate)
+				{
+					long fileLeng = file.length();
+					FileInputStream fis = new FileInputStream(file);
+					ZipEntry e = new ZipEntry(filePath+File.separator+file.getName());
+					zip.putNextEntry(e);
+					opened = true;
+
+					if (fileLeng <= 1048576)
+					{
+						byte fileContent[] = fis.readAllBytes();
+						zip.write(fileContent, 0, fileContent.length);
+					}
+					else
+					{
+						byte fileContent[] = new byte[1048576];
+						int readSize;
+						while ((readSize = fis.read(fileContent, 0, 1048576)) >= 0)
+						{
+							zip.write(fileContent, 0, readSize);
+						}
+					}
+					fis.close();
+
+					file.delete();
+				}
+			}
+			catch (Exception ex)
+			{
+				log.logException(ex);
+			}
+			if (opened)
+			{
+				try
+				{
+					zip.closeEntry();
+				}
+				catch (IOException ex)
+				{
+					log.logException(ex);
+				}
+			}
+		}
+	}
+
 	public void logZipDate(ZipOutputStream zip, File fileDir, int fileDate)
 	{
 		File monthList[] = fileDir.listFiles();
@@ -155,64 +255,18 @@ public class LogZipper
 				{
 					int k = 0;
 					int l = logFiles.length;
-					int m;
 					while (k < l)
 					{
-						m = logFiles[k].getName().indexOf(".");
-						if (m >= 8)
-						{
-							boolean opened = false;
-							try
-							{
-								int iDate = Integer.parseInt(logFiles[k].getName().substring(m - 8, m));
-								if (iDate == fileDate)
-								{
-									long fileLeng = logFiles[k].length();
-									FileInputStream fis = new FileInputStream(logFiles[k]);
-									ZipEntry e = new ZipEntry(logFiles[k].getName());
-									zip.putNextEntry(e);
-									opened = true;
-
-									if (fileLeng <= 1048576)
-									{
-										byte fileContent[] = fis.readAllBytes();
-										zip.write(fileContent, 0, fileContent.length);
-									}
-									else
-									{
-										byte fileContent[] = new byte[1048576];
-										int readSize;
-										while ((readSize = fis.read(fileContent, 0, 1048576)) >= 0)
-										{
-											zip.write(fileContent, 0, readSize);
-										}
-									}
-									fis.close();
-
-									logFiles[k].delete();
-								}
-							}
-							catch (Exception ex)
-							{
-								log.logException(ex);
-							}
-							if (opened)
-							{
-								try
-								{
-									zip.closeEntry();
-								}
-								catch (IOException ex)
-								{
-									log.logException(ex);
-								}
-							}
-						}
+						logZipDateFile(zip, logFiles[k], fileDate, fileDir.getName());
 						k++;
 					}
 
 					monthList[i].delete();
 				}
+			}
+			else if (monthList[i].isFile())
+			{
+				logZipDateFile(zip, monthList[i], fileDate, fileDir.getName());
 			}
 			i++;
 		}
