@@ -8,10 +8,9 @@ import java.util.Map;
 import org.sswr.util.data.ByteTool;
 import org.sswr.util.data.DateTimeUtil;
 import org.sswr.util.data.StringUtil;
+import org.sswr.util.math.unit.Distance;
+import org.sswr.util.math.unit.Distance.DistanceUnit;
 import org.sswr.util.media.ImageUtil;
-import org.sswr.util.unit.Distance;
-import org.sswr.util.unit.Distance.DistanceUnit;
-
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFPalette;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -192,7 +191,7 @@ public class XlsxUtil {
 	public static void setRowHeight(Sheet sheet, int index, DistanceUnit du, double val)
 	{
 		Row row = getRow(sheet, index);
-		row.setHeightInPoints((float)Distance.convert(du, DistanceUnit.DU_POINT, val));
+		row.setHeightInPoints((float)Distance.convert(du, DistanceUnit.Point, val));
 	}
 
 	public static void setRowHeightAuto(Sheet sheet, int index)
@@ -203,7 +202,7 @@ public class XlsxUtil {
 
 	public static double getRowHeight(Sheet sheet, int rowNum, DistanceUnit dUnit)
 	{
-		return Distance.convert(DistanceUnit.DU_POINT, dUnit, getRow(sheet, rowNum).getHeightInPoints());
+		return Distance.convert(DistanceUnit.Point, dUnit, getRow(sheet, rowNum).getHeightInPoints());
 	}
 
 	public static double getRowsHeight(Sheet sheet, int rowStart, int rowEnd, DistanceUnit dUnit)
@@ -216,7 +215,7 @@ public class XlsxUtil {
 			ptHeight += row.getHeightInPoints();
 			rowStart++;
 		}
-		return Distance.convert(DistanceUnit.DU_POINT, dUnit, ptHeight);
+		return Distance.convert(DistanceUnit.Point, dUnit, ptHeight);
 	}
 
 	public static Font createFont(Workbook wb, String fontName, double fontSize, boolean bold)
@@ -898,8 +897,8 @@ public class XlsxUtil {
 
 	public static ClientAnchor createAnchor(Sheet sheet, DistanceUnit du, double x, double y, double w, double h)
 	{
-		DistanceUnit emu = DistanceUnit.DU_EMU;
-		DistanceUnit inch = DistanceUnit.DU_INCH;
+		DistanceUnit emu = DistanceUnit.Emu;
+		DistanceUnit inch = DistanceUnit.Inch;
 		Drawing<?> drawing = sheet.createDrawingPatriarch();
 		double ix = Distance.convert(du, inch, x);
 		double iy = Distance.convert(du, inch, y);
@@ -936,7 +935,7 @@ public class XlsxUtil {
 
 		while (true)
 		{
-			size = getRowHeight(sheet, row1, DistanceUnit.DU_INCH);
+			size = getRowHeight(sheet, row1, DistanceUnit.Inch);
 			if (iy < size)
 			{
 				break;
@@ -949,7 +948,7 @@ public class XlsxUtil {
 
 		while (true)
 		{
-			size = getRowHeight(sheet, row2, DistanceUnit.DU_INCH);
+			size = getRowHeight(sheet, row2, DistanceUnit.Inch);
 			if (iy2 < size)
 			{
 				break;
