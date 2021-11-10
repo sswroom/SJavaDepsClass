@@ -344,7 +344,7 @@ public class XlsxValidator {
 		if (index < 0 || index >= this.headers.length)
 			return null;
 		XSSFCell cell = this.currRow.getCell(index);
-		if (cell.getCellType() == CellType.FORMULA)
+		if (cell != null && cell.getCellType() == CellType.FORMULA)
 		{
 			FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
 			DataFormatter formatter = new DataFormatter();
