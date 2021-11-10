@@ -6,7 +6,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.sswr.util.data.DataTools;
@@ -15,6 +17,7 @@ import org.sswr.util.data.StringUtil;
 
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -341,13 +344,27 @@ public class XlsxValidator {
 		if (index < 0 || index >= this.headers.length)
 			return null;
 		XSSFCell cell = this.currRow.getCell(index);
-		DataFormatter formatter = new DataFormatter();
-		String str = formatter.formatCellValue(cell);
-		if (this.trimStr && str != null)
+		if (cell.getCellType() == CellType.FORMULA)
 		{
-			str = str.trim();
+			FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
+			DataFormatter formatter = new DataFormatter();
+			String str = formatter.formatCellValue(cell, evaluator);
+			if (this.trimStr && str != null)
+			{
+				str = str.trim();
+			}
+			return str;
 		}
-		return str;
+		else
+		{
+			DataFormatter formatter = new DataFormatter();
+			String str = formatter.formatCellValue(cell);
+			if (this.trimStr && str != null)
+			{
+				str = str.trim();
+			}
+			return str;
+		}
 	}
 
 	public Integer getCellIntRange(int index, int min, int max)
@@ -665,5 +682,18 @@ public class XlsxValidator {
 			}
 		}
 		return null;
+	}
+
+	public Map<String, String> getRowAsMap()
+	{
+		Map<String, String> ret = new HashMap<String, String>();
+		int i = 0;
+		int j = this.headers.length;
+		while (i < j)
+		{
+			ret.put(this.headers[i], this.getCellDisp(i));
+			i++;
+		}
+		return ret;
 	}
 }
