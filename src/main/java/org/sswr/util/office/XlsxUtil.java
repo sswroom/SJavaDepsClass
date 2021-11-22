@@ -103,7 +103,7 @@ public class XlsxUtil {
 	}
 
 	public static final XDDFColor seriesColor[] = {
-		XDDFColor.from(PresetColor.PALE_GOLDENROD),
+		XDDFColor.from(PresetColor.DARK_BLUE),
 		XDDFColor.from(PresetColor.AQUA),
 		XDDFColor.from(PresetColor.FUCHSIA),
 		XDDFColor.from(PresetColor.BLUE_VIOLET),
@@ -1015,14 +1015,21 @@ public class XlsxUtil {
 		return (XDDFLineChartData)chart.createData(ChartTypes.LINE, bottomAxis, leftAxis);
 	}
 
-	public static void addLineChartSeries(XDDFLineChartData data, XDDFDataSource<?> category, XDDFNumericalDataSource<? extends Number> values, String name)
+	public static void addLineChartSeries(XDDFLineChartData data, XDDFDataSource<?> category, XDDFNumericalDataSource<? extends Number> values, String name, boolean showMarker)
 	{
 		int i = data.getSeriesCount();
 		XDDFLineChartData.Series series = (XDDFLineChartData.Series)data.addSeries(category, values);
 		if (name != null) series.setTitle(name, null);
 		series.setSmooth(false);
-		series.setMarkerSize((short)3);
-		series.setMarkerStyle(MarkerStyle.CIRCLE);
+		if (showMarker)
+		{
+			series.setMarkerSize((short)3);
+			series.setMarkerStyle(MarkerStyle.CIRCLE);
+		}
+		else
+		{
+			series.setMarkerStyle(MarkerStyle.NONE);
+		}
 		series.setLineProperties(new XDDFLineProperties(new XDDFSolidFillProperties(seriesColor[i % seriesColor.length])));
 	}
 
