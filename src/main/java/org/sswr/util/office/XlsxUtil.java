@@ -41,6 +41,7 @@ import org.apache.poi.xddf.usermodel.XDDFShapeProperties;
 import org.apache.poi.xddf.usermodel.XDDFSolidFillProperties;
 import org.apache.poi.xddf.usermodel.chart.AxisCrosses;
 import org.apache.poi.xddf.usermodel.chart.AxisPosition;
+import org.apache.poi.xddf.usermodel.chart.AxisTickLabelPosition;
 import org.apache.poi.xddf.usermodel.chart.ChartTypes;
 import org.apache.poi.xddf.usermodel.chart.LegendPosition;
 import org.apache.poi.xddf.usermodel.chart.MarkerStyle;
@@ -1012,6 +1013,7 @@ public class XlsxUtil {
 		}
 		if (bottomAxisName != null) bottomAxis.setTitle(bottomAxisName);
 		bottomAxis.getOrAddShapeProperties().setLineProperties(new XDDFLineProperties(new XDDFSolidFillProperties(XDDFColor.from(PresetColor.BLACK))));
+		bottomAxis.setTickLabelPosition(AxisTickLabelPosition.LOW);
 		return (XDDFLineChartData)chart.createData(ChartTypes.LINE, bottomAxis, leftAxis);
 	}
 
