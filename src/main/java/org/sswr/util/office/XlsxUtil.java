@@ -63,6 +63,9 @@ import org.apache.poi.xssf.usermodel.XSSFDrawing;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFSimpleShape;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTChart;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTDispBlanksAs;
+import org.openxmlformats.schemas.drawingml.x2006.chart.STDispBlanksAs;
 
 public class XlsxUtil {
 	public enum StyleProperty
@@ -1102,5 +1105,12 @@ public class XlsxUtil {
 			firstCol++;
 		}
 		return calcCellHeight(s, fontSize, totalWidth);
+	}
+
+	public static void setDisplayBlankAs(CTChart chart, STDispBlanksAs.Enum blankAs)
+	{
+		CTDispBlanksAs val = CTDispBlanksAs.Factory.newInstance();
+		val.setVal(blankAs);
+		chart.setDispBlanksAs(val);
 	}
 }
