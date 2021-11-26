@@ -94,16 +94,16 @@ public class XlsxUtil {
 
 	public enum UnderlineType
 	{
-		UT_NONE,
-		UT_SINGLE,
-		UT_DOUBLE
+		NONE,
+		SINGLE,
+		DOUBLE
 	}
 
 	public enum AxisType
 	{
-		AT_DATE,
-		AT_CATEGORY,
-		AT_NUMERIC
+		DATE,
+		CATEGORY,
+		NUMERIC
 	}
 
 	public static final XDDFColor seriesColor[] = {
@@ -248,13 +248,13 @@ public class XlsxUtil {
 		byte ulByte = Font.U_NONE;
 		switch (underline)
 		{
-		case UT_NONE:
+		case NONE:
 			ulByte = Font.U_NONE;
 			break;
-		case UT_SINGLE:
+		case SINGLE:
 			ulByte = Font.U_SINGLE;
 			break;
-		case UT_DOUBLE:
+		case DOUBLE:
 			ulByte = Font.U_DOUBLE;
 			break;
 		}
@@ -1004,13 +1004,13 @@ public class XlsxUtil {
 		XDDFChartAxis bottomAxis = null;
 		switch (bottomType)
 		{
-		case AT_CATEGORY:
+		case CATEGORY:
 			bottomAxis = chart.createCategoryAxis(AxisPosition.BOTTOM);
 			break;
-		case AT_DATE:
+		case DATE:
 			bottomAxis = chart.createDateAxis(AxisPosition.BOTTOM);
 			break;
-		case AT_NUMERIC:
+		case NUMERIC:
 			bottomAxis = chart.createValueAxis(AxisPosition.BOTTOM);
 			break;
 		}
