@@ -1,0 +1,383 @@
+package org.sswr.util.web.spring;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
+import javax.servlet.http.Part;
+
+public class LogHttpRequest implements HttpServletRequest {
+
+	private HttpServletRequest parent;
+
+	public LogHttpRequest(HttpServletRequest parent)
+	{
+		this.parent = parent;
+	}
+
+	@Override
+	public Object getAttribute(String name) {
+		return this.parent.getAttribute(name);
+	}
+
+	@Override
+	public Enumeration<String> getAttributeNames() {
+		return this.parent.getAttributeNames();
+	}
+
+	@Override
+	public String getCharacterEncoding() {
+		return this.parent.getCharacterEncoding();
+	}
+
+	@Override
+	public void setCharacterEncoding(String env) throws UnsupportedEncodingException {
+		this.parent.setCharacterEncoding(env);
+	}
+
+	@Override
+	public int getContentLength() {
+		return this.parent.getContentLength();
+	}
+
+	@Override
+	public long getContentLengthLong() {
+		return this.parent.getContentLengthLong();
+	}
+
+	@Override
+	public String getContentType() {
+		return this.parent.getContentType();
+	}
+
+	@Override
+	public ServletInputStream getInputStream() throws IOException {
+		return this.parent.getInputStream();
+	}
+
+	@Override
+	public String getParameter(String name) {
+		return this.parent.getParameter(name);
+	}
+
+	@Override
+	public Enumeration<String> getParameterNames() {
+		return this.parent.getParameterNames();
+	}
+
+	@Override
+	public String[] getParameterValues(String name) {
+		return this.parent.getParameterValues(name);
+	}
+
+	@Override
+	public Map<String, String[]> getParameterMap() {
+		return this.parent.getParameterMap();
+	}
+
+	@Override
+	public String getProtocol() {
+		return this.parent.getProtocol();
+	}
+
+	@Override
+	public String getScheme() {
+		return this.parent.getScheme();
+	}
+
+	@Override
+	public String getServerName() {
+		return this.parent.getServerName();
+	}
+
+	@Override
+	public int getServerPort() {
+		return this.parent.getServerPort();
+	}
+
+	@Override
+	public BufferedReader getReader() throws IOException {
+		return this.parent.getReader();
+	}
+
+	@Override
+	public String getRemoteAddr() {
+		return this.parent.getRemoteAddr();
+	}
+
+	@Override
+	public String getRemoteHost() {
+		return this.parent.getRemoteHost();
+	}
+
+	@Override
+	public void setAttribute(String name, Object o) {
+		this.parent.setAttribute(name, o);
+	}
+
+	@Override
+	public void removeAttribute(String name) {
+		this.parent.removeAttribute(name);
+	}
+
+	@Override
+	public Locale getLocale() {
+		return this.parent.getLocale();
+	}
+
+	@Override
+	public Enumeration<Locale> getLocales() {
+		return this.parent.getLocales();
+	}
+
+	@Override
+	public boolean isSecure() {
+		return this.parent.isSecure();
+	}
+
+	@Override
+	public RequestDispatcher getRequestDispatcher(String path) {
+		return this.parent.getRequestDispatcher(path);
+	}
+
+	@Override
+	@SuppressWarnings("deprecation")
+	public String getRealPath(String path) {
+		return this.parent.getRealPath(path);
+	}
+
+	@Override
+	public int getRemotePort() {
+		return this.parent.getRemotePort();
+	}
+
+	@Override
+	public String getLocalName() {
+		return this.parent.getLocalName();
+	}
+
+	@Override
+	public String getLocalAddr() {
+		return this.parent.getLocalAddr();
+	}
+
+	@Override
+	public int getLocalPort() {
+		return this.parent.getLocalPort();
+	}
+
+	@Override
+	public ServletContext getServletContext() {
+		return this.parent.getServletContext();
+	}
+
+	@Override
+	public AsyncContext startAsync() throws IllegalStateException {
+		return this.parent.startAsync();
+	}
+
+	@Override
+	public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse)
+			throws IllegalStateException {
+		return this.parent.startAsync(servletRequest, servletResponse);
+	}
+
+	@Override
+	public boolean isAsyncStarted() {
+		return this.parent.isAsyncStarted();
+	}
+
+	@Override
+	public boolean isAsyncSupported() {
+		return this.parent.isAsyncSupported();
+	}
+
+	@Override
+	public AsyncContext getAsyncContext() {
+		return this.parent.getAsyncContext();
+	}
+
+	@Override
+	public DispatcherType getDispatcherType() {
+		return this.parent.getDispatcherType();
+	}
+
+	@Override
+	public String getAuthType() {
+		return this.parent.getAuthType();
+	}
+
+	@Override
+	public Cookie[] getCookies() {
+		return this.parent.getCookies();
+	}
+
+	@Override
+	public long getDateHeader(String name) {
+		return this.parent.getDateHeader(name);
+	}
+
+	@Override
+	public String getHeader(String name) {
+		return this.parent.getHeader(name);
+	}
+
+	@Override
+	public Enumeration<String> getHeaders(String name) {
+		return this.parent.getHeaders(name);
+	}
+
+	@Override
+	public Enumeration<String> getHeaderNames() {
+		return this.parent.getHeaderNames();
+	}
+
+	@Override
+	public int getIntHeader(String name) {
+		return this.parent.getIntHeader(name);
+	}
+
+	@Override
+	public String getMethod() {
+		return this.parent.getMethod();
+	}
+
+	@Override
+	public String getPathInfo() {
+		return this.parent.getPathInfo();
+	}
+
+	@Override
+	public String getPathTranslated() {
+		return this.parent.getPathTranslated();
+	}
+
+	@Override
+	public String getContextPath() {
+		return this.parent.getContextPath();
+	}
+
+	@Override
+	public String getQueryString() {
+		return this.parent.getQueryString();
+	}
+
+	@Override
+	public String getRemoteUser() {
+		return this.parent.getRemoteUser();
+	}
+
+	@Override
+	public boolean isUserInRole(String role) {
+		return this.parent.isUserInRole(role);
+	}
+
+	@Override
+	public Principal getUserPrincipal() {
+		return this.parent.getUserPrincipal();
+	}
+
+	@Override
+	public String getRequestedSessionId() {
+		return this.parent.getRequestedSessionId();
+	}
+
+	@Override
+	public String getRequestURI() {
+		return this.parent.getRequestURI();
+	}
+
+	@Override
+	public StringBuffer getRequestURL() {
+		return this.parent.getRequestURL();
+	}
+
+	@Override
+	public String getServletPath() {
+		return this.parent.getServletPath();
+	}
+
+	@Override
+	public HttpSession getSession(boolean create) {
+		return this.parent.getSession(create);
+	}
+
+	@Override
+	public HttpSession getSession() {
+		return this.parent.getSession();
+	}
+
+	@Override
+	public String changeSessionId() {
+		return this.parent.changeSessionId();
+	}
+
+	@Override
+	public boolean isRequestedSessionIdValid() {
+		return this.parent.isRequestedSessionIdValid();
+	}
+
+	@Override
+	public boolean isRequestedSessionIdFromCookie() {
+		return this.parent.isRequestedSessionIdFromCookie();
+	}
+
+	@Override
+	public boolean isRequestedSessionIdFromURL() {
+		return this.parent.isRequestedSessionIdFromURL();
+	}
+
+	@Override
+	@SuppressWarnings("deprecation")
+	public boolean isRequestedSessionIdFromUrl() {
+		return this.parent.isRequestedSessionIdFromUrl();
+	}
+
+	@Override
+	public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
+		return this.parent.authenticate(response);
+	}
+
+	@Override
+	public void login(String username, String password) throws ServletException {
+		this.parent.login(username, password);
+	}
+
+	@Override
+	public void logout() throws ServletException {
+		this.parent.logout();
+	}
+
+	@Override
+	public Collection<Part> getParts() throws IOException, ServletException {
+		return this.parent.getParts();
+	}
+
+	@Override
+	public Part getPart(String name) throws IOException, ServletException {
+		return this.parent.getPart(name);
+	}
+
+	@Override
+	public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass) throws IOException, ServletException {
+		return this.parent.upgrade(handlerClass);
+	}
+}
