@@ -13,12 +13,36 @@ import org.springframework.web.filter.GenericFilterBean;
 
 public class ForwardHandlerFilter extends GenericFilterBean
 {
+	private String scheme;
+	private String host;
+
+	public ForwardHandlerFilter()
+	{
+		this.scheme = null;
+		this.host = null;
+	}
+
+	public ForwardHandlerFilter(String scheme, String host)
+	{
+		this.scheme = scheme;
+		this.host = host;
+	}
+
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
 	{
 		if (request instanceof HttpServletRequest)
 		{
-			request = new ForwardHandlerRequest((HttpServletRequest)request);
+			ForwardHandlerRequest req = new ForwardHandlerRequest((HttpServletRequest)request);
+			if (this.scheme != null)
+			{
+				req.setScheme(this.scheme);
+			}
+			if (this.host != null)
+			{
+				req.setHost(this.host);
+			}
+			request = req;
 		}
 		if (response instanceof HttpServletResponse)
 		{

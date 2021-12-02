@@ -46,6 +46,16 @@ public class ForwardHandlerRequest implements HttpServletRequest {
 		}
 	}
 
+	public void setScheme(String scheme)
+	{
+		this.fwdProto = scheme;
+	}
+
+	public void setHost(String host)
+	{
+		this.fwdHost = host;
+	}
+
 	@Override
 	public Object getAttribute(String name) {
 		return this.parent.getAttribute(name);
