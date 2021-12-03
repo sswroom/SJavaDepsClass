@@ -56,6 +56,50 @@ public class ForwardHandlerRequest implements HttpServletRequest {
 		this.fwdHost = host;
 	}
 
+	public void setServerUrl(String url)
+	{
+		int i;
+		Integer iPort;
+		if (url.startsWith("http://"))
+		{
+			this.fwdProto = "http";
+			this.fwdHost = url.substring(7);
+			i = this.fwdHost.lastIndexOf(':');
+			iPort = null;
+			if (i >= 0)
+			{
+				iPort = StringUtil.toInteger(this.fwdHost.substring(i + 1));
+			}
+			if (iPort == null)
+			{
+				this.fwdPort = "80";
+			}
+			else
+			{
+				this.fwdPort = iPort.toString();
+			}
+		}
+		else if (url.startsWith("https://"))
+		{
+			this.fwdProto = "https";
+			this.fwdHost = url.substring(8);
+			i = this.fwdHost.lastIndexOf(':');
+			iPort = null;
+			if (i >= 0)
+			{
+				iPort = StringUtil.toInteger(this.fwdHost.substring(i + 1));
+			}
+			if (iPort == null)
+			{
+				this.fwdPort = "443";
+			}
+			else
+			{
+				this.fwdPort = iPort.toString();
+			}
+		}
+	}
+
 	@Override
 	public Object getAttribute(String name) {
 		return this.parent.getAttribute(name);

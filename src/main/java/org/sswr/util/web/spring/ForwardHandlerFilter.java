@@ -1,6 +1,8 @@
 package org.sswr.util.web.spring;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -15,17 +17,29 @@ public class ForwardHandlerFilter extends GenericFilterBean
 {
 	private String scheme;
 	private String host;
+	private Map<String, String> cliMap;
 
 	public ForwardHandlerFilter()
 	{
 		this.scheme = null;
 		this.host = null;
+		this.cliMap = null;
 	}
 
 	public ForwardHandlerFilter(String scheme, String host)
 	{
 		this.scheme = scheme;
 		this.host = host;
+		this.cliMap = null;
+	}
+
+	public void addClientMap(String clientAddr, String serverUrl)
+	{
+		if (this.cliMap == null)
+		{
+			this.cliMap = new HashMap<String, String>();
+		}
+		this.cliMap.put(clientAddr, serverUrl);
 	}
 
 	@Override
@@ -41,6 +55,14 @@ public class ForwardHandlerFilter extends GenericFilterBean
 			if (this.host != null)
 			{
 				req.setHost(this.host);
+			}
+			if (this.cliMap != null)
+			{
+				String s = this.cliMap.get(request.getRemoteAddr());
+				if (s != null)
+				{
+					req.setServerUrl(s);
+				}
 			}
 			request = req;
 		}
