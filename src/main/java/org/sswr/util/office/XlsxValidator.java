@@ -455,6 +455,7 @@ public class XlsxValidator {
 		}
 		else if (cell.getCellType() == CellType.BLANK)
 		{
+			this.lastError = this.headers[index] + " is blank";
 			return null;
 		}
 		String v = getCellDisp(index);
