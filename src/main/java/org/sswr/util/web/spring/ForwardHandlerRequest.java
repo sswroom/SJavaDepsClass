@@ -225,7 +225,7 @@ public class ForwardHandlerRequest implements HttpServletRequest {
 	public String getRemoteAddr() {
 		if (this.fwdFor != null)
 		{
-			String forList[] = this.fwdFor.split(",");
+			String forList[] = StringUtil.split(this.fwdFor, ",");
 			return forList[0];
 		}
 		return this.parent.getRemoteAddr();
