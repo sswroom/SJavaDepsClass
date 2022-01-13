@@ -148,33 +148,56 @@ public class LogZipper
 		int j = monthList.length;
 		while (i < j)
 		{
-			if (monthList[i].isDirectory() && monthList[i].getName().charAt(0) != '.')
+			if (monthList[i].isDirectory())
 			{
-				File logFiles[] = monthList[i].listFiles();
-				if (logFiles != null)
+				if (monthList[i].getName().charAt(0) != '.')
 				{
-					int k = 0;
-					int l = logFiles.length;
-					int m;
-					while (k < l)
+					File logFiles[] = monthList[i].listFiles();
+					if (logFiles != null)
 					{
-						m = logFiles[k].getName().indexOf(".");
-						if (m >= 8)
+						int k = 0;
+						int l = logFiles.length;
+						int m;
+						while (k < l)
 						{
-							try
+							m = logFiles[k].getName().indexOf(".");
+							if (m >= 8)
 							{
-								int iDate = Integer.parseInt(logFiles[k].getName().substring(m - 8, m));
-								if (iDate < currDate)
+								try
 								{
-									timeMap.put(iDate, iDate);
+									int iDate = Integer.parseInt(logFiles[k].getName().substring(m - 8, m));
+									if (iDate < currDate)
+									{
+										timeMap.put(iDate, iDate);
+									}
+								}
+								catch (Exception ex)
+								{
+
 								}
 							}
-							catch (Exception ex)
-							{
-
-							}
+							k++;
 						}
-						k++;
+					}
+				}
+			}
+			else if (monthList[i].isFile())
+			{
+				int m;
+				m = monthList[i].getName().indexOf(".");
+				if (m >= 8)
+				{
+					try
+					{
+						int iDate = Integer.parseInt(monthList[i].getName().substring(m - 8, m));
+						if (iDate < currDate)
+						{
+							timeMap.put(iDate, iDate);
+						}
+					}
+					catch (Exception ex)
+					{
+
 					}
 				}
 			}
