@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
@@ -219,27 +220,37 @@ public class LogZipper
 				{
 					long fileLeng = file.length();
 					FileInputStream fis = new FileInputStream(file);
-					ZipEntry e = new ZipEntry(filePath+File.separator+file.getName());
-					zip.putNextEntry(e);
-					opened = true;
-
-					if (fileLeng <= 1048576)
+					ZipEntry e = new ZipEntry(filePath+"/"+file.getName());
+					try
 					{
-						byte fileContent[] = fis.readAllBytes();
-						zip.write(fileContent, 0, fileContent.length);
-					}
-					else
-					{
-						byte fileContent[] = new byte[1048576];
-						int readSize;
-						while ((readSize = fis.read(fileContent, 0, 1048576)) >= 0)
+						zip.putNextEntry(e);
+						opened = true;
+	
+						if (fileLeng <= 1048576)
 						{
-							zip.write(fileContent, 0, readSize);
+							byte fileContent[] = fis.readAllBytes();
+							zip.write(fileContent, 0, fileContent.length);
 						}
+						else
+						{
+							byte fileContent[] = new byte[1048576];
+							int readSize;
+							while ((readSize = fis.read(fileContent, 0, 1048576)) >= 0)
+							{
+								zip.write(fileContent, 0, readSize);
+							}
+						}
+					}
+					catch (ZipException ex)
+					{
+						log.logException(ex);
 					}
 					fis.close();
 
-					file.delete();
+					if (!file.delete())
+					{
+						log.logMessage("Error in deleting file "+file.getAbsolutePath(), LogLevel.ERROR);
+					}
 				}
 			}
 			catch (Exception ex)
