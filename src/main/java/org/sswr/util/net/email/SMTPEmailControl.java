@@ -13,6 +13,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.sswr.util.data.StringUtil;
 import org.sswr.util.io.LogTool;
 
 public class SMTPEmailControl implements EmailControl
@@ -86,7 +87,7 @@ public class SMTPEmailControl implements EmailControl
 		}
 	}
 
-	public boolean isServerValid()
+	public boolean isServerOnline()
 	{
 		Session session;
 		if (this.auth != null)
@@ -118,7 +119,12 @@ public class SMTPEmailControl implements EmailControl
 		}
 	}
 
-	public String testEmail(String toAddress)
+	public boolean validateDestAddr(String addr)
+	{
+		return StringUtil.isEmailAddress(addr);
+	}
+
+	public String sendTestingEmail(String toAddress)
 	{
 		Session session;
 		if (this.auth != null)
