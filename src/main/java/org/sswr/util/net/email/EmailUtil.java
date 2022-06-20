@@ -235,7 +235,7 @@ public class EmailUtil
 		ASN1EncodableVector attributes = new ASN1EncodableVector();
 		attributes.add(new SMIMEEncryptionKeyPreferenceAttribute(
 				new IssuerAndSerialNumber(
-						new X500Name(cert.getIssuerDN().getName()),
+						new X500Name(cert.getIssuerX500Principal().getName()),
 								cert.getSerialNumber())));
 		attributes.add(new SMIMECapabilitiesAttribute(capabilities));
 		
