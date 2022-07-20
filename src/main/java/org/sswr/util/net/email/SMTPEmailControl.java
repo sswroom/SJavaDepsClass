@@ -51,7 +51,7 @@ public class SMTPEmailControl implements EmailControl
 		}
 	}
 
-	public boolean sendMail(EmailTemplate template, String toList, String ccList)
+	public boolean sendMail(EmailMessage msg, String toList, String ccList)
 	{
 		Session session;
 		if (this.auth != null)
@@ -65,8 +65,8 @@ public class SMTPEmailControl implements EmailControl
 		try
 		{
 			MimeMessage message = new MimeMessage(session);
-			message.setSubject(template.getSubject());
-			message.setContent(template.getContent(), "text/html; charset=utf-8");
+			message.setSubject(msg.getSubject());
+			message.setContent(msg.getContent(), "text/html; charset=utf-8");
 			message.setSentDate(new Date(System.currentTimeMillis()));
 			message.setFrom(new InternetAddress(smtpFrom));
 			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toList));
