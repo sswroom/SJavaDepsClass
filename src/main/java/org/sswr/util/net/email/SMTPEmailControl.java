@@ -51,7 +51,7 @@ public class SMTPEmailControl implements EmailControl
 		}
 	}
 
-	public boolean sendMail(EmailTemplate template, String toList)
+	public boolean sendMail(EmailTemplate template, String toList, String ccList)
 	{
 		Session session;
 		if (this.auth != null)
@@ -70,6 +70,10 @@ public class SMTPEmailControl implements EmailControl
 			message.setSentDate(new Date(System.currentTimeMillis()));
 			message.setFrom(new InternetAddress(smtpFrom));
 			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toList));
+			if (ccList != null && ccList.length() > 0)
+			{
+				message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(ccList));
+			}
 			Transport.send(message);
 			return true;
 		}
