@@ -392,7 +392,22 @@ public class GenericSpecification<T> implements Specification<T> {
 					errors.add("GEOMETRY_INTERSECTS is not supported for "+dbType);
 				}
 				break;
-		}
+			case GEOMETRY_DISTANCE_LESS_THAN:
+				if (dbType == DBType.MSSQL)
+				{
+					predicates.add(builder.lessThan(builder.function(criteria.getKey()+".STDistance", Double.class, builder.function("geometry::STGeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), (Double)criteria.getValue2()));
+				}
+				else if (dbType == DBType.MySQL || dbType == DBType.PostgreSQL)
+				{
+					predicates.add(builder.equal(builder.function("ST_Distance", Double.class, root.get(criteria.getKey()).as(Geometry.class), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), (Double)criteria.getValue2()));
+				}
+				else
+				{
+					System.out.println("GEOMETRY_DISTANCE_LESS_THAN is not supported for "+dbType);
+					errors.add("GEOMETRY_DISTANCE_LESS_THAN is not supported for "+dbType);
+				}
+				break;
+	}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			errors.add(ex.getMessage());
