@@ -1,5 +1,7 @@
 package org.sswr.util.io;
 
+import java.time.ZonedDateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +14,7 @@ public class Log4JHandler implements LogHandler
 		this.logger = logger;
 	}
 
-	public void logAdded(long logTime, String logMsg, LogLevel logLev)
+	public void logAdded(ZonedDateTime logTime, String logMsg, LogLevel logLev)
 	{
 		switch (logLev)
 		{
