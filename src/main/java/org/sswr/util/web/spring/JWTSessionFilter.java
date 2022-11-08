@@ -59,8 +59,13 @@ public class JWTSessionFilter extends GenericFilterBean
 			if (sess == null)
 			{
 				Map<String, Object> params = HttpUtil.parseParams(req, null);
-				Object token;;
-				if ((token = params.get("Token")) != null || (token = params.get("token")) != null)
+				Object token;
+				token = params.get("Token");
+				if (token == null)
+				{
+					token = params.get("token");
+				}
+				if (token != null)
 				{
 					sess = this.sessMgr.getSession(token.toString());
 				}
