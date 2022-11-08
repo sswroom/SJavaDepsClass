@@ -3,7 +3,6 @@ package org.sswr.util.net.email;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Date;
 import java.util.Properties;
 
 import javax.mail.Authenticator;
@@ -17,6 +16,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.sswr.util.data.DateTimeUtil;
 import org.sswr.util.data.StringUtil;
 import org.sswr.util.io.LogTool;
 
@@ -70,7 +70,7 @@ public class SMTPEmailControl implements EmailControl
 		{
 			MimeMessage message = new MimeMessage(session);
 			message.setSubject(msg.getSubject());
-			message.setSentDate(new Date(System.currentTimeMillis()));
+			message.setSentDate(DateTimeUtil.timestampNow());
 			message.setFrom(new InternetAddress(smtpFrom));
 			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toList));
 			if (ccList != null && ccList.length() > 0)
@@ -184,7 +184,7 @@ public class SMTPEmailControl implements EmailControl
 			MimeMessage message = new MimeMessage(session);
 			message.setSubject("Email Testing");
 			message.setContent("This is a test email", "text/html; charset=utf-8");
-			message.setSentDate(new Date(System.currentTimeMillis()));
+			message.setSentDate(DateTimeUtil.timestampNow());
 			message.setFrom(new InternetAddress(smtpFrom));
 			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toAddress));
 			Transport.send(message);
