@@ -1014,9 +1014,12 @@ public class XlsxUtil {
 			bottomAxis = chart.createValueAxis(AxisPosition.BOTTOM);
 			break;
 		}
-		if (bottomAxisName != null) bottomAxis.setTitle(bottomAxisName);
-		bottomAxis.getOrAddShapeProperties().setLineProperties(new XDDFLineProperties(new XDDFSolidFillProperties(XDDFColor.from(PresetColor.BLACK))));
-		bottomAxis.setTickLabelPosition(AxisTickLabelPosition.LOW);
+		if (bottomAxis != null)
+		{
+			if (bottomAxisName != null) bottomAxis.setTitle(bottomAxisName);
+			bottomAxis.getOrAddShapeProperties().setLineProperties(new XDDFLineProperties(new XDDFSolidFillProperties(XDDFColor.from(PresetColor.BLACK))));
+			bottomAxis.setTickLabelPosition(AxisTickLabelPosition.LOW);
+		}
 		return (XDDFLineChartData)chart.createData(ChartTypes.LINE, bottomAxis, leftAxis);
 	}
 
