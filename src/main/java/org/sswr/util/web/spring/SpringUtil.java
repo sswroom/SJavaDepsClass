@@ -9,9 +9,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
+import org.sswr.util.data.StringUtil;
 
 public class SpringUtil {
-	public static Pageable createPageable(HttpServletRequest req)
+	public static Pageable createPageable(HttpServletRequest req, String defSort)
 	{
 		String s;
 		int page = 0;
@@ -39,34 +40,60 @@ public class SpringUtil {
 			}
 		}
 		String sarr[] = req.getParameterValues("sort");
-		if (sarr != null)
+		if (sarr != null || defSort != null)
 		{
 			List<Order> orders = new ArrayList<Order>();
-			int i = 0;
-			int j = sarr.length;
-			int k;
-			while (i < j)
+			if (sarr != null)
 			{
-				if (sarr[i].length() > 0)
+				int i = 0;
+				int j = sarr.length;
+				int k;
+				while (i < j)
 				{
-					k = sarr[i].indexOf(",");
-					if (k > 0)
+					if (sarr[i].length() > 0)
 					{
-						if (sarr[i].toUpperCase().endsWith(",DESC"))
+						k = sarr[i].indexOf(",");
+						if (k > 0)
 						{
-							orders.add(Order.desc(sarr[i].substring(0, k)));
+							if (sarr[i].toUpperCase().endsWith(",DESC"))
+							{
+								orders.add(Order.desc(sarr[i].substring(0, k)));
+							}
+							else
+							{
+								orders.add(Order.asc(sarr[i].substring(0, k)));
+							}
 						}
 						else
 						{
-							orders.add(Order.asc(sarr[i].substring(0, k)));
+							orders.add(Order.asc(sarr[i]));
 						}
+					}
+					i++;
+				}
+			}
+			if (defSort != null)
+			{
+				sarr = StringUtil.split(defSort, ",");
+				int i = 0;
+				int j = sarr.length;
+				while (i < j)
+				{
+					s = sarr[i].toUpperCase();
+					if (s.endsWith(" ASC"))
+					{
+						orders.add(Order.asc(sarr[i].substring(0, s.length() - 4)));
+					}
+					else if (s.endsWith(" DESC"))
+					{
+						orders.add(Order.desc(sarr[i].substring(0, s.length() - 5)));
 					}
 					else
 					{
 						orders.add(Order.asc(sarr[i]));
 					}
+					i++;
 				}
-				i++;
 			}
 			return PageRequest.of(page, size, Sort.by(orders));
 		}
@@ -74,5 +101,10 @@ public class SpringUtil {
 		{
 			return PageRequest.of(page, size);
 		}
+	}
+
+	public static Pageable createPageable(HttpServletRequest req)
+	{
+		return createPageable(req, null);
 	}
 }
