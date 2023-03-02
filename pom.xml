@@ -9,9 +9,9 @@
 	<description>Utilities with Dependency</description>
 
 	<properties>
-		<java.version>11</java.version>
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
+		<java.version>17</java.version>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<apache.poi.version>5.2.2</apache.poi.version>
 		<spring.data.version>2.7.2</spring.data.version>
