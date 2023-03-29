@@ -13,13 +13,13 @@ public class SearchCriteria {
 	private Object value2;
     private SearchOperation operation;
 
-    public SearchCriteria(String key, Object value, SearchOperation operation) {
+    private SearchCriteria(String key, Object value, SearchOperation operation) {
         this.key = key;
         this.value = value;
         this.operation = operation;
     }
 
-    public SearchCriteria(String key, Object value, Object value2, SearchOperation operation) {
+    private SearchCriteria(String key, Object value, Object value2, SearchOperation operation) {
         this.key = key;
         this.value = value;
 		this.value2 = value2;
@@ -118,6 +118,20 @@ public class SearchCriteria {
 		return new SearchCriteria(fieldName, value, SearchOperation.LESS_THAN);
 	}
 
+	public static SearchCriteria joinTextMatches(String fieldName, String textLikes, String[] textColumns)
+	{
+		return new SearchCriteria(fieldName, textLikes, textColumns, SearchOperation.JOIN_MATCH);
+	}
+
+	public static SearchCriteria joinWithFilter(String fieldName, List<SearchCriteria> filters)
+	{
+		return new SearchCriteria(fieldName, filters, SearchOperation.JOIN_FILTER);
+	}
+
+	public static SearchCriteria dateIntersect(String fieldNames, Timestamp[] values)
+	{
+		return new SearchCriteria(fieldNames, values, SearchOperation.DATE_RANGE_INTERSECT);
+	}
 
 	public static SearchCriteria geometryInside(String fieldName, String wktString) throws ParseException
 	{

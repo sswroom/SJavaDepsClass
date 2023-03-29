@@ -2,11 +2,13 @@ package org.sswr.util.web.spring;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
@@ -50,7 +52,7 @@ public class GenericSpecification<T> implements Specification<T> {
         orList.add(criteria);
     }
 
-	private void parseSearchCriteria(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder builder, List<Predicate> predicates, SearchCriteria criteria)
+	private void parseSearchCriteria(From<?, ?> root, CriteriaQuery<?> query, CriteriaBuilder builder, List<Predicate> predicates, SearchCriteria criteria)
 	{
 		try
 		{
@@ -142,6 +144,36 @@ public class GenericSpecification<T> implements Specification<T> {
 					}
 				}
 				break;
+			case DATE_RANGE_INTERSECT:
+				{
+					//jpa spec cannot use NOT case as : stackoverflow.com/questions/14208958/select-data-from-date-range-between-two-dates
+					String[] dateColName 	= criteria.getKey().split(",");
+					String colDateFrom		= dateColName[0];
+					String colDateTo		= dateColName[1];
+					Timestamp[] dateRange 	= (Timestamp[]) criteria.getValue();
+					Timestamp dtFrom 		= dateRange[0];
+					Timestamp dtTo 			= dateRange[1];
+					predicates.add(
+							builder.or(
+									new Predicate[]{
+											builder.or(builder.and(new Predicate[]{
+													builder.greaterThanOrEqualTo(root.get(colDateFrom).as(Timestamp.class),Timestamp.valueOf(dtFrom.toString()))
+													,builder.lessThanOrEqualTo(root.get(colDateFrom).as(Timestamp.class),Timestamp.valueOf(dtTo.toString()))
+											}))
+											, builder.or(builder.and(new Predicate[]{
+													builder.greaterThanOrEqualTo(root.get(colDateTo).as(Timestamp.class),Timestamp.valueOf(dtFrom.toString()))
+													,builder.lessThanOrEqualTo(root.get(colDateTo).as(Timestamp.class),Timestamp.valueOf(dtTo.toString()))
+											}))
+											, builder.or(builder.and(new Predicate[]{
+													builder.lessThanOrEqualTo(root.get(colDateFrom).as(Timestamp.class),Timestamp.valueOf(dtFrom.toString()))
+													,builder.greaterThanOrEqualTo(root.get(colDateTo).as(Timestamp.class),Timestamp.valueOf(dtTo.toString()))
+											}))
+									}
+							)
+					);
+
+				}
+			break;
 			//SubQuery: support textMatch and dateRange Only
 			case EXIST:
 				{
@@ -339,23 +371,35 @@ public class GenericSpecification<T> implements Specification<T> {
 			//SubQuery: support textMatch and dateRange Only
 			case JOIN_MATCH:
 				{
-					@SuppressWarnings("unchecked")
-					Map<String, String[]> joinCriteria = (Map<String, String[]>) criteria.getValue();
-
-					String joinField = joinCriteria.get("joinField")[0];
-					String joinValue = "%" + joinCriteria.get("joinValue")[0] + "%";
-					String[] joinColumns = (String[]) joinCriteria.get("joinColumns");
-					Join<Object, Object> landmarks = root.join(joinField, JoinType.LEFT);
+					String joinField = criteria.getKey();
+					String joinValue = "%" + criteria.getValue().toString() + "%";
+					String[] joinColumns = (String[]) criteria.getValue2();
+					Join<Object, Object> joinObj = root.join(joinField, JoinType.LEFT);
 
 
 					List<Predicate> joinOrPredicates = new ArrayList<>();
 					for (String colName : joinColumns) {
-						joinOrPredicates.add(builder.like(landmarks.get(colName), joinValue));
+						joinOrPredicates.add(builder.like(joinObj.get(colName), joinValue));
 					}
 					predicates.add(builder.or(joinOrPredicates.toArray(new Predicate[0])));
-
-					//Join may cause duplicate reocrd, make distinct
 					isDistinct = true;
+				}
+				break;
+			case JOIN_FILTER:
+				 {
+					String joinField = criteria.getKey();
+					Join<Object, Object> joinObj = root.join(joinField, JoinType.LEFT);
+					@SuppressWarnings("unchecked")
+					List<SearchCriteria> joinParams = (List<SearchCriteria>)criteria.getValue();
+
+					List<Predicate> joinPredicates = new ArrayList<>();
+					Iterator<SearchCriteria> itCriteria = joinParams.iterator();
+					while (itCriteria.hasNext())
+					{
+						parseSearchCriteria(joinObj, query, builder, joinPredicates, itCriteria.next());
+					}
+					predicates.add(builder.and(joinPredicates.toArray(new Predicate[0])));
+					this.isDistinct = true;
 				}
 				break;
 			case SUBQFIELDMATCH:
@@ -407,7 +451,7 @@ public class GenericSpecification<T> implements Specification<T> {
 					errors.add("GEOMETRY_DISTANCE_LESS_THAN is not supported for "+dbType);
 				}
 				break;
-	}
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			errors.add(ex.getMessage());
