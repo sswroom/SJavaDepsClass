@@ -3,6 +3,7 @@ package org.sswr.util.net.email;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Authenticator;
@@ -129,6 +130,11 @@ public class SMTPEmailControl implements EmailControl
 			}
 			return false;
 		}
+	}
+
+	public boolean sendBatchMail(EmailMessage msg, List<String> toList)
+	{
+		return sendMail(msg, StringUtil.join(toList, ","), null);
 	}
 
 	public boolean isServerOnline()
