@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	
-	<groupId>org.sswr</groupId>
+	<groupId>io.github.sswroom</groupId>
 	<artifactId>util-deps</artifactId>
 	<version>0.1</version>
 	<name>util-deps</name>
@@ -43,6 +43,12 @@
 			<groupId>com.sun.mail</groupId>
 			<artifactId>javax.mail</artifactId>
 			<version>1.5.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.github.sswroom</groupId>
+			<artifactId>util</artifactId>
+			<version>0.1</version>
 		</dependency>
 
 		<dependency>
@@ -119,12 +125,6 @@
 			<version>5.5.2</version>
 		</dependency>
 		
-		<dependency>
-			<groupId>org.sswr</groupId>
-			<artifactId>util</artifactId>
-			<version>0.1</version>
-		</dependency>
-
 	</dependencies>
 
 	<build>
