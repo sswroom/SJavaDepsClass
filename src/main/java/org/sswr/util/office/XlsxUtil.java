@@ -412,7 +412,7 @@ public class XlsxUtil {
 				return style.getFillBackgroundColor();
 			}
 		case SP_FONT:
-			return style.getFontIndexAsInt();
+			return style.getFontIndex();
 		case SP_HIDDEN:
 			return style.getHidden();
 		case SP_INDENTION:
