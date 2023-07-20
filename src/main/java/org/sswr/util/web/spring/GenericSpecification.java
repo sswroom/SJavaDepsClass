@@ -120,7 +120,7 @@ public class GenericSpecification<T> implements Specification<T> {
 				break;
 			case NOT_IN:
 				predicates.add(
-						builder.not(root.get(criteria.getKey())).in(criteria.getValue()));
+					builder.in(root.get(criteria.getKey())).value(criteria.getValue()).not());
 				break;
 			case DATE_AFTER:
 				predicates.add(
