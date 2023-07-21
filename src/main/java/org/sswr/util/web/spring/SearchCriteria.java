@@ -103,6 +103,11 @@ public class SearchCriteria {
 		return new SearchCriteria(fieldName, valList, SearchOperation.IN);
 	}
 
+	public static <T> SearchCriteria notIn(String fieldName, List<T> valList)
+	{
+		return new SearchCriteria(fieldName, valList, SearchOperation.NOT_IN);
+	}
+
 	public static SearchCriteria isNull(String fieldName)
 	{
 		return new SearchCriteria(fieldName, null, SearchOperation.IS_NULL);
