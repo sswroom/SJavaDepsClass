@@ -118,9 +118,19 @@ public class SearchCriteria {
 		return new SearchCriteria(fieldName, value, SearchOperation.GREATER_THAN);
 	}
 
+	public static SearchCriteria greaterThanEqual(String fieldName, int value)
+	{
+		return new SearchCriteria(fieldName, value, SearchOperation.GREATER_THAN_EQUAL);
+	}
+
 	public static SearchCriteria lessThan(String fieldName, int value)
 	{
 		return new SearchCriteria(fieldName, value, SearchOperation.LESS_THAN);
+	}
+
+	public static SearchCriteria lessThanEqual(String fieldName, int value)
+	{
+		return new SearchCriteria(fieldName, value, SearchOperation.LESS_THAN_EQUAL);
 	}
 
 	public static SearchCriteria joinTextMatches(String fieldName, String textLikes, String[] textColumns)
