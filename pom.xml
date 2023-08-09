@@ -17,6 +17,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<apache.poi.version>5.2.2</apache.poi.version>
 		<spring.data.version>2.7.2</spring.data.version>
+		<spring.security.version>5.8.5</spring.security.version>
 	</properties>
 
 	<dependencies>
@@ -121,8 +122,14 @@
 
 		<dependency>
 			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
-			<version>5.5.2</version>
+			<version>${spring.security.version}</version>
 		</dependency>
 		
 	</dependencies>
