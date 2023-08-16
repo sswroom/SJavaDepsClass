@@ -14,42 +14,75 @@ import java.util.Set;
 import org.sswr.util.data.DataTools;
 import org.sswr.util.data.DateTimeUtil;
 import org.sswr.util.data.StringUtil;
-
+import org.sswr.util.io.StreamUtil;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public class XlsxValidator {
-	XSSFWorkbook wb;
-	XSSFSheet sheet;
-	String headers[];
-	String lastError;
-	boolean fileValid;
-	int headerRow;
-	int nextRowInd;
-	XSSFRow currRow;
-	boolean trimStr;
+	private Workbook wb;
+	private Sheet sheet;
+	private String headers[];
+	private String lastError;
+	private boolean fileValid;
+	private int headerRow;
+	private int nextRowInd;
+	private Row currRow;
+	private boolean trimStr;
 
 	public XlsxValidator(InputStream stm, String headers[])
 	{
-		this(stm, headers, 0);
+		this(stm, headers, 0, false);
 	}
 
 	public XlsxValidator(InputStream stm, String headers[], int headerRow)
 	{
+		this(stm, headers, headerRow, false);
+	}
+
+	public XlsxValidator(InputStream stm, String headers[], int headerRow, boolean supportXls)
+	{
+		this.fileValid = false;
+		this.lastError = null;
+		this.headers = headers;
+		this.trimStr = false;
+		this.headerRow = headerRow;
 		try
 		{
-			this.fileValid = false;
-			this.lastError = null;
-			this.headers = headers;
-			this.trimStr = false;
-			this.headerRow = headerRow;
 			this.wb = new XSSFWorkbook(stm);
+		}
+		catch (IOException ex)
+		{
+			this.lastError = "File not found";
+			return;
+		}
+		catch (Exception ex)
+		{
+			this.lastError = "File is not Xlsx";
+		}
+		if (this.wb == null && supportXls)
+		{
+			try
+			{
+				StreamUtil.seekFromBeginning(stm, 0);
+				this.wb = new HSSFWorkbook(stm);
+			}
+			catch (Exception ex)
+			{
+				ex.printStackTrace();
+				this.lastError = "File is not Xlsx or Xls";
+			}
+		}
+
+		if (this.wb != null)
+		{
 			this.sheet = wb.getSheetAt(0);
 			if (this.sheet == null)
 			{
@@ -57,8 +90,8 @@ public class XlsxValidator {
 				return;
 			}
 
-			XSSFRow row = this.sheet.getRow(headerRow);
-			XSSFCell cell;
+			Row row = this.sheet.getRow(headerRow);
+			Cell cell;
 			if (row == null)
 			{
 				this.lastError = "Header row not found";
@@ -82,10 +115,6 @@ public class XlsxValidator {
 			this.nextRowInd = this.headerRow + 1;
 			this.fileValid = true;
 		}
-		catch (IOException ex)
-		{
-			this.lastError = "File is not Xlsx";
-		}
 	}
 
 	public boolean orHeaders(String headers[])
@@ -100,8 +129,8 @@ public class XlsxValidator {
 			return false;
 		}
 
-		XSSFRow row = this.sheet.getRow(this.headerRow);
-		XSSFCell cell;
+		Row row = this.sheet.getRow(this.headerRow);
+		Cell cell;
 		if (row == null)
 		{
 			this.lastError = "Header row not found";
@@ -156,7 +185,7 @@ public class XlsxValidator {
 			return true;
 		if (index < 0 || index >= this.headers.length)
 			return true;
-		XSSFCell cell = this.currRow.getCell(index);
+		Cell cell = this.currRow.getCell(index);
 		return cell == null || cell.getCellType() == CellType.BLANK;
 	}
 
@@ -166,7 +195,7 @@ public class XlsxValidator {
 			return null;
 		if (index < 0 || index >= this.headers.length)
 			return null;
-		XSSFCell cell = this.currRow.getCell(index);
+		Cell cell = this.currRow.getCell(index);
 		if (cell == null)
 		{
 			this.lastError = this.headers[index] + " is required";
@@ -190,7 +219,7 @@ public class XlsxValidator {
 			return null;
 		if (index < 0 || index >= this.headers.length)
 			return null;
-		XSSFCell cell = this.currRow.getCell(index);
+		Cell cell = this.currRow.getCell(index);
 		if (cell == null)
 		{
 			this.lastError = this.headers[index] + " is required";
@@ -224,7 +253,7 @@ public class XlsxValidator {
 			return null;
 		if (index < 0 || index >= this.headers.length)
 			return null;
-		XSSFCell cell = this.currRow.getCell(index);
+		Cell cell = this.currRow.getCell(index);
 		if (cell == null)
 		{
 			this.lastError = this.headers[index] + " is required";
@@ -247,9 +276,9 @@ public class XlsxValidator {
 		return str;
 	}
 
-	private static String getCellAsString(XSSFRow row, int index)
+	private static String getCellAsString(Row row, int index)
 	{
-		XSSFCell cell = row.getCell(index);
+		Cell cell = row.getCell(index);
 		if (cell == null)
 		{
 			return null;
@@ -290,7 +319,7 @@ public class XlsxValidator {
 			return null;
 		if (index < 0 || index >= this.headers.length)
 			return null;
-		XSSFCell cell = this.currRow.getCell(index);
+		Cell cell = this.currRow.getCell(index);
 		if (cell == null)
 		{
 			this.lastError = this.headers[index] + " is required";
@@ -343,7 +372,7 @@ public class XlsxValidator {
 			return null;
 		if (index < 0 || index >= this.headers.length)
 			return null;
-		XSSFCell cell = this.currRow.getCell(index);
+		Cell cell = this.currRow.getCell(index);
 		if (cell != null && cell.getCellType() == CellType.FORMULA)
 		{
 			FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
@@ -436,7 +465,7 @@ public class XlsxValidator {
 
 	public Timestamp getCellTimestamp(int index)
 	{
-		XSSFCell cell = this.currRow.getCell(index);
+		Cell cell = this.currRow.getCell(index);
 		if (cell == null)
 		{
 			this.lastError = this.headers[index] + " is required";
