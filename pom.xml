@@ -9,6 +9,7 @@
 	<name>util-deps</name>
 	<packaging>jar</packaging>
 	<description>Utilities with Dependency</description>
+	<url>https://github.com/sswroom/SJavaDepsClass</url>
 
 	<properties>
 		<java.version>17</java.version>
