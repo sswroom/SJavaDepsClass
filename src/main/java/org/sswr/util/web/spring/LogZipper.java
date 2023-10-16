@@ -24,6 +24,7 @@ import org.sswr.util.io.Log4JHandler;
 import org.sswr.util.io.LogLevel;
 import org.sswr.util.io.LogTool;
 import org.sswr.util.web.ProjectConfig;
+import org.sswr.util.web.ProjectPathSetting;
 
 @Component
 public class LogZipper
@@ -56,12 +57,12 @@ public class LogZipper
 	{
 		HashMap<Integer, Integer> timeMap = new HashMap<Integer, Integer>();
 		int iDate = this.lastExecYear * 10000 + this.lastExecMonth * 100 + this.lastExecDay;
-		List<String> logPaths = cfg.getLogPathsToZip();
+		List<ProjectPathSetting> logPaths = cfg.getLogPathsToZip();
 		int i = 0;
 		int j = logPaths.size();
 		while (i < j)
 		{
-			File logDir = new File(FileUtil.getRealPath(logPaths.get(i), false));
+			File logDir = new File(FileUtil.getRealPath(logPaths.get(i).getPath(), false));
 			logFindDates(timeMap, logDir, iDate);
 			i++;
 		}
@@ -124,8 +125,9 @@ public class LogZipper
 				i = 0;
 				while (i < j)
 				{
-					File logDir = new File(FileUtil.getRealPath(logPaths.get(i), false));
-					logZipDate(out, logDir, fileDate);
+					ProjectPathSetting setting = logPaths.get(i);
+					File logDir = new File(FileUtil.getRealPath(setting.getPath(), false));
+					logZipDate(out, logDir, fileDate, setting.isNeedDelete());
 					i++;
 				}
 	
@@ -206,7 +208,7 @@ public class LogZipper
 		}
 	}
 
-	private void logZipDateFile(ZipOutputStream zip, File file, int fileDate, String filePath)
+	private void logZipDateFile(ZipOutputStream zip, File file, int fileDate, String filePath, boolean needDelete)
 	{
 		int m;
 		m = file.getName().indexOf(".");
@@ -247,7 +249,7 @@ public class LogZipper
 					}
 					fis.close();
 
-					if (!file.delete())
+					if (needDelete && !file.delete())
 					{
 						log.logMessage("Error in deleting file "+file.getAbsolutePath(), LogLevel.ERROR);
 					}
@@ -271,7 +273,7 @@ public class LogZipper
 		}
 	}
 
-	public void logZipDate(ZipOutputStream zip, File fileDir, int fileDate)
+	public void logZipDate(ZipOutputStream zip, File fileDir, int fileDate, boolean needDelete)
 	{
 		File monthList[] = fileDir.listFiles();
 		if (monthList == null)
@@ -291,7 +293,7 @@ public class LogZipper
 					int l = logFiles.length;
 					while (k < l)
 					{
-						logZipDateFile(zip, logFiles[k], fileDate, fileDir.getName());
+						logZipDateFile(zip, logFiles[k], fileDate, fileDir.getName(), needDelete);
 						k++;
 					}
 
@@ -300,7 +302,7 @@ public class LogZipper
 			}
 			else if (monthList[i].isFile())
 			{
-				logZipDateFile(zip, monthList[i], fileDate, fileDir.getName());
+				logZipDateFile(zip, monthList[i], fileDate, fileDir.getName(), needDelete);
 			}
 			i++;
 		}

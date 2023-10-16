@@ -223,7 +223,7 @@ public class EmailUtil
 	}
 
 	public static MimeMessage signEmail(MimeMessage msg, X509Certificate cert, PrivateKey key)
-	{		
+	{
 		Properties props = System.getProperties();
 		Session session = Session.getDefaultInstance(props, null);
 

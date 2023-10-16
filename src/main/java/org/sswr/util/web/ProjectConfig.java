@@ -6,7 +6,7 @@ public abstract class ProjectConfig
 {
 	public abstract boolean enableOTP();
 	public abstract boolean enableLogZipper();
-	public abstract List<String> getLogPathsToZip();
+	public abstract List<ProjectPathSetting> getLogPathsToZip();
 	public abstract String getLogZipPath();
 	
 }
