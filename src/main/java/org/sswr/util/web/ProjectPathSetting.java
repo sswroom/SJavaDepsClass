@@ -2,18 +2,18 @@ package org.sswr.util.web;
 
 public class ProjectPathSetting {
     private String path;
-    private boolean needDelete;
+    private boolean deleteAfterProcess;
     
     public ProjectPathSetting(String path)
     {
         this.path = path;
-        this.needDelete = true;
+        this.deleteAfterProcess = true;
     }
 
-    public ProjectPathSetting(String path, boolean needDelete)
+    public ProjectPathSetting(String path, boolean deleteAfterProcess)
     {
         this.path = path;
-        this.needDelete = needDelete;
+        this.deleteAfterProcess = deleteAfterProcess;
     }
 
     public String getPath()
@@ -21,8 +21,8 @@ public class ProjectPathSetting {
         return this.path;
     }
 
-    public boolean isNeedDelete()
+    public boolean isDeleteAfterProcess()
     {
-        return this.needDelete;
+        return this.deleteAfterProcess;
     }
 }

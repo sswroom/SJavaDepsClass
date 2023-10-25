@@ -5,7 +5,7 @@
 	
 	<groupId>io.github.sswroom</groupId>
 	<artifactId>util-deps</artifactId>
-	<version>0.2.20231018</version>
+	<version>0.2.20231025</version>
 	<name>util-deps</name>
 	<packaging>jar</packaging>
 	<description>Utilities with Dependency</description>

@@ -127,7 +127,7 @@ public class LogZipper
 				{
 					ProjectPathSetting setting = logPaths.get(i);
 					File logDir = new File(FileUtil.getRealPath(setting.getPath(), false));
-					logZipDate(out, logDir, fileDate, setting.isNeedDelete());
+					logZipDate(out, logDir, fileDate, setting);
 					i++;
 				}
 	
@@ -208,7 +208,7 @@ public class LogZipper
 		}
 	}
 
-	private void logZipDateFile(ZipOutputStream zip, File file, int fileDate, String filePath, boolean needDelete)
+	private void logZipDateFile(ZipOutputStream zip, File file, int fileDate, String filePath, ProjectPathSetting setting)
 	{
 		int m;
 		m = file.getName().indexOf(".");
@@ -249,9 +249,18 @@ public class LogZipper
 					}
 					fis.close();
 
-					if (needDelete && !file.delete())
+					if (setting.isDeleteAfterProcess())
 					{
-						log.logMessage("Error in deleting file "+file.getAbsolutePath(), LogLevel.ERROR);
+						if (!file.delete())
+							log.logMessage("Error in deleting file "+file.getAbsolutePath(), LogLevel.ERROR);
+					}
+					else
+					{
+						LogZipperEventHandler evtHdlr = cfg.getLogZipperEventHandler();
+						if (evtHdlr != null)
+						{
+							evtHdlr.processedNonDeleteFile(setting, file);
+						}
 					}
 				}
 			}
@@ -273,7 +282,7 @@ public class LogZipper
 		}
 	}
 
-	public void logZipDate(ZipOutputStream zip, File fileDir, int fileDate, boolean needDelete)
+	public void logZipDate(ZipOutputStream zip, File fileDir, int fileDate, ProjectPathSetting setting)
 	{
 		File monthList[] = fileDir.listFiles();
 		if (monthList == null)
@@ -293,7 +302,7 @@ public class LogZipper
 					int l = logFiles.length;
 					while (k < l)
 					{
-						logZipDateFile(zip, logFiles[k], fileDate, fileDir.getName(), needDelete);
+						logZipDateFile(zip, logFiles[k], fileDate, fileDir.getName(), setting);
 						k++;
 					}
 
@@ -302,7 +311,7 @@ public class LogZipper
 			}
 			else if (monthList[i].isFile())
 			{
-				logZipDateFile(zip, monthList[i], fileDate, fileDir.getName(), needDelete);
+				logZipDateFile(zip, monthList[i], fileDate, fileDir.getName(), setting);
 			}
 			i++;
 		}
