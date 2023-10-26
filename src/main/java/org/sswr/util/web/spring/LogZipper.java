@@ -132,6 +132,11 @@ public class LogZipper
 				}
 	
 				out.close();
+				LogZipperEventHandler evtHdlr = cfg.getLogZipperEventHandler();
+				if (evtHdlr != null)
+				{
+					evtHdlr.zipFinished(zipFile);
+				}
 			}
 			catch (IOException ex)
 			{

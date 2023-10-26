@@ -7,4 +7,5 @@ import org.sswr.util.web.ProjectPathSetting;
 public interface LogZipperEventHandler
 {
 	public void processedNonDeleteFile(ProjectPathSetting setting, File file);
+	public void zipFinished(File zipFile);
 }
