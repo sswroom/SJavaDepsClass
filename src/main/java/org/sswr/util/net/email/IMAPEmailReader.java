@@ -10,7 +10,7 @@ import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Store;
 
-public class IMAPEmailReader
+public class IMAPEmailReader implements EmailReader
 {
 	private Properties props;
 	private Authenticator auth;
