@@ -44,20 +44,17 @@ public class POP3EmailReader implements EmailReader
 			this.props.put("mail.pop3.ssl.socketFactory", ssl.getSocketFactory());
 		else
 			this.props.put("mail.pop3.ssl.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		this.props.put("mail.pop3.socketFactory.fallback", "false");
+		this.props.put("mail.pop3.socketFactory.port", String.valueOf(port));
+		this.props.put("mail.pop3.ssl.protocols", "TLSv1.2");
 		if (connType == ConnType.SSL)
 		{
 	        this.props.put("mail.store.protocol", "pop3s");
-			this.props.put("mail.pop3.socketFactory.fallback", "false");
-			this.props.put("mail.pop3.socketFactory.port", String.valueOf(port));
-			this.props.put("mail.pop3.ssl.protocols", "TLSv1.2");
 			this.props.put("mail.pop3.ssl.enable", true);
 		}
 		else if (connType == ConnType.STARTTLS)
 		{
 	        this.props.put("mail.store.protocol", "pop3");
-			this.props.put("mail.pop3.socketFactory.fallback", "false");
-			this.props.put("mail.pop3.socketFactory.port", String.valueOf(port));
-			this.props.put("mail.pop3.ssl.protocols", "TLSv1.2");
 			this.props.put("mail.pop3.starttls.required", true);
 			this.props.put("mail.pop3.starttls.enable", true);
 		}
