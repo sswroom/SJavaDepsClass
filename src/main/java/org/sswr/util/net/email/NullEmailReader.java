@@ -7,12 +7,12 @@ public class NullEmailReader implements EmailReader
 
     @Override
     public boolean open() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean openFolder(String folderName) {
-        return false;
+        return true;
     }
 
     @Override
@@ -25,6 +25,6 @@ public class NullEmailReader implements EmailReader
 
     @Override
     public Message[] getMessages() {
-        return null;
+        return new Message[0];
     }
 }

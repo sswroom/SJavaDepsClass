@@ -1,6 +1,5 @@
 package org.sswr.util.net.email;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
@@ -8,14 +7,11 @@ import java.util.Properties;
 
 import javax.mail.Authenticator;
 import javax.mail.Message;
-import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 
 import org.sswr.util.data.DateTimeUtil;
 import org.sswr.util.data.StringUtil;
@@ -69,52 +65,7 @@ public class SMTPEmailControl implements EmailControl
 		}
 		try
 		{
-			MimeMessage message = new MimeMessage(session);
-			message.setSubject(msg.getSubject());
-			message.setSentDate(DateTimeUtil.timestampNow());
-			message.setFrom(new InternetAddress(smtpFrom));
-			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toList));
-			if (ccList != null && ccList.length() > 0)
-			{
-				message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(ccList));
-			}
-			int i = 0;
-			int j = msg.getAttachmentCount();
-			if (j <= 0)
-			{
-				message.setContent(msg.getContent(), "text/html; charset=utf-8");
-			}
-			else
-			{
-				Multipart multipart = new MimeMultipart();
-				MimeBodyPart part;
-				part = new MimeBodyPart();
-				part.setContent(msg.getContent(), "text/html; charset=utf-8");
-				multipart.addBodyPart(part);
-				while (i < j)
-				{
-					part = new MimeBodyPart();
-					try
-					{
-						part.attachFile(msg.getAttachment(i));
-						multipart.addBodyPart(part);
-					}
-					catch (IOException ex)
-					{
-						if (this.logger != null)
-						{
-							this.logger.logException(ex);
-						}
-						else
-						{
-							ex.printStackTrace();
-						}
-						return false;
-					}
-					i++;
-				}
-				message.setContent(multipart);
-			}
+			MimeMessage message = EmailUtil.createMimeMessage(session, msg, smtpFrom, toList, ccList);
 			Transport.send(message);
 			return true;
 		}

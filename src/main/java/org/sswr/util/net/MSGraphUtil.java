@@ -3,7 +3,8 @@ package org.sswr.util.net;
 import java.sql.Timestamp;
 import java.util.Map;
 
-import org.sswr.util.data.DataTools;
+import javax.annotation.Nonnull;
+
 import org.sswr.util.data.JSONBase;
 import org.sswr.util.data.SharedInt;
 import org.sswr.util.io.LogLevel;
@@ -19,11 +20,15 @@ public class MSGraphUtil
         public String accessToken;
     }
 
-    public static AccessTokenResult getApplicationAccessToken(LogTool log, String tenantId, String clientId, String clientSecret)
+    public static AccessTokenResult getApplicationAccessToken(LogTool log, @Nonnull String tenantId, @Nonnull String clientId, @Nonnull String clientSecret, String scope)
     {
         String url = "https://login.microsoftonline.com/"+tenantId+"/oauth2/v2.0/token";
         SharedInt statusCode = new SharedInt();
-        String s = HTTPMyClient.formPostAsString(url, Map.of("client_id", clientId, "scope", "api://"+clientId+"/.default", "client_secret", clientSecret, "grant_type", "client_credentials"), statusCode, 5000);
+        if (scope == null)
+        {
+            scope = "https://graph.microsoft.com/.default";
+        }
+        String s = HTTPMyClient.formPostAsString(url, Map.of("client_id", clientId, "scope", scope, "client_secret", clientSecret, "grant_type", "client_credentials"), statusCode, 5000);
         if (s != null && statusCode.value == 200)
         {
             AccessTokenResult token = new AccessTokenResult();
@@ -33,8 +38,6 @@ public class MSGraphUtil
             token.expiresIn = new Timestamp(t + json.getValueAsInt32("expires_in") * 1000);
             token.extExpiresIn = new Timestamp(t + json.getValueAsInt32("ext_expires_in") * 1000);
             token.accessToken = json.getValueString("access_token");
-            System.out.println(s);
-            System.out.println(DataTools.toJSONString(token));
             return token;
         }
         if (log != null)

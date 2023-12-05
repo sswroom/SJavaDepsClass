@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import javax.annotation.Nonnull;
 import javax.mail.BodyPart;
 import javax.mail.Header;
 import javax.mail.Message;
@@ -23,6 +24,8 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
@@ -50,6 +53,7 @@ import org.bouncycastle.mail.smime.SMIMESignedGenerator;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.Selector;
 import org.bouncycastle.util.Store;
+import org.sswr.util.data.DateTimeUtil;
 
 public class EmailUtil
 {
@@ -281,5 +285,62 @@ public class EmailUtil
 			ex.printStackTrace();
 			return null;
 		}
+	}
+
+	static MimeMessage createMimeMessage(@Nonnull Session session, @Nonnull EmailMessage msg, @Nonnull String from, String toList, String ccList) throws MessagingException
+	{
+		MimeMessage message = new MimeMessage(session);
+		message.setSubject(msg.getSubject());
+		message.setSentDate(DateTimeUtil.timestampNow());
+		message.setFrom(new InternetAddress(from));
+		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toList));
+		if (ccList != null && ccList.length() > 0)
+		{
+			message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(ccList));
+		}
+		int i;
+		int j;
+		i = 0;
+		j = msg.getCustomHeaderCount();
+		while (i < j)
+		{
+			message.addHeader(msg.getCustomHeaderName(i), msg.getCustomHeaderValue(i));
+			i++;
+		}
+
+		i = 0;
+		j = msg.getAttachmentCount();
+		if (j <= 0)
+		{
+			message.setContent(msg.getContent(), "text/html; charset=utf-8");
+		}
+		else
+		{
+			Multipart multipart = new MimeMultipart();
+			MimeBodyPart part;
+			part = new MimeBodyPart();
+			part.setContent(msg.getContent(), "text/html; charset=utf-8");
+			multipart.addBodyPart(part);
+			while (i < j)
+			{
+				part = new MimeBodyPart();
+				EmailAttachment att = msg.getAttachment(i);
+				part.setContent(att.content, att.contentType);;
+				part.setContentID(att.contentId);
+				part.setFileName(att.fileName);
+				if (att.isInline)
+					part.setDisposition(Part.INLINE);
+				else
+					part.setDisposition(Part.ATTACHMENT);
+/*				if (att.createTime != null)
+					part.addHeader("creation-date", WebUtil.date2Str(att.createTime));
+				if (att.modifyTime != null)
+					part.addHeader("modification-date", WebUtil.date2Str(att.createTime));*/
+				multipart.addBodyPart(part);
+				i++;
+			}
+			message.setContent(multipart);
+		}
+		return message;
 	}
 }
