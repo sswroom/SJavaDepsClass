@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import org.sswr.util.data.DateTimeUtil;
 import org.sswr.util.data.JSONBase;
 import org.sswr.util.data.SharedInt;
 import org.sswr.util.io.LogLevel;
@@ -34,9 +35,9 @@ public class MSGraphUtil
             AccessTokenResult token = new AccessTokenResult();
             JSONBase json = JSONBase.parseJSONStr(s);
             token.type = json.getValueString("token_type");
-            long t = System.currentTimeMillis();
-            token.expiresIn = new Timestamp(t + json.getValueAsInt32("expires_in") * 1000);
-            token.extExpiresIn = new Timestamp(t + json.getValueAsInt32("ext_expires_in") * 1000);
+            Timestamp t = DateTimeUtil.timestampNow();
+            token.expiresIn = Timestamp.from(t.toInstant().plusSeconds(json.getValueAsInt32("expires_in")));
+            token.extExpiresIn = Timestamp.from(t.toInstant().plusSeconds(json.getValueAsInt32("ext_expires_in")));
             token.accessToken = json.getValueString("access_token");
             return token;
         }
