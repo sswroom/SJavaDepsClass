@@ -20,7 +20,6 @@ import com.microsoft.graph.models.AttachmentCreateUploadSessionParameterSet;
 import com.microsoft.graph.models.AttachmentItem;
 import com.microsoft.graph.models.AttachmentType;
 import com.microsoft.graph.models.BodyType;
-import com.microsoft.graph.models.FileAttachment;
 import com.microsoft.graph.models.InternetMessageHeader;
 import com.microsoft.graph.models.ItemBody;
 import com.microsoft.graph.models.Message;
@@ -158,7 +157,6 @@ public class MSGraphEmailControl implements EmailControl
 			try
 			{
 				EmailAttachment att;
-				FileAttachment fileAtt;
 				i = 0;
 				j = message.getAttachmentCount();
 				while (i < j)
@@ -225,6 +223,7 @@ public class MSGraphEmailControl implements EmailControl
 					}
 /* 					else
 					{
+						FileAttachment fileAtt;
 						fileAtt = new FileAttachment();
 						fileAtt.name = att.fileName;
 //						fileAtt.contentId = att.contentId;
