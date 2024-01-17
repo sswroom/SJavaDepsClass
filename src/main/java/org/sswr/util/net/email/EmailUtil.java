@@ -287,6 +287,36 @@ public class EmailUtil
 		}
 	}
 
+	static Multipart createMultipart(List<EmailAttachment> attachments, String content, String contentType) throws MessagingException
+	{
+		Multipart multipart = new MimeMultipart();
+		MimeBodyPart part;
+		int i = 0;
+		int j = attachments.size();
+		part = new MimeBodyPart();
+		part.setContent(content, contentType);
+		multipart.addBodyPart(part);
+		while (i < j)
+		{
+			part = new MimeBodyPart();
+			EmailAttachment att = attachments.get(i);
+			part.setContent(att.content, att.contentType);;
+			part.setContentID(att.contentId);
+			part.setFileName(att.fileName);
+			if (att.isInline)
+				part.setDisposition(Part.INLINE);
+			else
+				part.setDisposition(Part.ATTACHMENT);
+/*				if (att.createTime != null)
+				part.addHeader("creation-date", WebUtil.date2Str(att.createTime));
+			if (att.modifyTime != null)
+				part.addHeader("modification-date", WebUtil.date2Str(att.createTime));*/
+			multipart.addBodyPart(part);
+			i++;
+		}
+		return multipart;
+	}
+
 	static MimeMessage createMimeMessage(@Nonnull Session session, @Nonnull EmailMessage msg, @Nonnull String from, String toList, String ccList) throws MessagingException
 	{
 		MimeMessage message = new MimeMessage(session);
@@ -316,30 +346,7 @@ public class EmailUtil
 		}
 		else
 		{
-			Multipart multipart = new MimeMultipart();
-			MimeBodyPart part;
-			part = new MimeBodyPart();
-			part.setContent(msg.getContent(), "text/html; charset=utf-8");
-			multipart.addBodyPart(part);
-			while (i < j)
-			{
-				part = new MimeBodyPart();
-				EmailAttachment att = msg.getAttachment(i);
-				part.setContent(att.content, att.contentType);;
-				part.setContentID(att.contentId);
-				part.setFileName(att.fileName);
-				if (att.isInline)
-					part.setDisposition(Part.INLINE);
-				else
-					part.setDisposition(Part.ATTACHMENT);
-/*				if (att.createTime != null)
-					part.addHeader("creation-date", WebUtil.date2Str(att.createTime));
-				if (att.modifyTime != null)
-					part.addHeader("modification-date", WebUtil.date2Str(att.createTime));*/
-				multipart.addBodyPart(part);
-				i++;
-			}
-			message.setContent(multipart);
+			message.setContent(createMultipart(msg.getAttachments(), msg.getContent(), "text/html; charset=utf-8"));
 		}
 		return message;
 	}

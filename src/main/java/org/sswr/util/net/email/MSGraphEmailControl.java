@@ -32,11 +32,11 @@ import okhttp3.Request;
 
 public class MSGraphEmailControl implements EmailControl
 {
-	@Nonnull    
+	@Nonnull
 	private String clientId;
-	@Nonnull    
+	@Nonnull
 	private String tenantId;
-	@Nonnull    
+	@Nonnull
 	private String clientSecret;
 	@Nonnull
 	private String fromEmail;
