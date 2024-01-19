@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.sswr.util.data.DateTimeUtil;
 import org.sswr.util.data.JSONBase;
@@ -21,7 +22,7 @@ public class MSGraphUtil
         public String accessToken;
     }
 
-    public static AccessTokenResult getApplicationAccessToken(LogTool log, @Nonnull String tenantId, @Nonnull String clientId, @Nonnull String clientSecret, String scope)
+    public static AccessTokenResult getApplicationAccessToken(@Nullable LogTool log, @Nonnull String tenantId, @Nonnull String clientId, @Nonnull String clientSecret, @Nullable String scope)
     {
         String url = "https://login.microsoftonline.com/"+tenantId+"/oauth2/v2.0/token";
         SharedInt statusCode = new SharedInt();

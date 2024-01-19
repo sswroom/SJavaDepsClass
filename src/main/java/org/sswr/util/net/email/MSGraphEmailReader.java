@@ -7,7 +7,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.annotation.Nonnull;
@@ -47,6 +50,7 @@ public class MSGraphEmailReader implements EmailReader
 	{
 		com.microsoft.graph.models.Message msg;
 		EmailMessage emsg;
+		boolean delete;
 
 		static EmailAddress addrFromRecipient(Recipient rcpt)
 		{
@@ -57,6 +61,7 @@ public class MSGraphEmailReader implements EmailReader
 		{
 			this.msg = msg;
 			this.emsg = emsg;
+			this.delete = false;
 		}
 
 		private static String[] arrayFromString(String s)
@@ -149,12 +154,12 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public String getContentType() throws MessagingException {
-			return this.msg.body.contentType.name();
+			return (this.msg.body.contentType == BodyType.HTML)?"text/html":"text/plain";
 		}
 
 		@Override
 		public boolean isMimeType(String mimeType) throws MessagingException {
-			return this.msg.body.contentType.name().equals(mimeType);
+			return this.getContentType().equals(mimeType);
 		}
 
 		@Override
@@ -201,7 +206,7 @@ public class MSGraphEmailReader implements EmailReader
 		public Object getContent() throws IOException, MessagingException {
 			if (this.emsg.getAttachmentCount() > 0)
 			{
-				return EmailUtil.createMultipart(this.emsg.getAttachments(), this.msg.body.content, this.msg.body.contentType.name());
+				return EmailUtil.createMultipart(this.emsg.getAttachments(), this.msg.body.content, this.getContentType());
 			}
 			else
 				return this.msg.body.content;
@@ -231,11 +236,12 @@ public class MSGraphEmailReader implements EmailReader
 		public void writeTo(OutputStream os) throws IOException, MessagingException {
 			SMTPMessage message = new SMTPMessage();
 			message.setMessageId(this.msg.id);
-			message.setContent(this.msg.body.content, this.msg.body.contentType.name());
+			message.setContent(this.msg.body.content, this.getContentType());
 			if (this.msg.sentDateTime != null)
 				message.setSentDate(this.msg.sentDateTime.toZonedDateTime());
 			message.setSubject(this.msg.subject);
-			message.setFrom(addrFromRecipient(this.msg.from));
+			if (this.msg.from != null)
+				message.setFrom(addrFromRecipient(this.msg.from));
 			int i = 0;
 			int j = this.msg.toRecipients.size();
 			while (i < j)
@@ -264,7 +270,7 @@ public class MSGraphEmailReader implements EmailReader
 				message.addAttachment(emsg.getAttachment(i));
 				i++;
 			}
-			if (!message.writeToStream(os))
+			if (!message.writeMessage(os))
 			{
 				throw new IOException("Error in writing to stream");
 			}
@@ -403,13 +409,16 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public Flags getFlags() throws MessagingException {
-			// TODO Auto-generated method stub
 			throw new UnsupportedOperationException("Unimplemented method 'getFlags'");
 		}
 
 		@Override
 		public void setFlags(Flags flag, boolean set) throws MessagingException {
-			throw new UnsupportedOperationException("Unimplemented method 'setFlags'");
+			if (flag.contains(Flags.Flag.DELETED))
+			{
+				this.delete = set;
+				addChanged(this.msg.id, this);
+			}
 		}
 
 		@Override
@@ -419,8 +428,17 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public void saveChanges() throws MessagingException {
-			// TODO Auto-generated method stub
 			throw new UnsupportedOperationException("Unimplemented method 'saveChanges'");
+		}
+
+		public boolean isDeleted()
+		{
+			return this.delete;
+		}
+
+		public String getId()
+		{
+			return this.msg.id;
 		}
 	}
 	
@@ -435,6 +453,7 @@ public class MSGraphEmailReader implements EmailReader
 	private AccessTokenResult accessToken;
 	private LogTool log;
 	private String folder;
+	private Map<String, GraphMessage> changedMap;
 
 	public MSGraphEmailReader(LogTool log, @Nonnull String clientId, @Nonnull String tenantId, @Nonnull String clientSecret, @Nonnull String fromEmail)
 	{
@@ -444,6 +463,7 @@ public class MSGraphEmailReader implements EmailReader
 		this.clientSecret = clientSecret;
 		this.fromEmail = fromEmail;
 		this.folder = null;
+		this.changedMap = new HashMap<String, GraphMessage>();
 		updateAccessToken();
 	}
 
@@ -509,6 +529,16 @@ public class MSGraphEmailReader implements EmailReader
 
     public void closeFolder()
 	{
+		Iterator<GraphMessage> it = changedMap.values().iterator();
+		GraphMessage msg;
+		while (it.hasNext())
+		{
+			msg = it.next();
+			if (msg.isDeleted())
+			{
+				this.deleteMessage(msg.getId());
+			}
+		}
 		this.folder = null;
 	}
 
@@ -544,6 +574,19 @@ public class MSGraphEmailReader implements EmailReader
 			i++;
 		}
 		return msgArr;
+	}
+
+	public boolean deleteMessage(String id)
+	{
+		GraphServiceClient<Request> client = createClient();
+		if (client == null)
+			return false;
+		com.microsoft.graph.models.Message msg = client.users(fromEmail).messages(id).buildRequest().delete();
+		if (msg != null)
+		{
+			return true;
+		}
+		return false;
 	}
 
 	private EmailMessage toEmailMessage(com.microsoft.graph.models.Message msg)
@@ -593,5 +636,10 @@ public class MSGraphEmailReader implements EmailReader
 		}
 		
 		return email;
+	}
+
+	private void addChanged(String id, GraphMessage msg)
+	{
+		this.changedMap.put(id, msg);
 	}
 }
