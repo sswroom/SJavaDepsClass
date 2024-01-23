@@ -55,11 +55,19 @@ public class MSGraphEmailControl implements EmailControl
 
 	private void updateAccessToken()
 	{
-		if (this.accessToken != null && this.accessToken.expiresIn.getTime() < System.currentTimeMillis())
+		if (this.accessToken != null && this.accessToken.expiresIn.getTime() > System.currentTimeMillis())
 		{
 			return;
 		}
 		this.accessToken = MSGraphUtil.getApplicationAccessToken(this.log, this.tenantId, this.clientId, this.clientSecret, null);
+		if (this.accessToken == null)
+		{
+			this.log.logMessage("Update access token failed", LogLevel.ERROR);
+		}
+		else
+		{
+			this.log.logMessage("Access token updated, expire time = "+this.accessToken.expiresIn.toString(), LogLevel.ACTION);
+		}
 	}
 
 	private GraphServiceClient<Request> createClient()

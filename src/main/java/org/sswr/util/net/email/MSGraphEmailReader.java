@@ -25,6 +25,7 @@ import javax.mail.internet.InternetAddress;
 
 import org.sswr.util.data.DataTools;
 import org.sswr.util.data.DateTimeUtil;
+import org.sswr.util.io.LogLevel;
 import org.sswr.util.io.LogTool;
 import org.sswr.util.net.AccessTokenProvider;
 import org.sswr.util.net.MSGraphUtil;
@@ -469,11 +470,19 @@ public class MSGraphEmailReader implements EmailReader
 
 	private void updateAccessToken()
 	{
-		if (this.accessToken != null && this.accessToken.expiresIn.getTime() < System.currentTimeMillis())
+		if (this.accessToken != null && this.accessToken.expiresIn.getTime() > System.currentTimeMillis())
 		{
 			return;
 		}
 		this.accessToken = MSGraphUtil.getApplicationAccessToken(this.log, this.tenantId, this.clientId, this.clientSecret, null);
+		if (this.accessToken == null)
+		{
+			this.log.logMessage("Update access token failed", LogLevel.ERROR);
+		}
+		else
+		{
+			this.log.logMessage("Access token updated, expire time = "+this.accessToken.expiresIn.toString(), LogLevel.ACTION);
+		}
 	}
 
 	private GraphServiceClient<Request> createClient()
@@ -539,6 +548,7 @@ public class MSGraphEmailReader implements EmailReader
 				this.deleteMessage(msg.getId());
 			}
 		}
+		this.changedMap.clear();
 		this.folder = null;
 	}
 
