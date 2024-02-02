@@ -5,8 +5,9 @@
 	
 	<groupId>io.github.sswroom</groupId>
 	<artifactId>util-deps</artifactId>
-	<version>0.2.20240117</version>
-	<name>util-deps</name>
+	<version>0.2.20240202</version>
+
+	<name>sswr-util-deps</name>
 	<packaging>jar</packaging>
 	<description>Utilities with Dependency</description>
 	<url>https://github.com/sswroom/SJavaDepsClass</url>
@@ -20,6 +21,26 @@
 		<spring.data.version>2.7.2</spring.data.version>
 		<spring.security.version>5.8.5</spring.security.version>
 	</properties>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Simon Wong</name>
+			<email>sswroom@yahoo.com</email>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:git://github.com/sswroom/SJavaDepsClass.git</connection>
+		<developerConnection>scm:git:ssh://github.com:sswroom/SJavaDepsClass.git</developerConnection>
+		<url>http://github.com/sswroom/SJavaDepsClass/tree/master</url>
+	</scm>
 
 	<dependencies>
 		<dependency>
@@ -171,7 +192,7 @@
 					</execution>
 				</executions>
 			</plugin>
-<!--			<plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.9.1</version>
@@ -183,7 +204,35 @@
 					</goals>
 					</execution>
 				</executions>
-			</plugin>-->
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+						<configuration>
+							<keyname>0x0648FFA8</keyname>
+							<passphraseServerId>sswroom</passphraseServerId>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+				<version>0.3.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<publishingServerId>central</publishingServerId>
+					<tokenAuth>true</tokenAuth>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>
