@@ -5,7 +5,7 @@
 	
 	<groupId>io.github.sswroom</groupId>
 	<artifactId>util-deps</artifactId>
-	<version>0.2.20240202</version>
+	<version>0.2.20240405</version>
 
 	<name>sswr-util-deps</name>
 	<packaging>jar</packaging>
@@ -17,9 +17,13 @@
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<apache.poi.version>5.2.2</apache.poi.version>
-		<spring.data.version>2.7.2</spring.data.version>
-		<spring.security.version>5.8.5</spring.security.version>
+		<apache.poi.version>5.2.5</apache.poi.version>
+		<hibernate.version>5.6.15.Final</hibernate.version>
+		<junit.jupiter.version>5.10.2</junit.jupiter.version>
+		<org.bouncycastle.version>1.77</org.bouncycastle.version>
+		<spring.data.version>2.7.18</spring.data.version>
+		<spring.security.version>5.8.11</spring.security.version>
+		<spring.web.version>5.3.33</spring.web.version>
 	</properties>
 
 	<licenses>
@@ -80,7 +84,7 @@
 		<dependency>
 			<groupId>io.github.sswroom</groupId>
 			<artifactId>util</artifactId>
-			<version>[0.2,)</version>
+			<version>[0.3,)</version>
 		</dependency>
 
 		<dependency>
@@ -116,46 +120,46 @@
 		<!-- https://mvnrepository.com/artifact/org.bouncycastle/bcmail-jdk15on -->
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcmail-jdk15on</artifactId>
-			<version>1.70</version>
+			<artifactId>bcmail-jdk18on</artifactId>
+			<version>${org.bouncycastle.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on -->
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpkix-jdk15on</artifactId>
-			<version>1.70</version>
+			<artifactId>bcpkix-jdk18on</artifactId>
+			<version>${org.bouncycastle.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on -->
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15on</artifactId>
-			<version>1.70</version>
+			<artifactId>bcprov-jdk18on</artifactId>
+			<version>${org.bouncycastle.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>5.6.15.Final</version>
+			<version>${hibernate.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-entitymanager -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
-			<version>5.6.15.Final</version>
+			<version>${hibernate.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.7.1</version>
+			<version>${junit.jupiter.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
-			<version>5.3.9</version>
+			<version>${spring.web.version}</version>
 		</dependency>
 
 		<dependency>
