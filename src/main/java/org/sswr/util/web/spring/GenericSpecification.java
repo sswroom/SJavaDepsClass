@@ -417,7 +417,7 @@ public class GenericSpecification<T> implements Specification<T> {
 				}
 				else if (dbType == DBType.PostgreSQLESRI)
 				{
-					predicates.add(builder.equal(builder.function("sde.ST_Within", Integer.class, root.get(criteria.getKey()).as(Geometry.class), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), 1));
+					predicates.add(builder.equal(builder.function("sde.ST_Within", Integer.class, builder.function("st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).as(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), 1));
 				}
 				else
 				{
@@ -436,7 +436,7 @@ public class GenericSpecification<T> implements Specification<T> {
 				}
 				else if (dbType == DBType.PostgreSQLESRI)
 				{
-					predicates.add(builder.equal(builder.function("sde.st_intersects", Integer.class, root.get(criteria.getKey()).as(Geometry.class), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), 1));
+					predicates.add(builder.equal(builder.function("sde.st_intersects", Integer.class, builder.function("st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).as(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), 1));
 				}
 				else
 				{
@@ -455,7 +455,7 @@ public class GenericSpecification<T> implements Specification<T> {
 				}
 				else if (dbType == DBType.PostgreSQLESRI)
 				{
-					predicates.add(builder.lessThan(builder.function("sde.st_distance", Double.class, root.get(criteria.getKey()).as(Geometry.class), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), (Double)criteria.getValue2()));
+					predicates.add(builder.lessThan(builder.function("sde.st_distance", Double.class, builder.function("st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).as(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), (Double)criteria.getValue2()));
 				}
 				else
 				{
