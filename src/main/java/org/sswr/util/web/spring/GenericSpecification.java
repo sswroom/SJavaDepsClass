@@ -411,13 +411,17 @@ public class GenericSpecification<T> implements Specification<T> {
 				{
 					predicates.add(builder.equal(builder.function(criteria.getKey()+".STWithin", Integer.class, builder.function("geometry::STGeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), 1));
 				}
-				else if (dbType == DBType.MySQL || dbType == DBType.PostgreSQL)
+				else if (dbType == DBType.MySQL)
 				{
 					predicates.add(builder.equal(builder.function("ST_Within", Integer.class, root.get(criteria.getKey()).as(Geometry.class), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), 1));
 				}
+				else if (dbType == DBType.PostgreSQL)
+				{
+					predicates.add(builder.isTrue(builder.function("ST_Within", Boolean.class, root.get(criteria.getKey()).as(Geometry.class), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid)))));
+				}
 				else if (dbType == DBType.PostgreSQLESRI)
 				{
-					predicates.add(builder.equal(builder.function("sde.ST_Within", Integer.class, builder.function("st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).as(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), 1));
+					predicates.add(builder.isTrue(builder.function("sde.ST_Within", Boolean.class, builder.function("st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).as(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid)))));
 				}
 				else
 				{
@@ -430,13 +434,17 @@ public class GenericSpecification<T> implements Specification<T> {
 				{
 					predicates.add(builder.equal(builder.function(criteria.getKey()+".STIntersects", Integer.class, builder.function("geometry::STGeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), 1));
 				}
-				else if (dbType == DBType.MySQL || dbType == DBType.PostgreSQL)
+				else if (dbType == DBType.MySQL)
 				{
 					predicates.add(builder.equal(builder.function("ST_Intersects", Integer.class, root.get(criteria.getKey()).as(Geometry.class), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), 1));
 				}
+				else if (dbType == DBType.PostgreSQL)
+				{
+					predicates.add(builder.isTrue(builder.function("ST_Intersects", Boolean.class, root.get(criteria.getKey()).as(Geometry.class), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid)))));
+				}
 				else if (dbType == DBType.PostgreSQLESRI)
 				{
-					predicates.add(builder.equal(builder.function("sde.st_intersects", Integer.class, builder.function("st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).as(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), 1));
+					predicates.add(builder.isTrue(builder.function("sde.st_intersects", Boolean.class, builder.function("st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).as(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid)))));
 				}
 				else
 				{
