@@ -61,7 +61,6 @@ public class POP3EmailReader implements EmailReader
 		else
 		{
 	        this.props.put("mail.store.protocol", "pop3");
-			this.props.put("mail.pop3.starttls.enable", true);
 		}
 		if (username != null && username.length() > 0 && password != null && password.length() > 0)
 		{
@@ -71,6 +70,11 @@ public class POP3EmailReader implements EmailReader
 				}
 			};
 		}
+	}
+
+	public void setSSLProtocols(String sslProtocols)
+	{
+		this.props.put("mail.pop3.ssl.protocols", sslProtocols);
 	}
 
 	public boolean open()
