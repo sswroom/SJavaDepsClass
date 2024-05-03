@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -15,6 +16,7 @@ public class XlsxTableBuilder implements TableBuilder
 {
 	private XSSFWorkbook wb;
 	private XSSFSheet sheet;
+	private XSSFCellStyle style;
 	private int currRow;
 
 	public XlsxTableBuilder(String sheetName)
@@ -22,7 +24,18 @@ public class XlsxTableBuilder implements TableBuilder
 		this.wb = new XSSFWorkbook();
 		this.sheet = this.wb.createSheet(sheetName);
 		this.currRow = 0;
+		this.style = null;
 	}
+
+	public XSSFCellStyle getCellStyle()
+	{
+		if (this.style == null)
+		{
+			this.style = this.wb.createCellStyle();
+		}
+		return this.style;
+	}
+
 	@Override
 	public void appendRow()
 	{
@@ -52,16 +65,19 @@ public class XlsxTableBuilder implements TableBuilder
 			{
 				cell = row.createCell(col, CellType.NUMERIC);
 				cell.setCellValue(((Integer)o).intValue());
+				if (this.style != null) cell.setCellStyle(this.style);
 			}
 			else if (o instanceof String)
 			{
 				cell = row.createCell(col, CellType.STRING);
 				cell.setCellValue((String)o);
+				if (this.style != null) cell.setCellStyle(this.style);
 			}
 			else
 			{
 				cell = row.createCell(col, CellType.STRING);
 				cell.setCellValue(o.toString());
+				if (this.style != null) cell.setCellStyle(this.style);
 			}
 			col++;
 		}
