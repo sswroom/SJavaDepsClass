@@ -5,7 +5,7 @@
 	
 	<groupId>io.github.sswroom</groupId>
 	<artifactId>util-deps</artifactId>
-	<version>0.2.20240503</version>
+	<version>0.2.20240509</version>
 
 	<name>sswr-util-deps</name>
 	<packaging>jar</packaging>
@@ -84,7 +84,7 @@
 		<dependency>
 			<groupId>io.github.sswroom</groupId>
 			<artifactId>util</artifactId>
-			<version>0.3.20240419</version>
+			<version>0.3.20240509</version>
 		</dependency>
 
 		<dependency>
