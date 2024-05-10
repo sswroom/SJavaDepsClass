@@ -35,6 +35,7 @@ import com.microsoft.graph.models.Attachment;
 import com.microsoft.graph.models.BodyType;
 import com.microsoft.graph.models.FileAttachment;
 import com.microsoft.graph.models.MailFolder;
+import com.microsoft.graph.models.MessageMoveParameterSet;
 import com.microsoft.graph.models.Recipient;
 import com.microsoft.graph.requests.AttachmentCollectionPage;
 import com.microsoft.graph.requests.AttachmentCollectionRequest;
@@ -455,6 +456,7 @@ public class MSGraphEmailReader implements EmailReader
 	private LogTool log;
 	private String folder;
 	private Map<String, GraphMessage> changedMap;
+	private boolean archiveOnDelete;
 
 	public MSGraphEmailReader(LogTool log, @Nonnull String clientId, @Nonnull String tenantId, @Nonnull String clientSecret, @Nonnull String fromEmail)
 	{
@@ -464,8 +466,14 @@ public class MSGraphEmailReader implements EmailReader
 		this.clientSecret = clientSecret;
 		this.fromEmail = fromEmail;
 		this.folder = null;
+		this.archiveOnDelete = false;
 		this.changedMap = new HashMap<String, GraphMessage>();
 		updateAccessToken();
+	}
+
+	public void setArchiveOnDelete(boolean archiveOnDelete)
+	{
+		this.archiveOnDelete = archiveOnDelete;
 	}
 
 	private void updateAccessToken()
@@ -545,7 +553,10 @@ public class MSGraphEmailReader implements EmailReader
 			msg = it.next();
 			if (msg.isDeleted())
 			{
-				this.deleteMessage(msg.getId());
+				if (this.archiveOnDelete)
+					this.moveMessageToArchive(msg.getId());
+				else
+					this.deleteMessage(msg.getId());
 			}
 		}
 		this.changedMap.clear();
@@ -584,6 +595,20 @@ public class MSGraphEmailReader implements EmailReader
 			i++;
 		}
 		return msgArr;
+	}
+
+	public boolean moveMessageToArchive(String id)
+	{
+		GraphServiceClient<Request> client = createClient();
+		if (client == null)
+			return false;
+		
+		com.microsoft.graph.models.Message msg = client.users(fromEmail).messages(id).move(MessageMoveParameterSet.newBuilder().withDestinationId("archive").build()).buildRequest().post();
+		if (msg != null)
+		{
+			return true;
+		}
+		return false;
 	}
 
 	public boolean deleteMessage(String id)

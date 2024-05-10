@@ -1,6 +1,8 @@
 # SJavaDepsClass
 
 # Changes:
+- MSGraphEmailReader.java support archiveOnDelete
+
 0.2.20240503
 - POP3EmailReader.java support SSLProtocols setting
 - XlsxTableBuilder.java support CellStyle setting
