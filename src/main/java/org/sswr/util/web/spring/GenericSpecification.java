@@ -421,7 +421,7 @@ public class GenericSpecification<T> implements Specification<T> {
 				}
 				else if (dbType == DBType.PostgreSQLESRI)
 				{
-					predicates.add(builder.isTrue(builder.function("sde.ST_Within", Boolean.class, builder.function("st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).as(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid)))));
+					predicates.add(builder.isTrue(builder.function("sde.ST_Within", Boolean.class, builder.function("sde.st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).as(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid)))));
 				}
 				else
 				{
@@ -444,7 +444,7 @@ public class GenericSpecification<T> implements Specification<T> {
 				}
 				else if (dbType == DBType.PostgreSQLESRI)
 				{
-					predicates.add(builder.isTrue(builder.function("sde.st_intersects", Boolean.class, builder.function("st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).as(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid)))));
+					predicates.add(builder.isTrue(builder.function("sde.st_intersects", Boolean.class, builder.function("sde.st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).as(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid)))));
 				}
 				else
 				{
@@ -463,7 +463,7 @@ public class GenericSpecification<T> implements Specification<T> {
 				}
 				else if (dbType == DBType.PostgreSQLESRI)
 				{
-					predicates.add(builder.lessThan(builder.function("sde.st_distance", Double.class, builder.function("st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).as(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), (Double)criteria.getValue2()));
+					predicates.add(builder.lessThan(builder.function("sde.st_distance", Double.class, builder.function("sde.st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).as(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), (Double)criteria.getValue2()));
 				}
 				else
 				{
