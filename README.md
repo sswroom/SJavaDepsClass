@@ -1,6 +1,12 @@
 # SJavaDepsClass
 
 # Changes:
+0.2.20240621
+- Update util version
+
+0.2.20240620
+- Update util version
+
 0.2.20240513
 - GenericSpecification.java enhance ESRI on PostgreSQL
 
