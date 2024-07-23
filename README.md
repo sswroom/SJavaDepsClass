@@ -1,6 +1,9 @@
 # SJavaDepsClass
 
 # Changes:
+0.2.20240723
+- Added MSGraphEmailControl.setAttSplitSize
+
 0.2.20240621
 - Update util version
 

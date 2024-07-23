@@ -42,6 +42,7 @@ public class MSGraphEmailControl implements EmailControl
 	private String fromEmail;
 	private AccessTokenResult accessToken;
 	private LogTool log;
+	private int attSplitSize;
 
 	public MSGraphEmailControl(LogTool log, @Nonnull String clientId, @Nonnull String tenantId, @Nonnull String clientSecret, @Nonnull String fromEmail)
 	{
@@ -50,7 +51,13 @@ public class MSGraphEmailControl implements EmailControl
 		this.tenantId = tenantId;
 		this.clientSecret = clientSecret;
 		this.fromEmail = fromEmail;
+		this.attSplitSize = 1048576 * 4;
 		updateAccessToken();
+	}
+
+	public void setAttSplitSize(int splitSizeByte)
+	{
+		this.attSplitSize = splitSizeByte;
 	}
 
 	private void updateAccessToken()
@@ -190,7 +197,7 @@ public class MSGraphEmailControl implements EmailControl
 						int endOfst;
 						while (currOfst < att.content.length)
 						{
-							endOfst = currOfst + 1048576 * 4;
+							endOfst = currOfst + this.attSplitSize;
 							if (endOfst > att.content.length)
 								endOfst = att.content.length;
 							HTTPMyClient cli = new HTTPMyClient(sess.uploadUrl, RequestMethod.HTTP_PUT);
