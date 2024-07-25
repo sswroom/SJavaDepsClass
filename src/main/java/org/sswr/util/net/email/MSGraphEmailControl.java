@@ -1,6 +1,7 @@
 package org.sswr.util.net.email;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -205,8 +206,10 @@ public class MSGraphEmailControl implements EmailControl
 							cli.addContentType("application/octet-stream");
 							cli.addContentLength(endOfst - currOfst);
 							cli.addHeader("Content-Range", "bytes "+currOfst+"-"+(endOfst - 1)+"/"+att.content.length);
+							cli.addHeader("Accept", "*/*");
 							cli.write(att.content, currOfst, endOfst - currOfst);
 							int status = cli.getRespStatus();
+							byte[] data = cli.readToEnd();
 							cli.close();
 							if (status == 200)
 							{
@@ -231,6 +234,7 @@ public class MSGraphEmailControl implements EmailControl
 							else
 							{
 								log.logMessage("MSGraphEmailControl: File upload unknown response: "+status, LogLevel.ERROR);
+								log.logMessage(new String(data, StandardCharsets.UTF_8), LogLevel.RAW);
 								succ = false;
 								break;
 							}

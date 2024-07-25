@@ -1,6 +1,12 @@
 # SJavaDepsClass
 
 # Changes:
+0.2.20240725.2
+- Added MSGraphEmailControl add Accept header
+
+0.2.20240725
+- Added MSGraphEmailControl.setAttSplitSize
+
 0.2.20240723
 - Added MSGraphEmailControl.setAttSplitSize
 
