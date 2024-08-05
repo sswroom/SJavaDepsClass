@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.Nonnull;
+
 import javax.mail.BodyPart;
 import javax.mail.Header;
 import javax.mail.Message;

@@ -1,6 +1,6 @@
 package org.sswr.util.web.spring;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 

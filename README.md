@@ -1,6 +1,9 @@
 # SJavaDepsClass
 
 # Changes:
+0.4.20240805
+- Migrate from javax.* to jakarta.*
+
 0.2.20240725.2
 - Added MSGraphEmailControl add Accept header
 

@@ -1,6 +1,6 @@
 package org.sswr.util.web;
 
-import javax.persistence.Transient;
+import jakarta.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

@@ -2,8 +2,8 @@ package org.sswr.util.jts;
 
 import org.hibernate.type.AbstractSingleColumnStandardBasicType;
 import org.hibernate.type.descriptor.WrapperOptions;
-import org.hibernate.type.descriptor.java.AbstractTypeDescriptor;
-import org.hibernate.type.descriptor.sql.BinaryTypeDescriptor;
+import org.hibernate.type.descriptor.java.AbstractClassJavaType;
+import org.hibernate.type.descriptor.jdbc.BinaryJdbcType;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKBReader;
@@ -13,7 +13,7 @@ import org.locationtech.jts.io.WKTWriter;
 
 public class ArcGISPostgreSQLGeometryType extends AbstractSingleColumnStandardBasicType<Geometry> {
    public ArcGISPostgreSQLGeometryType() {
-        super(BinaryTypeDescriptor.INSTANCE, GeometryJavaTypeDescriptior.INSTANCE);
+        super(BinaryJdbcType.INSTANCE, GeometryJavaType.INSTANCE);
     }
 
     @Override
@@ -21,11 +21,11 @@ public class ArcGISPostgreSQLGeometryType extends AbstractSingleColumnStandardBa
         return "st_geometry.WKB";
     }
 
-    public static class GeometryJavaTypeDescriptior extends AbstractTypeDescriptor<Geometry> {
-        public static final GeometryJavaTypeDescriptior INSTANCE = new GeometryJavaTypeDescriptior(Geometry.class);
+    public static class GeometryJavaType extends AbstractClassJavaType<Geometry> {
+        public static final GeometryJavaType INSTANCE = new GeometryJavaType();
 
-        protected GeometryJavaTypeDescriptior(Class<Geometry> type) {
-            super(type);
+        protected GeometryJavaType() {
+            super(Geometry.class);
         }
 
         @Override
@@ -34,10 +34,10 @@ public class ArcGISPostgreSQLGeometryType extends AbstractSingleColumnStandardBa
         }
 
         @Override
-        public Geometry fromString(String string) {
+        public Geometry fromString(CharSequence string) {
 			try
 			{
-				return new WKTReader().read(string);
+				return new WKTReader().read(string.toString());
 			}
 			catch (ParseException ex)
 			{

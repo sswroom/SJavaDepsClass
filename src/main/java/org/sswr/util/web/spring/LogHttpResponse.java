@@ -5,9 +5,9 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Locale;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class LogHttpResponse implements HttpServletResponse {
 
@@ -119,18 +119,6 @@ public class LogHttpResponse implements HttpServletResponse {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
-	public String encodeUrl(String url) {
-		return this.parent.encodeUrl(url);
-	}
-
-	@Override
-	@SuppressWarnings("deprecation")
-	public String encodeRedirectUrl(String url) {
-		return this.parent.encodeRedirectUrl(url);
-	}
-
-	@Override
 	public void sendError(int sc, String msg) throws IOException {
 		this.parent.sendError(sc, msg);
 	}
@@ -203,12 +191,6 @@ public class LogHttpResponse implements HttpServletResponse {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
-	public void setStatus(int sc, String sm) {
-		this.parent.setStatus(sc, sm);
-	}
-
-	@Override
 	public int getStatus() {
 		return this.parent.getStatus();
 	}
@@ -226,5 +208,18 @@ public class LogHttpResponse implements HttpServletResponse {
 	@Override
 	public Collection<String> getHeaderNames() {
 		return this.parent.getHeaderNames();
+	}
+
+	@Override
+	public void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException {
+		if (location.startsWith("https://"))
+		{
+			System.out.println(location);
+			this.parent.sendRedirect(location, sc, clearBuffer);
+		}
+		else
+		{
+			this.parent.sendRedirect(location, sc, clearBuffer);
+		}
 	}
 }
