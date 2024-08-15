@@ -1,6 +1,5 @@
 package org.sswr.util.net.email;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +10,7 @@ import org.sswr.util.data.StringUtil;
 import org.sswr.util.io.LogLevel;
 import org.sswr.util.io.LogTool;
 import org.sswr.util.net.AccessTokenProvider;
-import org.sswr.util.net.HTTPMyClient;
+import org.sswr.util.net.HTTPClient;
 import org.sswr.util.net.MSGraphUtil;
 import org.sswr.util.net.RequestMethod;
 import org.sswr.util.net.MSGraphUtil.AccessTokenResult;
@@ -201,7 +200,7 @@ public class MSGraphEmailControl implements EmailControl
 							endOfst = currOfst + this.attSplitSize;
 							if (endOfst > att.content.length)
 								endOfst = att.content.length;
-							HTTPMyClient cli = new HTTPMyClient(sess.uploadUrl, RequestMethod.HTTP_PUT);
+							HTTPClient cli = HTTPClient.createConnect(null, null, sess.uploadUrl, RequestMethod.HTTP_PUT, false);
 							cli.setReadTimeout(5000);
 							cli.addContentType("application/octet-stream");
 							cli.addContentLength(endOfst - currOfst);
@@ -260,11 +259,6 @@ public class MSGraphEmailControl implements EmailControl
 				}
 			}
 			catch (ClientException ex)
-			{
-				log.logException(ex);
-				succ = false;
-			}
-			catch (IOException ex)
 			{
 				log.logException(ex);
 				succ = false;

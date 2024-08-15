@@ -1,6 +1,9 @@
 # SJavaDepsClass
 
 # Changes:
+- Enhance MSGraphEmailControl HTTPClient
+- Added EmailControlConfig
+
 0.4.20240805
 - Migrate from javax.* to jakarta.*
 

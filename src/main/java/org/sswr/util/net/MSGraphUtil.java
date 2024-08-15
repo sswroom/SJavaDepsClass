@@ -30,7 +30,7 @@ public class MSGraphUtil
         {
             scope = "https://graph.microsoft.com/.default";
         }
-        String s = HTTPMyClient.formPostAsString(url, Map.of("client_id", clientId, "scope", scope, "client_secret", clientSecret, "grant_type", "client_credentials"), statusCode, 5000);
+        String s = HTTPOSClient.formPostAsString(url, Map.of("client_id", clientId, "scope", scope, "client_secret", clientSecret, "grant_type", "client_credentials"), statusCode, 5000);
         if (s != null && statusCode.value == 200)
         {
             AccessTokenResult token = new AccessTokenResult();
