@@ -1,6 +1,8 @@
 # SJavaDepsClass
 
 # Changes:
+- Added AWSEmailControl
+
 0.4.20240816
 - Enhance MSGraphEmailControl HTTPClient
 - Added EmailControlConfig
