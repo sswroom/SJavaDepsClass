@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Properties;
 
+import javax.activation.DataHandler;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -15,6 +16,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 
 import org.sswr.util.data.StringUtil;
 import org.sswr.util.io.LogLevel;
@@ -84,37 +86,6 @@ public class AWSEmailControl implements EmailControl{
 		}
 		lastSendTime = System.currentTimeMillis();
 		if (this.useProxy) {
-			//Start proxy
-		    System.setProperty("java.net.useSystemProxies", "true");
-		    
-			System.setProperty("http.proxyHost", this.proxyHost);
-			System.setProperty("http.proxyPort", String.valueOf(this.proxyPort));
-			System.setProperty("http.proxyUser", this.proxyUser);
-			System.setProperty("http.proxyPassword", this.proxyPassword);
-			
-			System.setProperty("https.proxyHost", this.proxyHost);
-			System.setProperty("https.proxyPort", String.valueOf(this.proxyPort));
-			System.setProperty("https.proxyUser", this.proxyUser);
-			System.setProperty("https.proxyPassword", this.proxyPassword);
-			if (this.log != null)
-			{
-				try {
-					log.logMessage("Email detail -> http.proxyHost: [" + System.getProperty("http.proxyHost") + "]", LogLevel.COMMAND);
-					log.logMessage("Email detail -> http.proxyPort: [" + System.getProperty("http.proxyPort") + "]", LogLevel.COMMAND);
-					log.logMessage("Email detail -> https.proxyHost: [" + System.getProperty("https.proxyHost") + "]", LogLevel.COMMAND);
-					log.logMessage("Email detail -> https.proxyPort: [" + System.getProperty("https.proxyPort") + "]", LogLevel.COMMAND);
-					
-					log.logMessage("Email detail -> proxyUser: [" + System.getProperty("https.proxyUser") + "]", LogLevel.COMMAND);
-					log.logMessage("Email detail -> proxyPassowrd: [" + System.getProperty("https.proxyPassword") + "]", LogLevel.COMMAND);
-					log.logMessage("Email detail -> URI: [" + URI.create("http://" + this.proxyHost + ":" + this.proxyPort).toURL()+ "]", LogLevel.COMMAND);
-				}
-				catch(Exception e) {
-					log.logMessage("Email detail print error", LogLevel.ERROR);
-					log.logException(e);
-				}
-			}
-			
-			//Proxy setting			
 			try {
 				ProxyConfiguration proxyConfig = ProxyConfiguration.builder()
 					.endpoint(URI.create("http://" + this.proxyHost + ":" + this.proxyPort))
@@ -165,7 +136,6 @@ public class AWSEmailControl implements EmailControl{
 			
 			if (this.log != null)
 				log.logMessage("Send Email: Done", LogLevel.COMMAND);
-			System.setProperty("java.net.useSystemProxies", "false");
 			return true;
 		} catch (IOException | MessagingException e) {
 			if (this.log != null)
@@ -173,7 +143,6 @@ public class AWSEmailControl implements EmailControl{
 				log.logMessage("Send Email: Failed", LogLevel.ERROR);
 				log.logException(e);
 			}
-			System.setProperty("java.net.useSystemProxies", "false");
 			return false;
 		}
 	}
@@ -208,6 +177,19 @@ public class AWSEmailControl implements EmailControl{
 
 		// Add the multipart/alternative part to the message
 		mimeMsg.addBodyPart(wrap);
+		int i = 0;
+		int j = msg.getAttachmentCount();
+		while (i < j)
+		{
+			wrap = new MimeBodyPart();
+			EmailAttachment att = msg.getAttachment(i);
+			ByteArrayDataSource ds = new ByteArrayDataSource(att.content, att.contentType);
+			wrap.setDataHandler(new DataHandler(ds));
+			wrap.setFileName(att.fileName);
+			wrap.setDisposition(att.isInline?"inline":"attachment");
+			mimeMsg.addBodyPart(wrap);
+			i++;
+		}
 
 		try {
 			if (this.log != null) log.logMessage("Attempting to send email: [" + msg.getSubject() + "] through Amazon SES using the AWS SDK for Java...", LogLevel.RAW);
@@ -236,9 +218,6 @@ public class AWSEmailControl implements EmailControl{
 				log.logException(e);
 			}
 		 }
-		
-		//Close proxy
-		System.setProperty("java.net.useSystemProxies", "false");
 	}
 
 	@Override
