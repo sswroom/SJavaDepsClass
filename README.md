@@ -1,6 +1,7 @@
 # SJavaDepsClass
 
 # Changes:
+0.4.20240913
 - Added AWSEmailControl
 
 0.4.20240816
