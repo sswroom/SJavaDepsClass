@@ -1,6 +1,8 @@
 # SJavaDepsClass
 
 # Changes:
+- Added ArcGISPostgreSQLGeometryUserType
+
 0.4.20240913
 - Added AWSEmailControl
 
