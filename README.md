@@ -2,6 +2,8 @@
 
 # Changes:
 - Added ArcGISPostgreSQLGeometryUserType
+- Added MQTTSessionRepository
+- Added SpringSession
 
 0.4.20240913
 - Added AWSEmailControl
