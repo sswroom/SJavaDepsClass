@@ -1,6 +1,7 @@
 # SJavaDepsClass
 
 # Changes:
+0.4.20240923
 - Added ArcGISPostgreSQLGeometryUserType
 - Added MQTTSessionRepository
 - Added SpringSession
