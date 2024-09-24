@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -14,12 +16,12 @@ import org.sswr.util.web.ParamValidator;
 
 public class ParamValidatorWithJPA extends ParamValidator
 {
-	public ParamValidatorWithJPA(String funcName, LogTool logger, HttpServletRequest req, HttpServletResponse resp)
+	public ParamValidatorWithJPA(@Nonnull String funcName, @Nonnull LogTool logger, @Nonnull HttpServletRequest req, @Nonnull HttpServletResponse resp)
 	{
 		super(funcName, logger, req, resp);
 	}
 
-	public <T> boolean checkEntityExists(JpaRepository<T, Integer> repo, String varName, String varValue, Enum<?> checkStatus, boolean invalidCheck)
+	public <T> boolean checkEntityExists(@Nonnull JpaRepository<T, Integer> repo, @Nonnull String varName, @Nonnull String varValue, @Nonnull Enum<?> checkStatus, boolean invalidCheck)
 	{
 		if (this.errMsg != null) return true;
 		String findFunc = "findBy"+Character.toUpperCase(varName.charAt(0))+varName.substring(1);
@@ -90,7 +92,7 @@ public class ParamValidatorWithJPA extends ParamValidator
 		}
 	}
 
-	public <T> T getEntity(Class<T> cls, JpaRepository<T, Integer> repo, int id, Enum<?> checkingStatus, boolean invalidCheck)
+	public <T> T getEntity(@Nonnull Class<T> cls, @Nonnull JpaRepository<T, Integer> repo, int id, @Nullable Enum<?> checkingStatus, boolean invalidCheck)
 	{
 		if (this.errMsg != null) return null;
 		Optional<T> entityObj = repo.findById(id);

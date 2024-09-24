@@ -11,10 +11,13 @@ import org.sswr.util.net.email.NullEmailControl;
 import org.sswr.util.net.email.SMTPConnType;
 import org.sswr.util.net.email.SMTPDirectEmailControl;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import software.amazon.awssdk.regions.Region;
 
 public class EmailControlConfig {
-	public static EmailControl loadFromConfig(SSLEngine ssl, PropertyResolver env, String categoryName, LogTool log)
+	@Nullable
+	public static EmailControl loadFromConfig(@Nullable SSLEngine ssl, @Nonnull PropertyResolver env, @Nullable String categoryName, @Nonnull LogTool log)
 	{
 		if (categoryName == null)
 		{
@@ -100,14 +103,17 @@ public class EmailControlConfig {
 			if ((fromAddr = env.getProperty(categoryName+"awsmail.from")) == null)
 			{
 				log.logMessage(categoryName+"awsmail.from not found", LogLevel.ERROR);
+				return null;
 			}
 			if (!StringUtil.isEmailAddress(fromAddr))
 			{
 				log.logMessage(categoryName+"awsmail.from not valid email", LogLevel.ERROR);
+				return null;
 			}
 			if ((sRegion = env.getProperty(categoryName+"awsmail.region")) == null)
 			{
 				log.logMessage(categoryName+"awsmail.region not found", LogLevel.ERROR);
+				return null;
 			}
 			if (sRegion.equals("us-east-2"))
 			{

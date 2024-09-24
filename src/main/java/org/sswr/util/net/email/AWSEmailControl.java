@@ -22,6 +22,8 @@ import org.sswr.util.data.StringUtil;
 import org.sswr.util.io.LogLevel;
 import org.sswr.util.io.LogTool;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
@@ -46,7 +48,7 @@ public class AWSEmailControl implements EmailControl{
 	private String proxyUser;
 	private String proxyPassword;
 
-	public AWSEmailControl(String fromAddr, Region region, LogTool log)
+	public AWSEmailControl(@Nonnull String fromAddr, @Nonnull Region region, @Nullable LogTool log)
 	{
 		this.fromAddr = fromAddr;
 		this.region = region;
@@ -58,7 +60,7 @@ public class AWSEmailControl implements EmailControl{
 		this.proxyPassword = null;
 	}
 	
-	public void setProxy(String proxyHost, int proxyPort, String proxyUser, String proxyPassword)
+	public void setProxy(@Nullable String proxyHost, int proxyPort, @Nullable String proxyUser, @Nullable String proxyPassword)
 	{
 		this.useProxy = true;
 		this.proxyHost = proxyHost;
@@ -67,6 +69,7 @@ public class AWSEmailControl implements EmailControl{
 		this.proxyPassword = proxyPassword;
 	}
 	
+	@Nullable
 	private SdkHttpClient getProxyHTTPClient()
 	{
 		//Proxy Setting for GCIS
@@ -147,7 +150,7 @@ public class AWSEmailControl implements EmailControl{
 		}
 	}
 
-	private void send(SesClient client, EmailMessage msg, String toList, String ccList) throws AddressException, MessagingException, IOException {
+	private void send(@Nonnull SesClient client, @Nonnull EmailMessage msg, @Nullable String toList, @Nullable String ccList) throws AddressException, MessagingException, IOException {
 		Session session = Session.getDefaultInstance(new Properties());
 		MimeMessage message = new MimeMessage(session);
 

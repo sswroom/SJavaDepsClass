@@ -12,6 +12,9 @@ import org.apache.poi.ss.usermodel.PatternFormatting;
 import org.apache.poi.ss.usermodel.SheetConditionalFormatting;
 import org.apache.poi.ss.util.CellRangeAddress;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 public class XlsxConditionalFormatBuilder
 {
 	class RuleEntry
@@ -33,7 +36,7 @@ public class XlsxConditionalFormatBuilder
 		this.entries = new ArrayList<RuleEntry>();
 	}
 
-	public XlsxConditionalFormatBuilder empty(CellStyle style)
+	public XlsxConditionalFormatBuilder empty(@Nonnull CellStyle style)
 	{
 		RuleEntry ent = this.createEntry(style);
 		ent.operation = ComparisonOperator.EQUAL;
@@ -43,7 +46,8 @@ public class XlsxConditionalFormatBuilder
 		return this;
 	}
 
-	public XlsxConditionalFormatBuilder between(double v1, double v2, CellStyle style)
+	@Nonnull
+	public XlsxConditionalFormatBuilder between(double v1, double v2, @Nonnull CellStyle style)
 	{
 		RuleEntry ent = this.createEntry(style);
 		ent.operation = ComparisonOperator.BETWEEN;
@@ -53,7 +57,8 @@ public class XlsxConditionalFormatBuilder
 		return this;
 	}
 
-	public XlsxConditionalFormatBuilder notBetween(double v1, double v2, CellStyle style)
+	@Nonnull
+	public XlsxConditionalFormatBuilder notBetween(double v1, double v2, @Nonnull CellStyle style)
 	{
 		RuleEntry ent = this.createEntry(style);
 		ent.operation = ComparisonOperator.NOT_BETWEEN;
@@ -63,7 +68,8 @@ public class XlsxConditionalFormatBuilder
 		return this;
 	}
 
-	private RuleEntry createEntry(CellStyle style)
+	@Nonnull
+	private RuleEntry createEntry(@Nonnull CellStyle style)
 	{
 		RuleEntry ent = new RuleEntry();
 		ent.operation = 0;
@@ -74,7 +80,8 @@ public class XlsxConditionalFormatBuilder
 		return ent;
 	}
 
-	private ConditionalFormattingRule createRule(SheetConditionalFormatting sCondFmt, RuleEntry entry)
+	@Nonnull
+	private ConditionalFormattingRule createRule(@Nonnull SheetConditionalFormatting sCondFmt, @Nonnull RuleEntry entry)
 	{
 		ConditionalFormattingRule rule;
 		if (entry.operation == ComparisonOperator.BETWEEN || entry.operation == ComparisonOperator.NOT_BETWEEN)
@@ -95,7 +102,7 @@ public class XlsxConditionalFormatBuilder
 		return rule;
 	}
 
-	private boolean isEquals(RuleEntry entry, ConditionalFormattingRule rule)
+	private boolean isEquals(@Nonnull RuleEntry entry, @Nonnull ConditionalFormattingRule rule)
 	{
 		if (entry.operation != rule.getComparisonOperation())
 		{
@@ -155,7 +162,7 @@ public class XlsxConditionalFormatBuilder
 		return true;
 	}
 
-	private short getFillPattern(FillPatternType fType)
+	private short getFillPattern(@Nullable FillPatternType fType)
 	{
 		switch (fType)
 		{
@@ -201,7 +208,8 @@ public class XlsxConditionalFormatBuilder
 		return 0;
 	}
 
-	public ConditionalFormatting getFormatting(SheetConditionalFormatting sCondFmt)
+	@Nullable
+	public ConditionalFormatting getFormatting(@Nonnull SheetConditionalFormatting sCondFmt)
 	{
 		ConditionalFormatting condFmt;
 		int i = 0;
@@ -226,7 +234,7 @@ public class XlsxConditionalFormatBuilder
 		return sCondFmt.getConditionalFormattingAt(sCondFmt.addConditionalFormatting(new CellRangeAddress[0], rules));
 	}
 
-	public boolean isEquals(ConditionalFormatting condFmt)
+	public boolean isEquals(@Nonnull ConditionalFormatting condFmt)
 	{
 		ConditionalFormattingRule rule;
 		int i = 0;

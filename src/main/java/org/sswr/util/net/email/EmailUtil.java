@@ -16,8 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import javax.annotation.Nonnull;
-
 import javax.mail.BodyPart;
 import javax.mail.Header;
 import javax.mail.Message;
@@ -56,11 +54,15 @@ import org.bouncycastle.util.Selector;
 import org.bouncycastle.util.Store;
 import org.sswr.util.data.DateTimeUtil;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 public class EmailUtil
 {
 	private static boolean debug = false;
 
-	public static Message loadFromEml(File file)
+	@Nullable
+	public static Message loadFromEml(@Nonnull File file)
 	{
 		Session mailSession = Session.getDefaultInstance(new Properties(), null);
 		try
@@ -83,7 +85,7 @@ public class EmailUtil
 		}
 	}
 
-	public static boolean isSMIME(Message msg)
+	public static boolean isSMIME(@Nonnull Message msg)
 	{
 		try
 		{
@@ -96,7 +98,7 @@ public class EmailUtil
 		return false;
 	}
 
-	private static void setEmailContent(ReceivedEmail email, Part content) throws IOException, MessagingException
+	private static void setEmailContent(@Nonnull ReceivedEmail email, @Nonnull Part content) throws IOException, MessagingException
 	{
 		if (content.isMimeType("multipart/signed"))
 		{
@@ -154,7 +156,8 @@ public class EmailUtil
 		}
 	}
 
-	public static ReceivedEmail toReceivedEmail(Message msg)
+	@Nullable
+	public static ReceivedEmail toReceivedEmail(@Nonnull Message msg)
 	{
 		ReceivedEmail email = new ReceivedEmail();
 		try
@@ -187,7 +190,7 @@ public class EmailUtil
 		}
 	}
 
-	public static boolean verifySign(BodyPart data, byte[] signature)
+	public static boolean verifySign(@Nonnull BodyPart data, @Nonnull byte[] signature)
 	{
 		Security.addProvider(new BouncyCastleProvider());
 		try
@@ -227,7 +230,8 @@ public class EmailUtil
 		}
 	}
 
-	public static MimeMessage signEmail(MimeMessage msg, X509Certificate cert, PrivateKey key)
+	@Nullable
+	public static MimeMessage signEmail(@Nonnull MimeMessage msg, @Nonnull X509Certificate cert, @Nonnull PrivateKey key)
 	{
 		Properties props = System.getProperties();
 		Session session = Session.getDefaultInstance(props, null);
@@ -288,7 +292,8 @@ public class EmailUtil
 		}
 	}
 
-	static Multipart createMultipart(List<EmailAttachment> attachments, String content, String contentType) throws MessagingException
+	@Nonnull
+	static Multipart createMultipart(@Nonnull List<EmailAttachment> attachments, @Nonnull String content, @Nonnull String contentType) throws MessagingException
 	{
 		Multipart multipart = new MimeMultipart();
 		MimeBodyPart part;
@@ -318,7 +323,8 @@ public class EmailUtil
 		return multipart;
 	}
 
-	static MimeMessage createMimeMessage(@Nonnull Session session, @Nonnull EmailMessage msg, @Nonnull String from, String toList, String ccList) throws MessagingException
+	@Nonnull
+	static MimeMessage createMimeMessage(@Nonnull Session session, @Nonnull EmailMessage msg, @Nonnull String from, @Nonnull String toList, @Nullable String ccList) throws MessagingException
 	{
 		MimeMessage message = new MimeMessage(session);
 		message.setSubject(msg.getSubject());

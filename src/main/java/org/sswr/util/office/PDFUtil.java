@@ -4,9 +4,12 @@ import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 public class PDFUtil
 {
-	public static boolean append(PDDocument workingDoc, PDDocument documentToAppend)
+	public static boolean append(@Nonnull PDDocument workingDoc, @Nonnull PDDocument documentToAppend)
 	{
 		int i = 0;
 		int j = documentToAppend.getNumberOfPages();
@@ -35,7 +38,7 @@ public class PDFUtil
 		return true;
 	}*/
 
-	public static void close(PDDocument doc)
+	public static void close(@Nullable PDDocument doc)
 	{
 		if (doc != null)
 		{

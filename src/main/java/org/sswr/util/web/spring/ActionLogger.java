@@ -1,5 +1,7 @@
 package org.sswr.util.web.spring;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostRemove;
@@ -19,6 +21,7 @@ public class ActionLogger implements DBUpdateHandler
     @Autowired
     private ActionFileStore store;
 
+    @Nullable
 	public String getUser()
 	{
 		return (String)ThreadVar.get("User");
@@ -30,33 +33,33 @@ public class ActionLogger implements DBUpdateHandler
     }
 
     @PostLoad
-    public void onPostLoad(AuditModel model)
+    public void onPostLoad(@Nonnull AuditModel model)
     {
         model.updateCurrVal();
     }
 
     @PostPersist
-    public void onPostPersist(AuditModel model)
+    public void onPostPersist(@Nonnull AuditModel model)
     {
         store.logAction(4, getUser(), ActionFileStore.ActionType.CREATE, model.getLastValue(), model.toString());
         model.updateCurrVal();
     }
 
     @PostUpdate
-    public void onPostUpdate(AuditModel model)
+    public void onPostUpdate(@Nonnull AuditModel model)
     {
         store.logAction(4, getUser(), ActionFileStore.ActionType.UPDATE, model.getLastValue(), model.toString());
         model.updateCurrVal();
     }
 
     @PostRemove
-    public void onPostRemove(AuditModel model)
+    public void onPostRemove(@Nonnull AuditModel model)
     {
         store.logAction(4, getUser(), ActionFileStore.ActionType.DELETE, model.getLastValue(), model.toString());
     }
 
     @Override
-    public void dbUpdated(Object oldObj, Object newObj) {
+    public void dbUpdated(@Nullable Object oldObj, @Nullable Object newObj) {
         if (oldObj == null && newObj == null)
         {
 

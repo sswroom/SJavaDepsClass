@@ -17,6 +17,10 @@ import org.sswr.util.data.DateTimeUtil;
 import org.sswr.util.data.StringUtil;
 import org.sswr.util.io.LogTool;
 
+import com.beust.jcommander.internal.Nullable;
+
+import jakarta.annotation.Nonnull;
+
 public class SMTPEmailControl implements EmailControl
 {
 	private Properties props;
@@ -26,7 +30,7 @@ public class SMTPEmailControl implements EmailControl
 	private String smtpFrom;
 	private LogTool logger;
 
-	public SMTPEmailControl(String smtpHost, Integer smtpPort, boolean tls, String username, String password, String smtpFrom, LogTool logger)
+	public SMTPEmailControl(@Nonnull String smtpHost, @Nullable Integer smtpPort, boolean tls, @Nullable String username, @Nullable String password, @Nonnull String smtpFrom, @Nullable LogTool logger)
 	{
 		this.props = new Properties();
 		if (tls)
@@ -52,7 +56,7 @@ public class SMTPEmailControl implements EmailControl
 		}
 	}
 
-	public boolean sendMail(EmailMessage msg, String toList, String ccList)
+	public boolean sendMail(@Nonnull EmailMessage msg, @Nonnull String toList, @Nullable String ccList)
 	{
 		Session session;
 		if (this.auth != null)
@@ -83,7 +87,7 @@ public class SMTPEmailControl implements EmailControl
 		}
 	}
 
-	public boolean sendBatchMail(EmailMessage msg, List<String> toList)
+	public boolean sendBatchMail(@Nonnull EmailMessage msg, @Nonnull List<String> toList)
 	{
 		return sendMail(msg, StringUtil.join(toList, ","), null);
 	}

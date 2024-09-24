@@ -1,5 +1,6 @@
 package org.sswr.util.web.spring;
 
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.security.authentication.AuthenticationDetailsSource;
@@ -9,13 +10,14 @@ public class OTPWebAuthenticationDetailsSource implements AuthenticationDetailsS
 {
 	private String otpCodeField;
 
-	public OTPWebAuthenticationDetailsSource(String otpCodeField)
+	public OTPWebAuthenticationDetailsSource(@Nonnull String otpCodeField)
 	{
 		this.otpCodeField = otpCodeField;
 	}
 
     @Override
-    public WebAuthenticationDetails buildDetails(HttpServletRequest context)
+	@Nonnull
+    public WebAuthenticationDetails buildDetails(@Nonnull HttpServletRequest context)
 	{
         return new OTPWebAuthenticationDetails(context, otpCodeField);
     }

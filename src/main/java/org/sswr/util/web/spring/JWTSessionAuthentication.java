@@ -10,12 +10,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.sswr.util.data.DataTools;
 import org.sswr.util.web.JWTSession;
 
+import jakarta.annotation.Nonnull;
+
 public class JWTSessionAuthentication implements Authentication
 {
 	private JWTSession sess;
 	private List<SimpleGrantedAuthority> authorities;
 
-	public JWTSessionAuthentication(JWTSession sess)
+	public JWTSessionAuthentication(@Nonnull JWTSession sess)
 	{
 		this.sess = sess;
 		List<String> roles = this.sess.getRoleList();

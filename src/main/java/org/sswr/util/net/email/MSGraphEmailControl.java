@@ -160,12 +160,16 @@ public class MSGraphEmailControl implements EmailControl
 					.messages()
 					.buildRequest()
 					.post(graphMsg);
-				if (newMsg == null)
-					return false;
 			}
 			catch (ClientException ex)
 			{
 				log.logException(ex);
+				return false;
+			}
+			String newMsgId = newMsg.id;
+			if (newMsgId == null)
+			{
+				this.log.logMessage("Message id not found", LogLevel.ERROR);
 				return false;
 			}
 			boolean succ = true;
@@ -186,13 +190,18 @@ public class MSGraphEmailControl implements EmailControl
 						item.isInline = att.isInline;
 						item.name = att.fileName;
 						item.size = (long)att.content.length;
-						UploadSession sess = client.users(this.fromEmail).messages(newMsg.id).attachments()
+						UploadSession sess = client.users(this.fromEmail).messages(newMsgId).attachments()
 							.createUploadSession(AttachmentCreateUploadSessionParameterSet
 								.newBuilder()
 								.withAttachmentItem(item)
 								.build())
 							.buildRequest()
 							.post();
+						if (sess == null)
+						{
+							this.log.logMessage("MSGraphEmailControl: Error in creating upload session", LogLevel.ERROR);
+							return false;
+						}
 						int currOfst = 0;
 						int endOfst;
 						while (currOfst < att.content.length)
@@ -249,13 +258,13 @@ public class MSGraphEmailControl implements EmailControl
 						fileAtt.contentBytes = att.content;
 //						fileAtt.lastModifiedDateTime = att.modifyTime.toOffsetDateTime();
 //						fileAtt.isInline = att.isInline;
-						client.users(this.fromEmail).messages(newMsg.id).attachments().buildRequest().post(fileAtt);
+						client.users(this.fromEmail).messages(newMsgId).attachments().buildRequest().post(fileAtt);
 					}*/
 					i++;
 				}
 				if (succ)
 				{
-					client.users(this.fromEmail).messages(newMsg.id).send().buildRequest().post();
+					client.users(this.fromEmail).messages(newMsgId).send().buildRequest().post();
 				}
 			}
 			catch (ClientException ex)
@@ -267,7 +276,7 @@ public class MSGraphEmailControl implements EmailControl
 			{
 				try
 				{
-					client.users(this.fromEmail).messages(newMsg.id).buildRequest().delete();
+					client.users(this.fromEmail).messages(newMsgId).buildRequest().delete();
 				}
 				catch (ClientException ex)
 				{

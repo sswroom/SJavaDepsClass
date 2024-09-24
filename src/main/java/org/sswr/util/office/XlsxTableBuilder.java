@@ -12,6 +12,9 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.sswr.util.data.TableBuilder;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 public class XlsxTableBuilder implements TableBuilder
 {
 	private XSSFWorkbook wb;
@@ -19,7 +22,7 @@ public class XlsxTableBuilder implements TableBuilder
 	private XSSFCellStyle style;
 	private int currRow;
 
-	public XlsxTableBuilder(String sheetName)
+	public XlsxTableBuilder(@Nonnull String sheetName)
 	{
 		this.wb = new XSSFWorkbook();
 		this.sheet = this.wb.createSheet(sheetName);
@@ -27,6 +30,7 @@ public class XlsxTableBuilder implements TableBuilder
 		this.style = null;
 	}
 
+	@Nonnull
 	public XSSFCellStyle getCellStyle()
 	{
 		if (this.style == null)
@@ -43,7 +47,7 @@ public class XlsxTableBuilder implements TableBuilder
 	}
 
 	@Override
-	public void appendRow(Iterable<?> rowData)
+	public void appendRow(@Nullable Iterable<?> rowData)
 	{
 		if (rowData == null)
 		{
@@ -84,6 +88,7 @@ public class XlsxTableBuilder implements TableBuilder
 	}
 
 	@Override
+	@Nullable
 	public byte[] build()
 	{
 		ByteArrayOutputStream stm = new ByteArrayOutputStream();

@@ -20,6 +20,8 @@ import org.sswr.util.data.JSONBuilder.ObjectType;
 import org.sswr.util.data.JSONObject;
 import org.sswr.util.data.StringUtil;
 
+import jakarta.annotation.Nonnull;
+
 public class SpringSession implements Session {
 	private String id;
 	private Instant createTime;
@@ -117,12 +119,12 @@ public class SpringSession implements Session {
 		return this.cnt;
 	}
 
-	void setId(String id)
+	void setId(@Nonnull String id)
 	{
 		this.id = id;
 	}
 
-	void setCreateTime(Instant createTime)
+	void setCreateTime(@Nonnull Instant createTime)
 	{
 		this.createTime = createTime;
 	}
@@ -137,6 +139,7 @@ public class SpringSession implements Session {
 		this.updated = updated;
 	}
 
+	@Nonnull
 	public String toJSON() throws IOException
 	{
 		JSONBuilder builder = new JSONBuilder(ObjectType.OT_OBJECT);
@@ -174,7 +177,7 @@ public class SpringSession implements Session {
 		return builder.toString();
 	}
 
-	public static SpringSession fromJSON(String sessStr) throws IOException, ClassNotFoundException
+	public static SpringSession fromJSON(@Nonnull String sessStr) throws IOException, ClassNotFoundException
 	{
 		if (sessStr == null)
 		{

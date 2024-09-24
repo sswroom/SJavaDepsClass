@@ -2,6 +2,7 @@ package org.sswr.util.web.spring;
 
 import java.io.IOException;
 
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -14,7 +15,7 @@ import org.springframework.web.filter.GenericFilterBean;
 public class RequestLogFilter extends GenericFilterBean
 {
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
+	public void doFilter(@Nonnull ServletRequest request, @Nonnull ServletResponse response, @Nonnull FilterChain chain) throws IOException, ServletException
 	{
 		if (request instanceof HttpServletRequest)
 		{

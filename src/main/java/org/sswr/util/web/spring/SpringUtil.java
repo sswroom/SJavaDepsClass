@@ -3,6 +3,8 @@ package org.sswr.util.web.spring;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.data.domain.PageRequest;
@@ -12,7 +14,8 @@ import org.springframework.data.domain.Sort.Order;
 import org.sswr.util.data.StringUtil;
 
 public class SpringUtil {
-	public static Pageable createPageable(HttpServletRequest req, String defSort)
+	@Nonnull
+	public static Pageable createPageable(@Nonnull HttpServletRequest req, @Nullable String defSort)
 	{
 		String s;
 		int page = 0;
@@ -103,7 +106,8 @@ public class SpringUtil {
 		}
 	}
 
-	public static Pageable createPageable(HttpServletRequest req)
+	@Nonnull
+	public static Pageable createPageable(@Nonnull HttpServletRequest req)
 	{
 		return createPageable(req, null);
 	}

@@ -9,6 +9,8 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
@@ -34,7 +36,7 @@ public class ForwardHandlerRequest implements HttpServletRequest {
 	private String fwdProto;
 	private String fwdFor;
 	
-	public ForwardHandlerRequest(HttpServletRequest parent)
+	public ForwardHandlerRequest(@Nonnull HttpServletRequest parent)
 	{
 		this.parent = parent;
 		this.fwdHost = this.parent.getHeader("X-Forwarded-Host");
@@ -47,17 +49,17 @@ public class ForwardHandlerRequest implements HttpServletRequest {
 		}
 	}
 
-	public void setScheme(String scheme)
+	public void setScheme(@Nullable String scheme)
 	{
 		this.fwdProto = scheme;
 	}
 
-	public void setHost(String host)
+	public void setHost(@Nullable String host)
 	{
 		this.fwdHost = host;
 	}
 
-	public void setServerUrl(String url)
+	public void setServerUrl(@Nonnull String url)
 	{
 		int i;
 		Integer iPort;
@@ -102,7 +104,7 @@ public class ForwardHandlerRequest implements HttpServletRequest {
 	}
 
 	@Override
-	public Object getAttribute(String name) {
+	public Object getAttribute(@Nonnull String name) {
 		return this.parent.getAttribute(name);
 	}
 

@@ -15,6 +15,10 @@ import org.sswr.util.data.DataTools;
 import org.sswr.util.data.DateTimeUtil;
 import org.sswr.util.data.StringUtil;
 import org.sswr.util.io.StreamUtil;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -37,17 +41,17 @@ public class XlsxValidator {
 	private Row currRow;
 	private boolean trimStr;
 
-	public XlsxValidator(InputStream stm, String headers[])
+	public XlsxValidator(@Nonnull InputStream stm, @Nonnull String headers[])
 	{
 		this(stm, headers, 0, false);
 	}
 
-	public XlsxValidator(InputStream stm, String headers[], int headerRow)
+	public XlsxValidator(@Nonnull InputStream stm, @Nonnull String headers[], int headerRow)
 	{
 		this(stm, headers, headerRow, false);
 	}
 
-	public XlsxValidator(InputStream stm, String headers[], int headerRow, boolean supportXls)
+	public XlsxValidator(@Nonnull InputStream stm, @Nonnull String headers[], int headerRow, boolean supportXls)
 	{
 		this.fileValid = false;
 		this.lastError = null;
@@ -117,7 +121,7 @@ public class XlsxValidator {
 		}
 	}
 
-	public boolean orHeaders(String headers[])
+	public boolean orHeaders(@Nonnull String headers[])
 	{
 		if (this.fileValid)
 		{
@@ -189,6 +193,7 @@ public class XlsxValidator {
 		return cell == null || cell.getCellType() == CellType.BLANK;
 	}
 
+	@Nullable
 	public Double getCellDouble(int index)
 	{
 		if (this.currRow == null)
@@ -213,6 +218,7 @@ public class XlsxValidator {
 		return cell.getNumericCellValue();
 	}
 
+	@Nullable
 	public Double getCellAsDouble(int index)
 	{
 		if (this.currRow == null)
@@ -247,6 +253,7 @@ public class XlsxValidator {
 		return null;
 	}
 
+	@Nullable
 	public String getCellString(int index)
 	{
 		if (this.currRow == null)
@@ -276,7 +283,8 @@ public class XlsxValidator {
 		return str;
 	}
 
-	private static String getCellAsString(Row row, int index)
+	@Nullable
+	private static String getCellAsString(@Nonnull Row row, int index)
 	{
 		Cell cell = row.getCell(index);
 		if (cell == null)
@@ -313,6 +321,7 @@ public class XlsxValidator {
 		return null;
 	}
 
+	@Nullable
 	public String getCellAsString(int index)
 	{
 		if (this.currRow == null)
@@ -366,6 +375,7 @@ public class XlsxValidator {
 		return null;
 	}
 
+	@Nullable
 	public String getCellDisp(int index)
 	{
 		if (this.currRow == null)
@@ -396,6 +406,7 @@ public class XlsxValidator {
 		}
 	}
 
+	@Nullable
 	public Integer getCellIntRange(int index, int min, int max)
 	{
 		Double dVal = getCellDouble(index);
@@ -410,6 +421,7 @@ public class XlsxValidator {
 		return v;
 	}
 
+	@Nullable
 	public String getCellStringCharLen(int index, int minLen, int maxLen, boolean allowEmpty)
 	{
 		String v;
@@ -441,6 +453,7 @@ public class XlsxValidator {
 		return v;
 	}
 
+	@Nullable
 	public String getCellDispCharLen(int index, int minLen, int maxLen)
 	{
 		String v;
@@ -463,6 +476,7 @@ public class XlsxValidator {
 		return v;
 	}
 
+	@Nullable
 	public Timestamp getCellTimestamp(int index)
 	{
 		Cell cell = this.currRow.getCell(index);
@@ -502,6 +516,7 @@ public class XlsxValidator {
 		}
 	}
 
+	@Nullable
 	public Integer getCellYN(int index)
 	{
 		String v = getCellString(index);
@@ -522,7 +537,8 @@ public class XlsxValidator {
 		}
 	}
 
-	public <T extends Enum<T>> T getCellEnum(int index, Class<T> cls)
+	@Nullable
+	public <T extends Enum<T>> T getCellEnum(int index, @Nonnull Class<T> cls)
 	{
 		String v = getCellAsString(index);
 		if (v == null)
@@ -541,6 +557,7 @@ public class XlsxValidator {
 		return ret;
 	}
 
+	@Nullable
 	public Double getCellDoubleRange(int index, double min, double max)
 	{
 		Double v = getCellDouble(index);
@@ -553,7 +570,8 @@ public class XlsxValidator {
 		return v;
 	}
 
-	public <T> T getEntityBy(JpaRepository<T, Integer> repo, String varName, String varValue, Enum<?> checkStatus, boolean invalidCheck)
+	@Nullable
+	public <T> T getEntityBy(@Nonnull JpaRepository<T, Integer> repo, @Nonnull String varName, @Nonnull String varValue, @Nonnull Enum<?> checkStatus, boolean invalidCheck)
 	{
 		String findFunc = "findBy"+Character.toUpperCase(varName.charAt(0))+varName.substring(1);
 		try
@@ -602,7 +620,7 @@ public class XlsxValidator {
 		}
 	}
 
-	public <T> boolean checkInList(String varName, T varValue, List<T> validList)
+	public <T> boolean checkInList(@Nonnull String varName, @Nonnull T varValue, @Nonnull List<T> validList)
 	{
 		boolean found = false;
 		int i = validList.size();
@@ -622,7 +640,7 @@ public class XlsxValidator {
 		return false;
 	}
 
-	public <T> boolean checkInSet(String varName, T varValue, Set<T> validSet)
+	public <T> boolean checkInSet(@Nonnull String varName, @Nonnull T varValue, @Nonnull Set<T> validSet)
 	{
 		if (!validSet.contains(varValue))
 		{
@@ -642,6 +660,7 @@ public class XlsxValidator {
 		return this.nextRowInd;
 	}
 
+	@Nullable
 	public String getLastError()
 	{
 		return this.lastError;
@@ -663,7 +682,8 @@ public class XlsxValidator {
 		}
 	}
 
-	public static <T> String getRepoClassName(JpaRepository<T, Integer> repo)
+	@Nonnull
+	public static <T> String getRepoClassName(@Nonnull JpaRepository<T, Integer> repo)
 	{
 		String clsName = getRepoEntityName(repo);
 		if (clsName != null)
@@ -678,7 +698,8 @@ public class XlsxValidator {
 		return repo.getClass().getSimpleName();
 	}
 	
-	private static <T> Class<?> getRepoClass(JpaRepository<T, Integer> repo)
+	@Nullable
+	private static <T> Class<?> getRepoClass(@Nonnull JpaRepository<T, Integer> repo)
 	{
 		Class<?> cls = repo.getClass();
 		Class<?> interfaces[] = cls.getInterfaces();
@@ -698,7 +719,8 @@ public class XlsxValidator {
 		return null;
 	}
 
-	private static <T> String getRepoEntityName(JpaRepository<T, Integer> repo)
+	@Nullable
+	private static <T> String getRepoEntityName(@Nonnull JpaRepository<T, Integer> repo)
 	{
 		Class<?> cls = getRepoClass(repo);
 		Type [] interfaces = cls.getGenericInterfaces();
@@ -714,6 +736,7 @@ public class XlsxValidator {
 		return null;
 	}
 
+	@Nonnull
 	public Map<String, String> getRowAsMap()
 	{
 		Map<String, String> ret = new HashMap<String, String>();

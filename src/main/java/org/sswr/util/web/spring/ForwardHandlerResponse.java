@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Locale;
 
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,13 +16,14 @@ public class ForwardHandlerResponse implements HttpServletResponse {
 	private HttpServletRequest req;
 	private HttpServletResponse resp;
 
-	public ForwardHandlerResponse(HttpServletRequest req, HttpServletResponse resp)
+	public ForwardHandlerResponse(@Nonnull HttpServletRequest req, @Nonnull HttpServletResponse resp)
 	{
 		this.req = req;
 		this.resp = resp;
 	}
 
-	private String filterLocation(String location)
+	@Nonnull
+	private String filterLocation(@Nonnull String location)
 	{
 //		System.out.println("Redirect location: "+location);
 		if (location.startsWith("https://"))

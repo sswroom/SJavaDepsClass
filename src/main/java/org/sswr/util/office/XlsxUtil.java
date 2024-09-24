@@ -11,6 +11,10 @@ import org.sswr.util.data.StringUtil;
 import org.sswr.util.math.unit.Distance;
 import org.sswr.util.math.unit.Distance.DistanceUnit;
 import org.sswr.util.media.ImageUtil;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFPalette;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -120,7 +124,7 @@ public class XlsxUtil {
 		XDDFColor.from(PresetColor.THISTLE)
 	};
 
-	public static void addPicture(Sheet sheet, byte img[], int format, DistanceUnit dUnit, double x, double y, double w, double h)
+	public static void addPicture(@Nonnull Sheet sheet, @Nonnull byte img[], int format, @Nonnull DistanceUnit dUnit, double x, double y, double w, double h)
 	{
 		Workbook wb = sheet.getWorkbook();
 		int pictureIndex = wb.addPicture(img, format);
@@ -135,7 +139,7 @@ public class XlsxUtil {
 		drawing.createPicture(anchor, pictureIndex);
 	}
 
-	public static void addWordArt(Sheet sheet, String text, int fontColor, int borderColor, DistanceUnit dUnit, double x, double y, double w, double h)
+	public static void addWordArt(@Nonnull Sheet sheet, @Nonnull String text, int fontColor, int borderColor, @Nonnull DistanceUnit dUnit, double x, double y, double w, double h)
 	{
 		if (sheet instanceof XSSFSheet)
 		{
@@ -161,17 +165,17 @@ public class XlsxUtil {
 		}
 	}
 
-	public static double getColumnWidthInch(Sheet sheet, int colIndex)
+	public static double getColumnWidthInch(@Nonnull Sheet sheet, int colIndex)
 	{
 		return sheet.getColumnWidth(colIndex) * 3 / 10000.0;
 	}
 
-	public static void setColumnWidthInch(Sheet sheet, int colIndex, double inchWidth)
+	public static void setColumnWidthInch(@Nonnull Sheet sheet, int colIndex, double inchWidth)
 	{
 		sheet.setColumnWidth(colIndex, (int)(inchWidth * 10000 / 3));
 	}
 
-	public static void setColumnWidthInchs(Sheet sheet, double inchWidths[])
+	public static void setColumnWidthInchs(@Nonnull Sheet sheet, double inchWidths[])
 	{
 		int i = 0;
 		int j = inchWidths.length;
@@ -182,7 +186,8 @@ public class XlsxUtil {
 		}
 	}
 
-	public static Row getRow(Sheet sheet, int rowIndex)
+	@Nonnull
+	public static Row getRow(@Nonnull Sheet sheet, int rowIndex)
 	{
 		Row row = sheet.getRow(rowIndex);
 		if (row == null)
@@ -192,24 +197,24 @@ public class XlsxUtil {
 		return row;
 	}
 
-	public static void setRowHeight(Sheet sheet, int index, DistanceUnit du, double val)
+	public static void setRowHeight(@Nonnull Sheet sheet, int index, @Nonnull DistanceUnit du, double val)
 	{
 		Row row = getRow(sheet, index);
 		row.setHeightInPoints((float)Distance.convert(du, DistanceUnit.Point, val));
 	}
 
-	public static void setRowHeightAuto(Sheet sheet, int index)
+	public static void setRowHeightAuto(@Nonnull Sheet sheet, int index)
 	{
 		Row row = getRow(sheet, index);
 		row.setHeight((short)-1);
 	}
 
-	public static double getRowHeight(Sheet sheet, int rowNum, DistanceUnit dUnit)
+	public static double getRowHeight(@Nonnull Sheet sheet, int rowNum, @Nonnull DistanceUnit dUnit)
 	{
 		return Distance.convert(DistanceUnit.Point, dUnit, getRow(sheet, rowNum).getHeightInPoints());
 	}
 
-	public static double getRowsHeight(Sheet sheet, int rowStart, int rowEnd, DistanceUnit dUnit)
+	public static double getRowsHeight(@Nonnull Sheet sheet, int rowStart, int rowEnd, @Nonnull DistanceUnit dUnit)
 	{
 		double ptHeight = 0;
 		Row row;
@@ -222,7 +227,8 @@ public class XlsxUtil {
 		return Distance.convert(DistanceUnit.Point, dUnit, ptHeight);
 	}
 
-	public static Font createFont(Workbook wb, String fontName, double fontSize, boolean bold)
+	@Nonnull
+	public static Font createFont(@Nonnull Workbook wb, @Nonnull String fontName, double fontSize, boolean bold)
 	{
 		Font f = wb.createFont();
 		f.setFontName(fontName);
@@ -231,19 +237,21 @@ public class XlsxUtil {
 		return f;
 	}
 
-	public static Font setFontColor(Font f, IndexedColors color)
+	@Nonnull
+	public static Font setFontColor(@Nonnull Font f, @Nonnull IndexedColors color)
 	{
 		f.setColor(color.getIndex());
 		return f;
 	}
 
-	public static Font setFontColorIndex(Font f, short colorIndex)
+	@Nonnull
+	public static Font setFontColorIndex(@Nonnull Font f, short colorIndex)
 	{
 		f.setColor(colorIndex);
 		return f;
 	}
 
-	public static Font setFontUnderline(Font f, UnderlineType underline)
+	public static Font setFontUnderline(@Nonnull Font f, @Nonnull UnderlineType underline)
 	{
 		byte ulByte = Font.U_NONE;
 		switch (underline)
@@ -262,7 +270,8 @@ public class XlsxUtil {
 		return f;
 	}
 
-	public static CellStyle createCellStyle(Workbook wb, Font f, HorizontalAlignment halign, VerticalAlignment valign, String dataFormat)
+	@Nonnull
+	public static CellStyle createCellStyle(@Nonnull Workbook wb, @Nullable Font f, @Nullable HorizontalAlignment halign, @Nullable VerticalAlignment valign, @Nullable String dataFormat)
 	{
 		CellStyle style = wb.createCellStyle();
 		if (f != null) style.setFont(f);
@@ -272,13 +281,15 @@ public class XlsxUtil {
 		return style;
 	}
 
-	public static CellStyle setStyleWrapText(CellStyle style, boolean wrapped)
+	@Nonnull
+	public static CellStyle setStyleWrapText(@Nonnull CellStyle style, boolean wrapped)
 	{
 		style.setWrapText(wrapped);
 		return style;
 	}
 
-	public static CellStyle setStyleBgColor(Workbook wb, CellStyle style, int colorArgb)
+	@Nonnull
+	public static CellStyle setStyleBgColor(@Nonnull Workbook wb, @Nonnull CellStyle style, int colorArgb)
 	{
 		if (style.getClass().equals(XSSFCellStyle.class))
 		{
@@ -306,7 +317,7 @@ public class XlsxUtil {
 		return style;
 	}
 
-	public static boolean isStylePropertyValid(CellStyle style, StyleProperty property, Object value)
+	public static boolean isStylePropertyValid(@Nonnull CellStyle style, @Nonnull StyleProperty property, @Nullable Object value)
 	{
 		if (value == null)
 			return true;
@@ -371,7 +382,8 @@ public class XlsxUtil {
 		return false;
 	}
 
-	public static Object getStyleProperty(CellStyle style, StyleProperty property)
+	@Nullable
+	public static Object getStyleProperty(@Nonnull CellStyle style, @Nonnull StyleProperty property)
 	{
 		switch (property)
 		{
@@ -433,7 +445,7 @@ public class XlsxUtil {
 		return null;
 	}
 
-	public static void setStyleProperty(Workbook wb, CellStyle style, StyleProperty property, Object value)
+	public static void setStyleProperty(@Nonnull Workbook wb, @Nonnull CellStyle style, @Nonnull StyleProperty property, @Nullable Object value)
 	{
 		if (value == null)
 		{
@@ -518,7 +530,8 @@ public class XlsxUtil {
 		}
 	}
 
-	public static Map<StyleProperty, Object> getStyleProperties(CellStyle style)
+	@Nonnull
+	public static Map<StyleProperty, Object> getStyleProperties(@Nonnull CellStyle style)
 	{
 		HashMap<StyleProperty, Object> retMap = new HashMap<StyleProperty, Object>();
 		StyleProperty props[] = StyleProperty.values();
@@ -532,7 +545,7 @@ public class XlsxUtil {
 		return retMap;
 	}
 
-	public static void setStyleProperties(Workbook wb, CellStyle style, Map<StyleProperty, Object> propMap)
+	public static void setStyleProperties(@Nonnull Workbook wb, @Nonnull CellStyle style, @Nonnull Map<StyleProperty, Object> propMap)
 	{
 		StyleProperty props[] = StyleProperty.values();
 		int i = 0;
@@ -544,7 +557,8 @@ public class XlsxUtil {
 		}
 	}
 
-	public static Cell getCell(Row row, int cellIndex)
+	@Nonnull
+	public static Cell getCell(@Nonnull Row row, int cellIndex)
 	{
 		Cell cell = row.getCell(cellIndex);
 		if (cell == null)
@@ -554,7 +568,8 @@ public class XlsxUtil {
 		return cell;
 	}
 
-	public static String getCellStr (Row row, int cellIndex)
+	@Nullable
+	public static String getCellStr(@Nonnull Row row, int cellIndex)
 	{
 		Cell cell = row.getCell(cellIndex);
 		if (cell == null)
@@ -581,14 +596,14 @@ public class XlsxUtil {
 		return null;
 	}
 
-	public static void setCell(Row row, int cellIndex, CellStyle style, String val)
+	public static void setCell(@Nonnull Row row, int cellIndex, @Nonnull CellStyle style, @Nonnull String val)
 	{
 		Cell cell = getCell(row, cellIndex);
 		cell.setCellValue(val);
 		cell.setCellStyle(style);
 	}
 
-	public static void setCell(Row row, int cellIndex, CellStyle style, RichTextString val)
+	public static void setCell(@Nonnull Row row, int cellIndex, @Nullable CellStyle style, @Nonnull RichTextString val)
 	{
 		Cell cell = getCell(row, cellIndex);
 		cell.setCellValue(val);
@@ -598,7 +613,7 @@ public class XlsxUtil {
 		}
 	}
 
-	public static void setCell(Row row, int cellIndex, CellStyle style, Timestamp val)
+	public static void setCell(@Nonnull Row row, int cellIndex, @Nonnull CellStyle style, @Nullable Timestamp val)
 	{
 		Cell cell = getCell(row, cellIndex);
 		if (val != null)
@@ -612,7 +627,7 @@ public class XlsxUtil {
 		cell.setCellStyle(style);
 	}
 
-	public static void setCell(Row row, int cellIndex, CellStyle style, Double val)
+	public static void setCell(@Nonnull Row row, int cellIndex, @Nonnull CellStyle style, @Nullable Double val)
 	{
 		Cell cell = getCell(row, cellIndex);
 		if (val != null)
@@ -622,7 +637,7 @@ public class XlsxUtil {
 		cell.setCellStyle(style);
 	}
 
-	public static void setCell(Row row, int cellIndex, CellStyle style, Integer val)
+	public static void setCell(@Nonnull Row row, int cellIndex, @Nonnull CellStyle style, @Nullable Integer val)
 	{
 		Cell cell = getCell(row, cellIndex);
 		if (val != null)
@@ -632,7 +647,7 @@ public class XlsxUtil {
 		cell.setCellStyle(style);
 	}
 
-	public static void setCell(Row row, int cellIndex, CellStyle style, double val, String formula)
+	public static void setCell(@Nonnull Row row, int cellIndex, @Nonnull CellStyle style, double val, @Nullable String formula)
 	{
 		Cell cell = getCell(row, cellIndex);
 		cell.setCellValue(val);
@@ -643,12 +658,12 @@ public class XlsxUtil {
 		cell.setCellStyle(style);
 	}
 
-	public static void setCellStyle(Row row, int cellIndex, CellStyle style)
+	public static void setCellStyle(@Nonnull Row row, int cellIndex, @Nonnull CellStyle style)
 	{
 		getCell(row, cellIndex).setCellStyle(style);
 	}
 
-	public static void setCellBgColor(Row row, int cellIndex, int colorArgb)
+	public static void setCellBgColor(@Nonnull Row row, int cellIndex, int colorArgb)
 	{
 		Sheet sheet = row.getSheet();
 		Workbook wb = sheet.getWorkbook();
@@ -678,7 +693,7 @@ public class XlsxUtil {
 		setCellProperty(cell, StyleProperty.SP_FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
 	}
 
-	public static void setCells(Row row, CellStyle style, String vals[], boolean autoFilter)
+	public static void setCells(@Nonnull Row row, @Nonnull CellStyle style, @Nonnull String vals[], boolean autoFilter)
 	{
 		int i = 0;
 		int j = vals.length;
@@ -694,7 +709,7 @@ public class XlsxUtil {
 	}
 
 
-	public static void setCellsBorderLeft(Sheet sheet, int colIndex, int rowStart, int rowEnd, BorderStyle border)
+	public static void setCellsBorderLeft(@Nonnull Sheet sheet, int colIndex, int rowStart, int rowEnd, @Nonnull BorderStyle border)
 	{
 		while (rowStart <= rowEnd)
 		{
@@ -704,7 +719,7 @@ public class XlsxUtil {
 		}
 	}
 
-	public static void setCellsBorderTop(Sheet sheet, int rowIndex, int colStart, int colEnd, BorderStyle border)
+	public static void setCellsBorderTop(@Nonnull Sheet sheet, int rowIndex, int colStart, int colEnd, @Nonnull BorderStyle border)
 	{
 		Row row = getRow(sheet, rowIndex);
 		while (colStart <= colEnd)
@@ -714,7 +729,7 @@ public class XlsxUtil {
 		}
 	}
 
-	public static void setCellsBorderRight(Sheet sheet, int colIndex, int rowStart, int rowEnd, BorderStyle border)
+	public static void setCellsBorderRight(@Nonnull Sheet sheet, int colIndex, int rowStart, int rowEnd, @Nonnull BorderStyle border)
 	{
 		while (rowStart <= rowEnd)
 		{
@@ -724,7 +739,7 @@ public class XlsxUtil {
 		}
 	}
 
-	public static void setCellsBorderBottom(Sheet sheet, int rowIndex, int colStart, int colEnd, BorderStyle border)
+	public static void setCellsBorderBottom(@Nonnull Sheet sheet, int rowIndex, int colStart, int colEnd, @Nonnull BorderStyle border)
 	{
 		Row row = getRow(sheet, rowIndex);
 		while (colStart <= colEnd)
@@ -734,7 +749,7 @@ public class XlsxUtil {
 		}
 	}
 
-	public static void setCellProperty(Cell cell, StyleProperty property, Object value)
+	public static void setCellProperty(@Nonnull Cell cell, @Nonnull StyleProperty property, @Nullable Object value)
 	{
 		Workbook wb = cell.getSheet().getWorkbook();
 		CellStyle oriStyle = cell.getCellStyle();
@@ -762,12 +777,13 @@ public class XlsxUtil {
 	}
 
 
+	@Nonnull
 	public static XlsxConditionalFormatBuilder buildCondFormat()
 	{
 		return new XlsxConditionalFormatBuilder();
 	}
 
-	public static void setConditionalFormat(Row row, int colIndex, XlsxConditionalFormatBuilder builder)
+	public static void setConditionalFormat(@Nonnull Row row, int colIndex, @Nonnull XlsxConditionalFormatBuilder builder)
 	{
 		Sheet sheet = row.getSheet();
 		SheetConditionalFormatting sCondFmt = sheet.getSheetConditionalFormatting();
@@ -775,7 +791,8 @@ public class XlsxUtil {
 		condFmt.setFormattingRanges(cellRangesAddCell(condFmt.getFormattingRanges(), row.getRowNum(), colIndex));
 	}
 
-	public static CellRangeAddress[] cellRangesAddCell(CellRangeAddress[] cellRanges, int rowIndex, int colIndex)
+	@Nonnull
+	public static CellRangeAddress[] cellRangesAddCell(@Nonnull CellRangeAddress[] cellRanges, int rowIndex, int colIndex)
 	{
 		CellRangeAddress cellRange;
 		int i = 0;
@@ -826,6 +843,7 @@ public class XlsxUtil {
 		return newCellRanges;
 	}
 
+	@Nonnull
 	public static String colCode(int colIndex)
 	{
 		char vals[];
@@ -850,7 +868,7 @@ public class XlsxUtil {
 		return String.valueOf(vals);
 	}
 
-	public static int findSimilarColor(IndexedColorMap colorMap, int color, int maxDiff)
+	public static int findSimilarColor(@Nonnull IndexedColorMap colorMap, int color, int maxDiff)
 	{
 		int minIndex = -1;
 		int minDiff = maxDiff + 1;
@@ -885,7 +903,7 @@ public class XlsxUtil {
 		return minIndex;
 	}
 
-	public static int getImgFormat(byte imgBuff[])
+	public static int getImgFormat(@Nonnull byte imgBuff[])
 	{
 		String imgFmt = ImageUtil.getImageFmt(imgBuff);
 		switch (imgFmt)
@@ -899,7 +917,8 @@ public class XlsxUtil {
 		}
 	}
 
-	public static ClientAnchor createAnchor(Sheet sheet, DistanceUnit du, double x, double y, double w, double h)
+	@Nonnull
+	public static ClientAnchor createAnchor(@Nonnull Sheet sheet, @Nonnull DistanceUnit du, double x, double y, double w, double h)
 	{
 		DistanceUnit emu = DistanceUnit.Emu;
 		DistanceUnit inch = DistanceUnit.Inch;
@@ -968,7 +987,7 @@ public class XlsxUtil {
 			col1, row1, col2, row2);
 	}
 
-	public static XSSFChart createChart(Sheet sheet, DistanceUnit du, double x, double y, double w, double h, String title)
+	public static XSSFChart createChart(@Nonnull Sheet sheet, @Nonnull DistanceUnit du, double x, double y, double w, double h, @Nullable String title)
 	{
 		if (!sheet.getClass().equals(XSSFSheet.class))
 		{
@@ -988,13 +1007,14 @@ public class XlsxUtil {
 		return chart;
 	}
 
-	public static void chartAddLegend(XSSFChart chart, LegendPosition pos)
+	public static void chartAddLegend(@Nonnull XSSFChart chart, @Nonnull LegendPosition pos)
 	{
 		XDDFChartLegend legend = chart.getOrAddLegend();
 		legend.setPosition(pos);
 	}
 
-	public static XDDFLineChartData lineChart(XSSFChart chart, String leftAxisName, String bottomAxisName, AxisType bottomType)
+	@Nonnull
+	public static XDDFLineChartData lineChart(@Nonnull XSSFChart chart, @Nullable String leftAxisName, @Nullable String bottomAxisName, @Nonnull AxisType bottomType)
 	{
 		XDDFValueAxis leftAxis = chart.createValueAxis(AxisPosition.LEFT);
 		if (leftAxisName != null) leftAxis.setTitle(leftAxisName);
@@ -1023,7 +1043,7 @@ public class XlsxUtil {
 		return (XDDFLineChartData)chart.createData(ChartTypes.LINE, bottomAxis, leftAxis);
 	}
 
-	public static void addLineChartSeries(XDDFLineChartData data, XDDFDataSource<?> category, XDDFNumericalDataSource<? extends Number> values, String name, boolean showMarker)
+	public static void addLineChartSeries(@Nonnull XDDFLineChartData data, @Nonnull XDDFDataSource<?> category, @Nonnull XDDFNumericalDataSource<? extends Number> values, @Nullable String name, boolean showMarker)
 	{
 		int i = data.getSeriesCount();
 		XDDFLineChartData.Series series = (XDDFLineChartData.Series)data.addSeries(category, values);
@@ -1041,7 +1061,7 @@ public class XlsxUtil {
 		series.setLineProperties(new XDDFLineProperties(new XDDFSolidFillProperties(seriesColor[i % seriesColor.length])));
 	}
 
-	public static void closeWb(Workbook wb)
+	public static void closeWb(@Nonnull Workbook wb)
 	{
 		try
 		{
@@ -1053,7 +1073,7 @@ public class XlsxUtil {
 		}
 	}
 
-	private  static int calcLineCnt(String s, double fontSize, double cellWidthInch)
+	private  static int calcLineCnt(@Nonnull String s, double fontSize, double cellWidthInch)
 	{
 		int lineCharCnt = (int)(cellWidthInch / fontSize / 0.0066);
 		int sLen = s.length();
@@ -1066,7 +1086,7 @@ public class XlsxUtil {
 		return ret + 1;
 	}
 
-	public static double calcCellHeight(String s, double fontSize, double cellWidthInch)
+	public static double calcCellHeight(@Nonnull String s, double fontSize, double cellWidthInch)
 	{
 		int lineCnt;
 		if (StringUtil.isNullOrEmpty(s))
@@ -1099,7 +1119,7 @@ public class XlsxUtil {
 		return lineCnt * fontSize * 0.018 + 0.02;
 	}
 
-	public static double calcCellHeight(String s,double fontSize, Sheet sheet, int firstCol, int lastCol)
+	public static double calcCellHeight(@Nonnull String s, double fontSize, @Nonnull Sheet sheet, int firstCol, int lastCol)
 	{
 		double totalWidth = 0;
 		while (firstCol <= lastCol)
@@ -1110,7 +1130,7 @@ public class XlsxUtil {
 		return calcCellHeight(s, fontSize, totalWidth);
 	}
 
-	public static void setDisplayBlankAs(CTChart chart, STDispBlanksAs.Enum blankAs)
+	public static void setDisplayBlankAs(@Nonnull CTChart chart, @Nonnull STDispBlanksAs.Enum blankAs)
 	{
 		CTDispBlanksAs val = CTDispBlanksAs.Factory.newInstance();
 		val.setVal(blankAs);

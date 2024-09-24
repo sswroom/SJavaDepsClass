@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -26,14 +28,14 @@ public class ForwardHandlerFilter extends GenericFilterBean
 		this.cliMap = null;
 	}
 
-	public ForwardHandlerFilter(String scheme, String host)
+	public ForwardHandlerFilter(@Nullable String scheme, @Nullable String host)
 	{
 		this.scheme = scheme;
 		this.host = host;
 		this.cliMap = null;
 	}
 
-	public void addClientMap(String clientAddr, String serverUrl)
+	public void addClientMap(@Nonnull String clientAddr, @Nonnull String serverUrl)
 	{
 		if (this.cliMap == null)
 		{
@@ -43,7 +45,7 @@ public class ForwardHandlerFilter extends GenericFilterBean
 	}
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
+	public void doFilter(@Nonnull ServletRequest request, @Nonnull ServletResponse response, @Nonnull FilterChain chain) throws IOException, ServletException
 	{
 		if (request instanceof HttpServletRequest)
 		{

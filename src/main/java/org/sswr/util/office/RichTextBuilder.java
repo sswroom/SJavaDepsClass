@@ -10,6 +10,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 public class RichTextBuilder
 {
 	public class TextPart
@@ -18,7 +21,7 @@ public class RichTextBuilder
 		public Font f;
 		public int index;
 
-		public TextPart(String s, Font f)
+		public TextPart(@Nonnull String s, @Nullable Font f)
 		{
 			this.s = s;
 			this.f = f;
@@ -32,13 +35,15 @@ public class RichTextBuilder
 		this.parts = new ArrayList<TextPart>();
 	}
 
-	public RichTextBuilder append(String s, Font f)
+	@Nonnull
+	public RichTextBuilder append(@Nonnull String s, @Nullable Font f)
 	{
 		this.parts.add(new TextPart(s, f));
 		return this;
 	}
 
-	public RichTextString build(Sheet sheet)
+	@Nullable
+	public RichTextString build(@Nonnull Sheet sheet)
 	{
 		Class<?> cls = sheet.getClass();
 		RichTextString ret;

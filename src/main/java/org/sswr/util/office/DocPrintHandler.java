@@ -12,25 +12,27 @@ import org.sswr.util.math.unit.Distance.DistanceUnit;
 import org.sswr.util.media.PrintDocument;
 import org.sswr.util.media.PrintHandler;
 
+import jakarta.annotation.Nonnull;
+
 public class DocPrintHandler implements PrintHandler
 {
 	private HWPFDocument doc;
 	private PrintDocument printDoc;
 
-	public DocPrintHandler(HWPFDocument doc)
+	public DocPrintHandler(@Nonnull HWPFDocument doc)
 	{
 		this.doc = doc;
 	}
 
 	@Override
-	public boolean beginPrint(PrintDocument doc)
+	public boolean beginPrint(@Nonnull PrintDocument doc)
 	{
 		this.printDoc = doc;
 		return true;
 	}
 
 	@Override
-	public boolean printPage(int pageNum, Graphics2D printPage)
+	public boolean printPage(int pageNum, @Nonnull Graphics2D printPage)
 	{
 		Range range = doc.getRange();
 		int i;
@@ -83,18 +85,19 @@ public class DocPrintHandler implements PrintHandler
 	}
 
 	@Override
-	public boolean endPrint(PrintDocument doc)
+	public boolean endPrint(@Nonnull PrintDocument doc)
 	{
 		return true;
 	}
 	
-	private void printSection(DocPrintSession sess, Section section)
+	private void printSection(@Nonnull DocPrintSession sess, @Nonnull Section section)
 	{
 		sess.pageNum--;
 		///////////////////////////////////////////
 	}
 
-	private PageFormat getPageFormat(Section section)
+	@Nonnull
+	private PageFormat getPageFormat(@Nonnull Section section)
 	{
 		PageFormat pf = new PageFormat();
 		Paper paper = new Paper();
@@ -135,6 +138,7 @@ public class DocPrintHandler implements PrintHandler
 	}
 
 	@Override
+	@Nonnull
 	public PageFormat getPageFormat(int pageNum)
 	{
 		Range range = doc.getRange();

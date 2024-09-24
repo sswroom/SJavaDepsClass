@@ -2,6 +2,8 @@ package org.sswr.util.net.email;
 
 import javax.mail.Message;
 
+import jakarta.annotation.Nonnull;
+
 public class NullEmailReader implements EmailReader
 {
 
@@ -11,7 +13,7 @@ public class NullEmailReader implements EmailReader
     }
 
     @Override
-    public boolean openFolder(String folderName) {
+    public boolean openFolder(@Nonnull String folderName) {
         return true;
     }
 

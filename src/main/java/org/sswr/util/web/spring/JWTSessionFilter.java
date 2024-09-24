@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -24,19 +26,20 @@ public class JWTSessionFilter extends GenericFilterBean
 {
 	private List<String> ignorePaths;
 	private JWTSessionManager sessMgr;
-	public JWTSessionFilter(JWTSessionManager sessMgr)
+	public JWTSessionFilter(@Nonnull JWTSessionManager sessMgr)
 	{
 		super();
 		this.sessMgr = sessMgr;
 		this.ignorePaths = new ArrayList<String>();
 	}
 
-	public void ignorePath(String path)
+	public void ignorePath(@Nonnull String path)
 	{
 		this.ignorePaths.add(path);
 	}
 
-	public JWTSession getSession(ServletRequest request)
+	@Nullable
+	public JWTSession getSession(@Nonnull ServletRequest request)
 	{
 		if (request instanceof HttpServletRequest)
 		{
@@ -76,7 +79,7 @@ public class JWTSessionFilter extends GenericFilterBean
 	}
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
+	public void doFilter(@Nonnull ServletRequest request, @Nonnull ServletResponse response, @Nonnull FilterChain chain) throws IOException, ServletException
 	{
 		SecurityContext securityContext = SecurityContextHolder.getContext();
 		Authentication authentication = securityContext.getAuthentication();

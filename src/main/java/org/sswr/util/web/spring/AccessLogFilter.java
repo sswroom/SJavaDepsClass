@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -30,7 +31,7 @@ public class AccessLogFilter extends GenericFilterBean
 	private LogTool logger;
 	private Map<Long, RequestStatus> threadMap;
 
-	public AccessLogFilter(String logPath)
+	public AccessLogFilter(@Nonnull String logPath)
 	{
 		this.threadMap = new HashMap<Long, RequestStatus>();
 		this.logger = new LogTool();
@@ -76,7 +77,7 @@ public class AccessLogFilter extends GenericFilterBean
 	}
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+	public void doFilter(@Nonnull ServletRequest request, @Nonnull ServletResponse response, @Nonnull FilterChain chain) throws IOException, ServletException {
 		boolean found = false;
 		RequestStatus status = new RequestStatus();
 		status.thread = Thread.currentThread();

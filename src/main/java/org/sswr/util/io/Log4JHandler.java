@@ -5,11 +5,13 @@ import java.time.ZonedDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.annotation.Nonnull;
+
 public class Log4JHandler implements LogHandler
 {
 	private Logger logger;
 
-	Log4JHandler(Logger logger)
+	Log4JHandler(@Nonnull Logger logger)
 	{
 		this.logger = logger;
 	}
@@ -52,7 +54,8 @@ public class Log4JHandler implements LogHandler
 
 	}
 
-	public static LogTool createLogTool(Class<?> cls)
+	@Nonnull
+	public static LogTool createLogTool(@Nonnull Class<?> cls)
 	{
 		LogTool log = new LogTool();
 		log.skipStarted();

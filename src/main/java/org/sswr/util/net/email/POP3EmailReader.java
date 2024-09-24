@@ -12,6 +12,9 @@ import javax.mail.Store;
 
 import org.sswr.util.net.SSLEngine;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 public class POP3EmailReader implements EmailReader
 {
 	public enum ConnType
@@ -30,7 +33,7 @@ public class POP3EmailReader implements EmailReader
 	private Folder inbox;
 	private Store store;
 
-	public POP3EmailReader(String serverHost, int port, ConnType connType, SSLEngine ssl, String username, String password)
+	public POP3EmailReader(@Nonnull String serverHost, int port, @Nonnull ConnType connType, @Nullable SSLEngine ssl, @Nonnull String username, @Nonnull String password)
 	{
 		this.serverHost = serverHost;
 		this.username = username;
@@ -72,7 +75,7 @@ public class POP3EmailReader implements EmailReader
 		}
 	}
 
-	public void setSSLProtocols(String sslProtocols)
+	public void setSSLProtocols(@Nonnull String sslProtocols)
 	{
 		this.props.put("mail.pop3.ssl.protocols", sslProtocols);
 	}
@@ -142,6 +145,7 @@ public class POP3EmailReader implements EmailReader
 		this.store = null;
 	}
 
+	@Nullable
 	public Message[] getMessages()
 	{
 		if (this.inbox == null)

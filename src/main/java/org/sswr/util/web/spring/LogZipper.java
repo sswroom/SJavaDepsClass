@@ -26,6 +26,8 @@ import org.sswr.util.io.LogTool;
 import org.sswr.util.web.ProjectConfig;
 import org.sswr.util.web.ProjectPathSetting;
 
+import jakarta.annotation.Nonnull;
+
 @Component
 public class LogZipper
 {
@@ -145,7 +147,7 @@ public class LogZipper
 		}
 	}
 
-	private void logFindDates(HashMap<Integer, Integer> timeMap, File fileDir, int currDate)
+	private void logFindDates(@Nonnull HashMap<Integer, Integer> timeMap, @Nonnull File fileDir, int currDate)
 	{
 		File monthList[] = fileDir.listFiles();
 		if (monthList == null)
@@ -213,7 +215,7 @@ public class LogZipper
 		}
 	}
 
-	private void logZipDateFile(ZipOutputStream zip, File file, int fileDate, String filePath, ProjectPathSetting setting)
+	private void logZipDateFile(@Nonnull ZipOutputStream zip, @Nonnull File file, int fileDate, @Nonnull String filePath, @Nonnull ProjectPathSetting setting)
 	{
 		int m;
 		m = file.getName().indexOf(".");
@@ -287,7 +289,7 @@ public class LogZipper
 		}
 	}
 
-	public void logZipDate(ZipOutputStream zip, File fileDir, int fileDate, ProjectPathSetting setting)
+	public void logZipDate(@Nonnull ZipOutputStream zip, @Nonnull File fileDir, int fileDate, @Nonnull ProjectPathSetting setting)
 	{
 		File monthList[] = fileDir.listFiles();
 		if (monthList == null)

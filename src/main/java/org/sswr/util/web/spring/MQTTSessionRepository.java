@@ -15,13 +15,16 @@ import org.sswr.util.net.MQTTStaticClient;
 import org.sswr.util.net.SSLEngine;
 import org.sswr.util.net.TCPClientType;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 public class MQTTSessionRepository implements SessionRepository<SpringSession>, MQTTPublishMessageHdlr {
 	private HashMap<String, SpringSession> sessMap;
 	private MQTTStaticClient cli;
 	private String topicBase;
 	private LogTool log;
 
-	public MQTTSessionRepository(LogTool log, String brokerHost, int port, SSLEngine ssl, TCPClientType clientType, int keepAliveS, String user, String password, String topicBase)
+	public MQTTSessionRepository(@Nonnull LogTool log, @Nonnull String brokerHost, int port, @Nullable SSLEngine ssl, @Nonnull TCPClientType clientType, int keepAliveS, @Nullable String user, @Nullable String password, @Nonnull String topicBase)
 	{
 		this.log = log;
 		if (topicBase.endsWith("/"))
@@ -38,12 +41,13 @@ public class MQTTSessionRepository implements SessionRepository<SpringSession>, 
 	}
 
 	@Override
+	@Nonnull 
 	public SpringSession createSession() {
 		return new SpringSession();
 	}
 
 	@Override
-	public void save(SpringSession session) {
+	public void save(@Nonnull SpringSession session) {
 		synchronized (this)
 		{
 			this.sessMap.put(session.getId(), session);
@@ -56,7 +60,8 @@ public class MQTTSessionRepository implements SessionRepository<SpringSession>, 
 	}
 
 	@Override
-	public SpringSession findById(String id) {
+	@Nullable
+	public SpringSession findById(@Nonnull String id) {
 		synchronized (this)
 		{
 			return this.sessMap.get(id);
@@ -64,7 +69,7 @@ public class MQTTSessionRepository implements SessionRepository<SpringSession>, 
 	}
 
 	@Override
-	public void deleteById(String id) {
+	public void deleteById(@Nonnull String id) {
 		synchronized (this)
 		{
 			this.sessMap.remove(id);
@@ -73,7 +78,7 @@ public class MQTTSessionRepository implements SessionRepository<SpringSession>, 
 	}
 
 	@Override
-	public void onPublishMessage(String topic, byte[] buff, int buffOfst, int buffSize) {
+	public void onPublishMessage(@Nonnull String topic, @Nonnull byte[] buff, int buffOfst, int buffSize) {
 		if (topic.endsWith("/all"))
 		{
 			try

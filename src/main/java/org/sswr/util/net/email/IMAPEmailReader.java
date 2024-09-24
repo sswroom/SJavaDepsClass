@@ -10,6 +10,9 @@ import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Store;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 public class IMAPEmailReader implements EmailReader
 {
 	private Properties props;
@@ -22,7 +25,7 @@ public class IMAPEmailReader implements EmailReader
 	private Folder inbox;
 	private Store store;
 
-	public IMAPEmailReader(String serverHost, int port, boolean ssl, String username, String password)
+	public IMAPEmailReader(@Nonnull String serverHost, int port, boolean ssl, @Nonnull String username, @Nonnull String password)
 	{
 		this.serverHost = serverHost;
 		this.username = username;
@@ -69,7 +72,7 @@ public class IMAPEmailReader implements EmailReader
 
 	}
 
-	public boolean openFolder(String folderName)
+	public boolean openFolder(@Nonnull String folderName)
 	{
 		if (this.store == null)
 		{
@@ -126,6 +129,7 @@ public class IMAPEmailReader implements EmailReader
 		}
 	}
 
+	@Nullable
 	public Message[] getMessages()
 	{
 		if (this.inbox == null)

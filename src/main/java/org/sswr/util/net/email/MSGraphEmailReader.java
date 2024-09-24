@@ -34,16 +34,20 @@ import org.sswr.util.net.MSGraphUtil.AccessTokenResult;
 import com.microsoft.graph.models.Attachment;
 import com.microsoft.graph.models.BodyType;
 import com.microsoft.graph.models.FileAttachment;
+import com.microsoft.graph.models.ItemBody;
 import com.microsoft.graph.models.MailFolder;
 import com.microsoft.graph.models.MessageMoveParameterSet;
 import com.microsoft.graph.models.Recipient;
 import com.microsoft.graph.requests.AttachmentCollectionPage;
 import com.microsoft.graph.requests.AttachmentCollectionRequest;
+import com.microsoft.graph.requests.AttachmentCollectionRequestBuilder;
 import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.graph.requests.MailFolderCollectionPage;
 import com.microsoft.graph.requests.MailFolderCollectionRequest;
+import com.microsoft.graph.requests.MailFolderCollectionRequestBuilder;
 import com.microsoft.graph.requests.MessageCollectionPage;
 
+import jakarta.annotation.Nullable;
 import okhttp3.Request;
 
 public class MSGraphEmailReader implements EmailReader
@@ -54,9 +58,13 @@ public class MSGraphEmailReader implements EmailReader
 		EmailMessage emsg;
 		boolean delete;
 
-		static EmailAddress addrFromRecipient(Recipient rcpt)
+		@Nullable
+		static EmailAddress addrFromRecipient(@Nonnull Recipient rcpt)
 		{
-			return new EmailAddress(rcpt.emailAddress.name, rcpt.emailAddress.address);
+			com.microsoft.graph.models.EmailAddress addr = rcpt.emailAddress;
+			if (addr == null)
+				return null;
+			return new EmailAddress(addr.name, addr.address);
 		}
 
 		public GraphMessage(com.microsoft.graph.models.Message msg, EmailMessage emsg)
@@ -77,15 +85,18 @@ public class MSGraphEmailReader implements EmailReader
 
 		private static Address addressFromRecipient(Recipient rcpt)
 		{
+			com.microsoft.graph.models.EmailAddress addr = rcpt.emailAddress;
+			if (addr == null)
+				return null;
 			try
 			{
-				return new InternetAddress(rcpt.emailAddress.address, rcpt.emailAddress.name);
+				return new InternetAddress(addr.address, addr.name);
 			}
 			catch (UnsupportedEncodingException ex)
 			{
 				try
 				{
-					return new InternetAddress(rcpt.emailAddress.address);
+					return new InternetAddress(addr.address);
 				}
 				catch (AddressException ex2)
 				{
@@ -121,7 +132,10 @@ public class MSGraphEmailReader implements EmailReader
 
 		private static String fromRecipient(Recipient rcpt)
 		{
-			return rcpt.emailAddress.address;
+			com.microsoft.graph.models.EmailAddress addr = rcpt.emailAddress;
+			if (addr == null)
+				return null;
+			return addr.address;
 		}
 		
 		private static String[] fromRecipients(List<Recipient> rcpts)
@@ -146,7 +160,13 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public int getSize() throws MessagingException {
-			return this.msg.body.content.length();
+			ItemBody body = this.msg.body;
+			if (body == null)
+				throw new MessagingException("body is null");
+			String content = body.content;
+			if (content == null)
+				throw new MessagingException("content is null");
+			return content.length();
 		}
 
 		@Override
@@ -156,7 +176,10 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public String getContentType() throws MessagingException {
-			return (this.msg.body.contentType == BodyType.HTML)?"text/html":"text/plain";
+			ItemBody body = this.msg.body;
+			if (body == null)
+				throw new MessagingException("body is null");
+			return (body.contentType == BodyType.HTML)?"text/html":"text/plain";
 		}
 
 		@Override
@@ -206,12 +229,15 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public Object getContent() throws IOException, MessagingException {
+			ItemBody body = this.msg.body;
+			if (body == null)
+				throw new MessagingException("body is null");
 			if (this.emsg.getAttachmentCount() > 0)
 			{
-				return EmailUtil.createMultipart(this.emsg.getAttachments(), this.msg.body.content, this.getContentType());
+				return EmailUtil.createMultipart(this.emsg.getAttachments(), body.content, this.getContentType());
 			}
 			else
-				return this.msg.body.content;
+				return body.content;
 		}
 
 		@Override
@@ -236,34 +262,52 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public void writeTo(OutputStream os) throws IOException, MessagingException {
+			ItemBody body = this.msg.body;
+			if (body == null)
+				throw new MessagingException("body is null");
+			List<Recipient> recipients;
 			SMTPMessage message = new SMTPMessage();
 			message.setMessageId(this.msg.id);
-			message.setContent(this.msg.body.content, this.getContentType());
+			message.setContent(body.content, this.getContentType());
 			if (this.msg.sentDateTime != null)
 				message.setSentDate(this.msg.sentDateTime.toZonedDateTime());
 			message.setSubject(this.msg.subject);
 			if (this.msg.from != null)
 				message.setFrom(addrFromRecipient(this.msg.from));
-			int i = 0;
-			int j = this.msg.toRecipients.size();
-			while (i < j)
+			int i;
+			int j;
+			recipients = this.msg.toRecipients;
+			if (recipients != null)
 			{
-				message.addTo(addrFromRecipient(this.msg.toRecipients.get(i)));
-				i++;
+				i = 0;
+				j = recipients.size();
+				while (i < j)
+				{
+					message.addTo(addrFromRecipient(recipients.get(i)));
+					i++;
+				}
 			}
-			i = 0;
-			j = this.msg.ccRecipients.size();
-			while (i < j)
+			recipients = this.msg.ccRecipients;
+			if (recipients != null)
 			{
-				message.addCc(addrFromRecipient(this.msg.ccRecipients.get(i)));
-				i++;
+				i = 0;
+				j = recipients.size();
+				while (i < j)
+				{
+					message.addCc(addrFromRecipient(recipients.get(i)));
+					i++;
+				}
 			}
-			i = 0;
-			j = this.msg.bccRecipients.size();
-			while (i < j)
+			recipients = this.msg.bccRecipients;
+			if (recipients != null)
 			{
-				message.addBcc(addrFromRecipient(this.msg.bccRecipients.get(i)));
-				i++;
+				i = 0;
+				j = recipients.size();
+				while (i < j)
+				{
+					message.addBcc(addrFromRecipient(recipients.get(i)));
+					i++;
+				}
 			}
 			i = 0;
 			j = emsg.getAttachmentCount();
@@ -537,9 +581,10 @@ public class MSGraphEmailReader implements EmailReader
 				}
 				i++;
 			}
-			if (folders.getNextPage() == null)
+			MailFolderCollectionRequestBuilder nextPage = folders.getNextPage();
+			if (nextPage == null)
 				return false;
-			req = folders.getNextPage().buildRequest();
+			req = nextPage.buildRequest();
 		}
 		return false;
 	}
@@ -624,15 +669,22 @@ public class MSGraphEmailReader implements EmailReader
 		return false;
 	}
 
-	private EmailMessage toEmailMessage(com.microsoft.graph.models.Message msg)
+	@Nullable
+	private EmailMessage toEmailMessage(@Nonnull com.microsoft.graph.models.Message msg)
 	{
-		SimpleEmailMessage email = new SimpleEmailMessage(msg.subject, msg.body.content, msg.body.contentType == BodyType.HTML);
-		if (msg.hasAttachments)
+		ItemBody body = msg.body;
+		if (body == null)
+			return null;
+		String msgId = msg.id;
+		if (msgId == null)
+			return null;
+		SimpleEmailMessage email = new SimpleEmailMessage(msg.subject, body.content, body.contentType == BodyType.HTML);
+		if (msg.hasAttachments != null && msg.hasAttachments)
 		{
 			GraphServiceClient<Request> client = createClient();
 			if (client == null)
 				return null;
-			AttachmentCollectionRequest req = client.users(fromEmail).messages(msg.id).attachments().buildRequest();
+			AttachmentCollectionRequest req = client.users(fromEmail).messages(msgId).attachments().buildRequest();
 			AttachmentCollectionPage page;
 			int i;
 			int j;
@@ -649,10 +701,13 @@ public class MSGraphEmailReader implements EmailReader
 					{
 						FileAttachment fatt = (FileAttachment)att;
 						EmailAttachment eatt = new EmailAttachment();
-						eatt.isInline = fatt.isInline;
+						eatt.isInline = fatt.isInline != null && fatt.isInline;
 						eatt.contentId = fatt.contentId;
 						eatt.fileName = fatt.name;
-						eatt.modifyTime = fatt.lastModifiedDateTime.toZonedDateTime();
+						if (fatt.lastModifiedDateTime != null)
+						{
+							eatt.modifyTime = fatt.lastModifiedDateTime.toZonedDateTime();
+						}
 						eatt.contentType = fatt.contentType;
 						eatt.content = fatt.contentBytes;
 						email.addAttachment(eatt);
@@ -664,9 +719,10 @@ public class MSGraphEmailReader implements EmailReader
 					i++;
 				}
 
-				if (page.getNextPage() == null)
+				AttachmentCollectionRequestBuilder nextPage = page.getNextPage();
+				if (nextPage == null)
 					break;
-				req = page.getNextPage().buildRequest();
+				req = nextPage.buildRequest();
 			}
 		}
 		
