@@ -2,13 +2,15 @@ package org.sswr.util.web.spring;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.zip.DataFormatException;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.springframework.session.SessionRepository;
-import org.sswr.util.data.StringUtil;
+import org.sswr.util.io.LogLevel;
 import org.sswr.util.io.LogTool;
 import org.sswr.util.net.MQTTPublishMessageHdlr;
 import org.sswr.util.net.MQTTStaticClient;
@@ -21,7 +23,7 @@ public class MQTTSessionRepository implements SessionRepository<SpringSession>, 
 	private String topicBase;
 	private LogTool log;
 
-	public MQTTSessionRepository(LogTool log, String brokerHost, int port, SSLEngine ssl, TCPClientType clientType, int keepAliveS, String user, String password, String topicBase)
+	public MQTTSessionRepository(@Nonnull LogTool log, @Nonnull String brokerHost, int port, @Nullable SSLEngine ssl, @Nonnull TCPClientType clientType, int keepAliveS, @Nullable String user, @Nullable String password, @Nonnull String topicBase)
 	{
 		this.log = log;
 		if (topicBase.endsWith("/"))
@@ -34,10 +36,12 @@ public class MQTTSessionRepository implements SessionRepository<SpringSession>, 
 		}
 		this.cli = new MQTTStaticClient(brokerHost, port, ssl, clientType, keepAliveS, user, password, true);
 		this.cli.subscribe(this.topicBase+"+", this);
+		this.cli.publish(this.topicBase+"cmd", "getAll");
 		this.sessMap = new HashMap<String, SpringSession>();
 	}
 
 	@Override
+	@Nonnull 
 	public SpringSession createSession() {
 		return new SpringSession();
 	}
@@ -51,11 +55,12 @@ public class MQTTSessionRepository implements SessionRepository<SpringSession>, 
 		if (session.isUpdated())
 		{
 			session.setUpdated(false);
-			this.publishAll();
+			this.publishUpdate(session);
 		}
 	}
 
 	@Override
+	@Nullable
 	public SpringSession findById(String id) {
 		synchronized (this)
 		{
@@ -68,24 +73,20 @@ public class MQTTSessionRepository implements SessionRepository<SpringSession>, 
 		synchronized (this)
 		{
 			this.sessMap.remove(id);
-			this.publishAll();
+			this.publishDelete(id);
 		}
 	}
 
 	@Override
-	public void onPublishMessage(String topic, byte[] buff, int buffOfst, int buffSize) {
-		if (topic.endsWith("/all"))
+	public void onPublishMessage(@Nonnull String topic, @Nonnull byte[] buff, int buffOfst, int buffSize) {
+		if (topic.endsWith("/update"))
 		{
 			try
 			{
-				List<SpringSession> sessList = new ArrayList<SpringSession>();
-				String[] sarr = StringUtil.split(new String(buff, buffOfst, buffSize, StandardCharsets.UTF_8), "|");
-				int i = 0;
-				int j = sarr.length;
-				while (i < j)
+				SpringSession session = SpringSession.fromJSON(new String(buff, buffOfst, buffSize, StandardCharsets.UTF_8));
+				synchronized (this)
 				{
-					sessList.add(SpringSession.fromJSON(sarr[i]));
-					i++;
+					this.sessMap.put(session.getId(), session);
 				}
 			}
 			catch (IOException ex)
@@ -96,34 +97,59 @@ public class MQTTSessionRepository implements SessionRepository<SpringSession>, 
 			{
 				log.logException(ex);
 			}
+			catch (DataFormatException ex)
+			{
+				log.logException(ex);
+			}
 		}
-		else
+		else if (topic.endsWith("/del"))
 		{
-
+			String id = new String(buff, buffOfst, buffSize, StandardCharsets.UTF_8);
+			synchronized (this)
+			{
+				this.sessMap.remove(id);
+			}
+		}
+		else if (topic.endsWith("/cmd"))
+		{
+			String val = new String(buff, buffOfst, buffSize, StandardCharsets.UTF_8);
+			if (val.equals("getAll"))
+			{
+				synchronized (this)
+				{
+					Iterator<SpringSession> it = this.sessMap.values().iterator();
+					while (it.hasNext())
+					{
+						this.publishUpdate(it.next());
+					}
+				}
+	
+			}
 		}
 	}
 
-	private void publishAll()
+	private void publishUpdate(@Nonnull SpringSession session)
 	{
-		StringBuilder sb = new StringBuilder();
-		synchronized(this)
+		try
 		{
-			Iterator<SpringSession> it = this.sessMap.values().iterator();
-			while (it.hasNext())
+			String json = session.toJSON();
+			if (json.length() > 65000)
 			{
-				SpringSession sess = it.next();
-				try
-				{
-					String json = sess.toJSON();
-					if (sb.length() > 0) sb.append("|");
-					sb.append(json);
-				}
-				catch (IOException ex)
-				{
-					this.log.logException(ex);
-				}
+				this.log.logMessage("Session is too large to boardcast: len = "+json.length(), LogLevel.ERROR);
+			}
+			else
+			{
+				this.cli.publish(this.topicBase+"update", json);
 			}
 		}
-		this.cli.publish(this.topicBase+"all", sb.toString());
+		catch (IOException ex)
+		{
+			this.log.logException(ex);
+		}
+	}
+
+	private void publishDelete(@Nonnull String id)
+	{
+		this.cli.publish(this.topicBase+"del", id);
 	}
 }

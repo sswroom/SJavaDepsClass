@@ -1,6 +1,13 @@
 # SJavaDepsClass
 
 # Changes:
+0.2.20240925
+- Compress SpringSession
+
+0.2.20240924
+- Added SpringSession
+- Added MQTTSessionRepository
+
 0.2.20240725.2
 - Added MSGraphEmailControl add Accept header
 
