@@ -11,14 +11,19 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 import org.springframework.session.Session;
+import org.sswr.util.data.ByteTool;
 import org.sswr.util.data.DataTools;
 import org.sswr.util.data.JSONBase;
 import org.sswr.util.data.JSONBuilder;
 import org.sswr.util.data.JSONBuilder.ObjectType;
+import org.sswr.util.data.textbinenc.Base64Enc;
+import org.sswr.util.data.textbinenc.Base64Enc.B64Charset;
 import org.sswr.util.data.JSONObject;
-import org.sswr.util.data.StringUtil;
 
 import jakarta.annotation.Nonnull;
 
@@ -153,6 +158,8 @@ public class SpringSession implements Session {
 		builder.objectBeginObject("attributes");
 		Set<String> names = this.getAttributeNames();
 		Iterator<String> it = names.iterator();
+		Deflater deflate = new Deflater(Deflater.BEST_COMPRESSION);
+		Base64Enc b64 = new Base64Enc(B64Charset.NORMAL, true);
 		while (it.hasNext())
 		{
 			String name = it.next();
@@ -165,7 +172,14 @@ public class SpringSession implements Session {
 				oos.writeObject(obj);
 				oos.flush();
 				oos.close();
-				builder.objectAddStr(name, StringUtil.toHex(baos.toByteArray()));
+				byte[] input = baos.toByteArray();
+				byte[] output = new byte[input.length + 5];
+				deflate.setInput(input);
+				deflate.finish();
+				int compSize = deflate.deflate(output, 4, output.length - 4);
+				deflate.end();
+				ByteTool.writeInt32(output, 0, input.length);
+				builder.objectAddStr(name, b64.encodeBin(output, 0, compSize + 4));
 			}
 			else
 			{
@@ -177,12 +191,9 @@ public class SpringSession implements Session {
 		return builder.toString();
 	}
 
-	public static SpringSession fromJSON(@Nonnull String sessStr) throws IOException, ClassNotFoundException
+	@Nonnull
+	public static SpringSession fromJSON(@Nonnull String sessStr) throws IOException, ClassNotFoundException, DataFormatException
 	{
-		if (sessStr == null)
-		{
-			throw new IllegalArgumentException("sessStr is null");
-		}
 		String s;
 		JSONBase json = JSONBase.parseJSONStr(sessStr);
 		if (json == null)
@@ -204,14 +215,21 @@ public class SpringSession implements Session {
 		JSONObject attr = json.getValueObject("attributes");
 		if (attr == null) throw new IOException("attributes not found");
 		Set<String> names = attr.getObjectNames();
+		Base64Enc b64 = new Base64Enc(B64Charset.NORMAL, true);
 		Iterator<String> it = names.iterator();
 		while (it.hasNext())
 		{
 			String name = it.next();
 			String value = attr.getObjectString(name);
 			if (value == null) throw new IOException("attribute["+name+"] not found");
-			byte[] buff = StringUtil.hex2Bytes(value);
-			ByteArrayInputStream bais = new ByteArrayInputStream(buff);
+			byte[] buff = b64.decodeBin(value);
+			int len = ByteTool.readInt32(buff, 0);
+			byte[] outBuff = new byte[len];
+			Inflater inflater = new Inflater();
+			inflater.setInput(buff, 4, buff.length - 4);
+			inflater.inflate(outBuff);
+			inflater.end();
+			ByteArrayInputStream bais = new ByteArrayInputStream(outBuff);
 			ObjectInputStream ois = new ObjectInputStream(bais);
 			sess.setAttribute(name, ois.readObject());
 		}

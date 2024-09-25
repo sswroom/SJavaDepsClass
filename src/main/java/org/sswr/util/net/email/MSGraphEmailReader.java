@@ -502,7 +502,7 @@ public class MSGraphEmailReader implements EmailReader
 	private Map<String, GraphMessage> changedMap;
 	private boolean archiveOnDelete;
 
-	public MSGraphEmailReader(LogTool log, @Nonnull String clientId, @Nonnull String tenantId, @Nonnull String clientSecret, @Nonnull String fromEmail)
+	public MSGraphEmailReader(@Nonnull LogTool log, @Nonnull String clientId, @Nonnull String tenantId, @Nonnull String clientSecret, @Nonnull String fromEmail)
 	{
 		this.log = log;
 		this.clientId = clientId;
