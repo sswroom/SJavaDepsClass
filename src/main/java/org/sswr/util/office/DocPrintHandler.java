@@ -17,7 +17,7 @@ import jakarta.annotation.Nonnull;
 public class DocPrintHandler implements PrintHandler
 {
 	private HWPFDocument doc;
-	private PrintDocument printDoc;
+	//private PrintDocument printDoc;
 
 	public DocPrintHandler(@Nonnull HWPFDocument doc)
 	{
@@ -27,7 +27,7 @@ public class DocPrintHandler implements PrintHandler
 	@Override
 	public boolean beginPrint(@Nonnull PrintDocument doc)
 	{
-		this.printDoc = doc;
+		//this.printDoc = doc;
 		return true;
 	}
 
