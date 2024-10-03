@@ -1,6 +1,7 @@
 # SJavaDepsClass
 
 # Changes:
+0.4.20241003
 - SpringSession compress session
 - Added Nonnull/Nullable
 
