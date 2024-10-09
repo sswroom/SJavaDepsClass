@@ -36,6 +36,7 @@ public class XlsxConditionalFormatBuilder
 		this.entries = new ArrayList<RuleEntry>();
 	}
 
+	@Nonnull
 	public XlsxConditionalFormatBuilder empty(@Nonnull CellStyle style)
 	{
 		RuleEntry ent = this.createEntry(style);
@@ -162,7 +163,7 @@ public class XlsxConditionalFormatBuilder
 		return true;
 	}
 
-	private short getFillPattern(@Nullable FillPatternType fType)
+	private short getFillPattern(@Nonnull FillPatternType fType)
 	{
 		switch (fType)
 		{

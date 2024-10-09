@@ -77,7 +77,7 @@ public class AccessLogFilter extends GenericFilterBean
 	}
 
 	@Override
-	public void doFilter(@Nonnull ServletRequest request, @Nonnull ServletResponse response, @Nonnull FilterChain chain) throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		boolean found = false;
 		RequestStatus status = new RequestStatus();
 		status.thread = Thread.currentThread();

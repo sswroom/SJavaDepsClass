@@ -2,18 +2,17 @@ package org.sswr.util.net.email;
 
 import java.util.Properties;
 
-import javax.mail.Authenticator;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Store;
-
-import org.sswr.util.net.SSLEngine;
-
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import jakarta.mail.Authenticator;
+import jakarta.mail.Folder;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Store;
+
+import org.sswr.util.net.SSLEngine;
 
 public class POP3EmailReader implements EmailReader
 {
@@ -97,7 +96,7 @@ public class POP3EmailReader implements EmailReader
 		}
 	}
 
-	public boolean openFolder(String folderName)
+	public boolean openFolder(@Nonnull String folderName)
 	{
 		if (this.inbox != null)
 			return true;

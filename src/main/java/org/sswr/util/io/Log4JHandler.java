@@ -16,7 +16,7 @@ public class Log4JHandler implements LogHandler
 		this.logger = logger;
 	}
 
-	public void logAdded(ZonedDateTime logTime, String logMsg, LogLevel logLev)
+	public void logAdded(@Nonnull ZonedDateTime logTime, @Nonnull String logMsg, @Nonnull LogLevel logLev)
 	{
 		switch (logLev)
 		{

@@ -4,19 +4,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 import org.sswr.util.data.StringUtil;
 import org.sswr.util.io.LogLevel;
 import org.sswr.util.io.LogTool;
-import org.sswr.util.net.AccessTokenProvider;
 import org.sswr.util.net.HTTPClient;
+import org.sswr.util.net.MSGraphAccessTokenProvider;
 import org.sswr.util.net.MSGraphUtil;
 import org.sswr.util.net.RequestMethod;
 import org.sswr.util.net.MSGraphUtil.AccessTokenResult;
 
-import com.microsoft.graph.core.ClientException;
-import com.microsoft.graph.models.AttachmentCreateUploadSessionParameterSet;
 import com.microsoft.graph.models.AttachmentItem;
 import com.microsoft.graph.models.AttachmentType;
 import com.microsoft.graph.models.BodyType;
@@ -25,10 +24,10 @@ import com.microsoft.graph.models.ItemBody;
 import com.microsoft.graph.models.Message;
 import com.microsoft.graph.models.Recipient;
 import com.microsoft.graph.models.UploadSession;
-import com.microsoft.graph.models.UserSendMailParameterSet;
-import com.microsoft.graph.requests.GraphServiceClient;
-
-import okhttp3.Request;
+import com.microsoft.graph.serviceclient.GraphServiceClient;
+import com.microsoft.graph.users.item.messages.item.attachments.createuploadsession.CreateUploadSessionPostRequestBody;
+import com.microsoft.graph.users.item.sendmail.SendMailPostRequestBody;
+import com.microsoft.kiota.authentication.BaseBearerTokenAuthenticationProvider;
 
 public class MSGraphEmailControl implements EmailControl
 {
@@ -77,44 +76,47 @@ public class MSGraphEmailControl implements EmailControl
 		}
 	}
 
-	private GraphServiceClient<Request> createClient()
+	private GraphServiceClient createClient()
 	{
 		updateAccessToken();
 		if (accessToken == null)
 		{
 			return null;
 		}
-		return GraphServiceClient
-				.builder()
-				.authenticationProvider(new AccessTokenProvider(accessToken.accessToken))
-				.buildClient();
+		BaseBearerTokenAuthenticationProvider authProvider = new BaseBearerTokenAuthenticationProvider(new MSGraphAccessTokenProvider(accessToken.accessToken));
+		return new GraphServiceClient(authProvider);
 	}
 
 	@Override
-	public boolean sendMail(EmailMessage message, String toList, String ccList) {
+	public boolean sendMail(@Nonnull EmailMessage message, @Nullable String toList, @Nullable String ccList) {
 		Message graphMsg = new Message();
-		graphMsg.subject = message.getSubject();
+		graphMsg.setSubject(message.getSubject());
 		ItemBody body = new ItemBody();
 		if (message.isContentHTML())
-			body.contentType = BodyType.HTML;
+			body.setContentType(BodyType.Html);
 		else
-			body.contentType = BodyType.TEXT;
-		body.content = message.getContent();
-		graphMsg.body = body;
-		List<Recipient> toRecipientsList = new ArrayList<Recipient>();
-		String []toArr = toList.split(",");
-		int i = 0;
-		int j = toArr.length;
-		while (i < j)
+			body.setContentType(BodyType.Text);
+		body.setContent(message.getContent());
+		graphMsg.setBody(body);
+		int i;
+		int j;
+		if (toList != null)
 		{
-			Recipient toRecipients = new Recipient();
-			com.microsoft.graph.models.EmailAddress emailAddress = new com.microsoft.graph.models.EmailAddress();
-			emailAddress.address = toArr[i];
-			toRecipients.emailAddress = emailAddress;
-			toRecipientsList.add(toRecipients);
-			i++;
+			List<Recipient> toRecipientsList = new ArrayList<Recipient>();
+			String []toArr = toList.split(",");
+			i = 0;
+			j = toArr.length;
+			while (i < j)
+			{
+				Recipient toRecipients = new Recipient();
+				com.microsoft.graph.models.EmailAddress emailAddress = new com.microsoft.graph.models.EmailAddress();
+				emailAddress.setAddress(toArr[i]);
+				toRecipients.setEmailAddress(emailAddress);
+				toRecipientsList.add(toRecipients);
+				i++;
+			}
+			graphMsg.setToRecipients(toRecipientsList);
 		}
-		graphMsg.toRecipients = toRecipientsList;
 		if (ccList != null && ccList.length() > 0)
 		{
 			List<Recipient> ccRecipientsList = new ArrayList<Recipient>();
@@ -125,8 +127,8 @@ public class MSGraphEmailControl implements EmailControl
 			{
 				Recipient ccRecipients = new Recipient();
 				com.microsoft.graph.models.EmailAddress emailAddress = new com.microsoft.graph.models.EmailAddress();
-				emailAddress.address = ccArr[i];
-				ccRecipients.emailAddress = emailAddress;
+				emailAddress.setAddress(ccArr[i]);
+				ccRecipients.setEmailAddress(emailAddress);
 				ccRecipientsList.add(ccRecipients);
 				i++;
 			}
@@ -140,178 +142,152 @@ public class MSGraphEmailControl implements EmailControl
 			while (i < j)
 			{
 				InternetMessageHeader header = new InternetMessageHeader();
-				header.name = message.getCustomHeaderName(i);
-				header.value = message.getCustomHeaderValue(i);
+				header.setName(message.getCustomHeaderName(i));
+				header.setValue(message.getCustomHeaderValue(i));
 				headers.add(header);
 				i++;
 			}
-			graphMsg.internetMessageHeaders = headers;
+			graphMsg.setInternetMessageHeaders(headers);
 		}
 
 		if (message.getAttachmentCount() > 0)
 		{
 			Message newMsg = null;
-			GraphServiceClient<Request> client = createClient();
+			GraphServiceClient client = createClient();
 			if (client == null)
 				return false;
-			try
+			newMsg = client.users().byUserId(this.fromEmail)
+				.messages()
+				.post(graphMsg);
+			if (newMsg == null)
 			{
-				newMsg = client.users(this.fromEmail)
-					.messages()
-					.buildRequest()
-					.post(graphMsg);
-			}
-			catch (ClientException ex)
-			{
-				log.logException(ex);
+				this.log.logMessage("Error in getting user info", LogLevel.ERROR);
 				return false;
 			}
-			String newMsgId = newMsg.id;
+			String newMsgId = newMsg.getId();
 			if (newMsgId == null)
 			{
 				this.log.logMessage("Message id not found", LogLevel.ERROR);
 				return false;
 			}
 			boolean succ = true;
-			try
+			EmailAttachment att;
+			i = 0;
+			j = message.getAttachmentCount();
+			while (i < j)
 			{
-				EmailAttachment att;
-				i = 0;
-				j = message.getAttachmentCount();
-				while (i < j)
+				att = message.getAttachment(i);
+				if (att != null)//att.content.length > 1048576 * 3)
 				{
-					att = message.getAttachment(i);
-					if (true)//att.content.length > 1048576 * 3)
+					AttachmentItem item = new AttachmentItem();
+					item.setAttachmentType(AttachmentType.File);
+					item.setContentId(att.contentId);
+					item.setContentType(att.contentType);
+					item.setIsInline(att.isInline);
+					item.setName(att.fileName);
+					item.setSize((long)att.content.length);
+					CreateUploadSessionPostRequestBody itemBody = new CreateUploadSessionPostRequestBody();
+					itemBody.setAttachmentItem(item);
+					UploadSession sess = client.users().byUserId(this.fromEmail).messages().byMessageId(newMsgId).attachments()
+						.createUploadSession().post(itemBody);
+					if (sess == null)
 					{
-						AttachmentItem item = new AttachmentItem();
-						item.attachmentType = AttachmentType.FILE;
-						item.contentId = att.contentId;
-						item.contentType = att.contentType;
-						item.isInline = att.isInline;
-						item.name = att.fileName;
-						item.size = (long)att.content.length;
-						UploadSession sess = client.users(this.fromEmail).messages(newMsgId).attachments()
-							.createUploadSession(AttachmentCreateUploadSessionParameterSet
-								.newBuilder()
-								.withAttachmentItem(item)
-								.build())
-							.buildRequest()
-							.post();
-						if (sess == null)
+						this.log.logMessage("MSGraphEmailControl: Error in creating upload session", LogLevel.ERROR);
+						return false;
+					}
+					String uploadUrl = sess.getUploadUrl();
+					if (uploadUrl == null)
+					{
+						this.log.logMessage("MSGraphEmailControl: Upload session url not found", LogLevel.ERROR);
+						return false;
+					}
+					int currOfst = 0;
+					int endOfst;
+					while (currOfst < att.content.length)
+					{
+						endOfst = currOfst + this.attSplitSize;
+						if (endOfst > att.content.length)
+							endOfst = att.content.length;
+						HTTPClient cli = HTTPClient.createConnect(null, null, uploadUrl, RequestMethod.HTTP_PUT, false);
+						cli.setReadTimeout(5000);
+						cli.addContentType("application/octet-stream");
+						cli.addContentLength(endOfst - currOfst);
+						cli.addHeader("Content-Range", "bytes "+currOfst+"-"+(endOfst - 1)+"/"+att.content.length);
+						cli.addHeader("Accept", "*/*");
+						cli.write(att.content, currOfst, endOfst - currOfst);
+						int status = cli.getRespStatus();
+						byte[] data = cli.readToEnd();
+						cli.close();
+						if (status == 200)
 						{
-							this.log.logMessage("MSGraphEmailControl: Error in creating upload session", LogLevel.ERROR);
-							return false;
-						}
-						int currOfst = 0;
-						int endOfst;
-						while (currOfst < att.content.length)
-						{
-							endOfst = currOfst + this.attSplitSize;
-							if (endOfst > att.content.length)
-								endOfst = att.content.length;
-							HTTPClient cli = HTTPClient.createConnect(null, null, sess.uploadUrl, RequestMethod.HTTP_PUT, false);
-							cli.setReadTimeout(5000);
-							cli.addContentType("application/octet-stream");
-							cli.addContentLength(endOfst - currOfst);
-							cli.addHeader("Content-Range", "bytes "+currOfst+"-"+(endOfst - 1)+"/"+att.content.length);
-							cli.addHeader("Accept", "*/*");
-							cli.write(att.content, currOfst, endOfst - currOfst);
-							int status = cli.getRespStatus();
-							byte[] data = cli.readToEnd();
-							cli.close();
-							if (status == 200)
+							currOfst = endOfst;
+							if (endOfst >= att.content.length)
 							{
-								currOfst = endOfst;
-								if (endOfst >= att.content.length)
-								{
-									log.logMessage("MSGraphEmailControl: File upload pass end of file: "+att.content.length, LogLevel.ERROR);
-									succ = false;
-									break;
-								}
-							}
-							else if (status == 201)
-							{
-								if (endOfst != att.content.length)
-								{
-									log.logMessage("MSGraphEmailControl: File upload missing data: "+endOfst+" != "+att.content.length, LogLevel.ERROR);
-									succ = false;
-									break;
-								}
-								break;
-							}
-							else
-							{
-								log.logMessage("MSGraphEmailControl: File upload unknown response: "+status, LogLevel.ERROR);
-								log.logMessage(new String(data, StandardCharsets.UTF_8), LogLevel.RAW);
+								log.logMessage("MSGraphEmailControl: File upload pass end of file: "+att.content.length, LogLevel.ERROR);
 								succ = false;
 								break;
 							}
 						}
+						else if (status == 201)
+						{
+							if (endOfst != att.content.length)
+							{
+								log.logMessage("MSGraphEmailControl: File upload missing data: "+endOfst+" != "+att.content.length, LogLevel.ERROR);
+								succ = false;
+								break;
+							}
+							break;
+						}
+						else
+						{
+							log.logMessage("MSGraphEmailControl: File upload unknown response: "+status, LogLevel.ERROR);
+							log.logMessage(new String(data, StandardCharsets.UTF_8), LogLevel.RAW);
+							succ = false;
+							break;
+						}
 					}
+				}
 /* 					else
-					{
-						FileAttachment fileAtt;
-						fileAtt = new FileAttachment();
-						fileAtt.name = att.fileName;
+				{
+					FileAttachment fileAtt;
+					fileAtt = new FileAttachment();
+					fileAtt.name = att.fileName;
 //						fileAtt.contentId = att.contentId;
-						fileAtt.contentType = att.contentType;
-						fileAtt.contentBytes = att.content;
+					fileAtt.contentType = att.contentType;
+					fileAtt.contentBytes = att.content;
 //						fileAtt.lastModifiedDateTime = att.modifyTime.toOffsetDateTime();
 //						fileAtt.isInline = att.isInline;
-						client.users(this.fromEmail).messages(newMsgId).attachments().buildRequest().post(fileAtt);
-					}*/
-					i++;
-				}
-				if (succ)
-				{
-					client.users(this.fromEmail).messages(newMsgId).send().buildRequest().post();
-				}
+					client.users(this.fromEmail).messages(newMsgId).attachments().buildRequest().post(fileAtt);
+				}*/
+				i++;
 			}
-			catch (ClientException ex)
+			if (succ)
 			{
-				log.logException(ex);
-				succ = false;
+				client.users().byUserId(this.fromEmail).messages().byMessageId(newMsgId).send().post();
 			}
 			if (!succ)
 			{
-				try
-				{
-					client.users(this.fromEmail).messages(newMsgId).buildRequest().delete();
-				}
-				catch (ClientException ex)
-				{
-					log.logException(ex);
-				}
+				client.users().byUserId(this.fromEmail).messages().byMessageId(newMsgId).delete();
 			}
 			return succ;
 		}
 		else
 		{
-			try
-			{
-				GraphServiceClient<Request> client = createClient();
-				if (client == null)
-					return false;
-				client.users(this.fromEmail)
-					.sendMail(UserSendMailParameterSet
-						.newBuilder()
-						.withMessage(graphMsg)
-						.withSaveToSentItems(null)
-						.build())
-					.buildRequest()
-					.post();
-				return true;
-			}
-			catch (ClientException ex)
-			{
-				log.logException(ex);
+			GraphServiceClient client = createClient();
+			if (client == null)
 				return false;
-			}
+			SendMailPostRequestBody mailBody = new SendMailPostRequestBody();
+			mailBody.setMessage(graphMsg);
+			mailBody.setSaveToSentItems(null);
+			client
+				.users().byUserId(this.fromEmail)
+				.sendMail().post(mailBody);
+			return true;
 		}
 	}
 
 	@Override
-	public boolean sendBatchMail(EmailMessage message, List<String> toList)
+	public boolean sendBatchMail(@Nonnull EmailMessage message, @Nonnull List<String> toList)
 	{
 		int i = toList.size();
 		if (i <= 0)
@@ -334,12 +310,13 @@ public class MSGraphEmailControl implements EmailControl
 	}
 
 	@Override
-	public boolean validateDestAddr(String addr) {
+	public boolean validateDestAddr(@Nonnull String addr) {
 		return StringUtil.isEmailAddress(addr);
 	}
 
 	@Override
-	public String sendTestingEmail(String toAddress) {
+	@Nonnull 
+	public String sendTestingEmail(@Nonnull String toAddress) {
 		EmailMessage message = new SimpleEmailMessage("Email Testing", "This is a test email", false);
 		if (sendMail(message, toAddress, null))
 		{

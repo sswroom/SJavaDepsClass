@@ -104,7 +104,7 @@ public class ForwardHandlerRequest implements HttpServletRequest {
 	}
 
 	@Override
-	public Object getAttribute(@Nonnull String name) {
+	public Object getAttribute(String name) {
 		return this.parent.getAttribute(name);
 	}
 

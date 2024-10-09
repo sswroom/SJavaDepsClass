@@ -12,6 +12,9 @@ public class DocUtil
 	{
 		DocPrintHandler printHandler = new DocPrintHandler(doc);
 		PrintDocument pdoc = printer.startPrint(printHandler);
-		printer.endPrint(pdoc);
+		if (pdoc != null)
+		{
+			printer.endPrint(pdoc);
+		}
 	}
 }

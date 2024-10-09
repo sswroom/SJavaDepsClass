@@ -16,17 +16,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import javax.mail.BodyPart;
-import javax.mail.Header;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Part;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import jakarta.mail.BodyPart;
+import jakarta.mail.Header;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.Part;
+import jakarta.mail.Session;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.cms.AttributeTable;
@@ -53,9 +55,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.Selector;
 import org.bouncycastle.util.Store;
 import org.sswr.util.data.DateTimeUtil;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
+import org.sswr.util.data.StringUtil;
 
 public class EmailUtil
 {
@@ -324,13 +324,16 @@ public class EmailUtil
 	}
 
 	@Nonnull
-	static MimeMessage createMimeMessage(@Nonnull Session session, @Nonnull EmailMessage msg, @Nonnull String from, @Nonnull String toList, @Nullable String ccList) throws MessagingException
+	static MimeMessage createMimeMessage(@Nonnull Session session, @Nonnull EmailMessage msg, @Nonnull String from, @Nullable String toList, @Nullable String ccList) throws MessagingException
 	{
 		MimeMessage message = new MimeMessage(session);
 		message.setSubject(msg.getSubject());
 		message.setSentDate(DateTimeUtil.timestampNow());
 		message.setFrom(new InternetAddress(from));
-		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toList));
+		if (toList != null && toList.length() > 0)
+		{
+			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toList));
+		}
 		if (ccList != null && ccList.length() > 0)
 		{
 			message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(ccList));
@@ -353,7 +356,7 @@ public class EmailUtil
 		}
 		else
 		{
-			message.setContent(createMultipart(msg.getAttachments(), msg.getContent(), "text/html; charset=utf-8"));
+			message.setContent(createMultipart(msg.getAttachments(), StringUtil.orEmpty(msg.getContent()), "text/html; charset=utf-8"));
 		}
 		return message;
 	}

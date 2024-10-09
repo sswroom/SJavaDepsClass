@@ -17,7 +17,7 @@ public class OTPWebAuthenticationDetailsSource implements AuthenticationDetailsS
 
     @Override
 	@Nonnull
-    public WebAuthenticationDetails buildDetails(@Nonnull HttpServletRequest context)
+    public WebAuthenticationDetails buildDetails(HttpServletRequest context)
 	{
         return new OTPWebAuthenticationDetails(context, otpCodeField);
     }

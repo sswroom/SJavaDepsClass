@@ -16,6 +16,7 @@ import jakarta.annotation.Nullable;
 import software.amazon.awssdk.regions.Region;
 
 public class EmailControlConfig {
+	@SuppressWarnings("unused")
 	@Nullable
 	public static EmailControl loadFromConfig(@Nullable SSLEngine ssl, @Nonnull PropertyResolver env, @Nullable String categoryName, @Nonnull LogTool log)
 	{

@@ -60,21 +60,27 @@ public class ActionLogger implements DBUpdateHandler
 
     @Override
     public void dbUpdated(@Nullable Object oldObj, @Nullable Object newObj) {
-        if (oldObj == null && newObj == null)
+        if (oldObj == null)
         {
+			if (newObj == null)
+			{
 
-        }
-        else if (oldObj == null)
-        {
-            store.logAction(3, getUser(), ActionFileStore.ActionType.CREATE, null, newObj.toString());
-        }
-        else if (newObj == null)
-        {
-            store.logAction(3, getUser(), ActionFileStore.ActionType.DELETE, oldObj.toString(), null);
-        }
+			}
+			else
+			{
+				store.logAction(3, getUser(), ActionFileStore.ActionType.CREATE, null, newObj.toString());
+			}
+		}
         else
-        {
-            store.logAction(3, getUser(), ActionFileStore.ActionType.UPDATE, oldObj.toString(), newObj.toString());
-        }
+		{
+			if (newObj == null)
+			{
+				store.logAction(3, getUser(), ActionFileStore.ActionType.DELETE, oldObj.toString(), null);
+			}
+			else
+			{
+				store.logAction(3, getUser(), ActionFileStore.ActionType.UPDATE, oldObj.toString(), newObj.toString());
+			}
+		}
     }
 }

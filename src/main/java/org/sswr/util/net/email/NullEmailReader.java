@@ -1,8 +1,7 @@
 package org.sswr.util.net.email;
 
-import javax.mail.Message;
-
 import jakarta.annotation.Nonnull;
+import jakarta.mail.Message;
 
 public class NullEmailReader implements EmailReader
 {

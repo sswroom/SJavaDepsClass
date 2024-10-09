@@ -502,7 +502,7 @@ public class XlsxValidator {
 			return null;
 		}
 		String v = getCellDisp(index);
-		if (StringUtil.isNullOrEmpty(v))
+		if (v == null || v.length() == 0)
 			return null;
 		try
 		{
@@ -723,6 +723,7 @@ public class XlsxValidator {
 	private static <T> String getRepoEntityName(@Nonnull JpaRepository<T, Integer> repo)
 	{
 		Class<?> cls = getRepoClass(repo);
+		if (cls == null) return null;
 		Type [] interfaces = cls.getGenericInterfaces();
 		int i = interfaces.length;
 		while (i-- > 0)

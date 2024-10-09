@@ -788,7 +788,8 @@ public class XlsxUtil {
 		Sheet sheet = row.getSheet();
 		SheetConditionalFormatting sCondFmt = sheet.getSheetConditionalFormatting();
 		ConditionalFormatting condFmt = builder.getFormatting(sCondFmt);
-		condFmt.setFormattingRanges(cellRangesAddCell(condFmt.getFormattingRanges(), row.getRowNum(), colIndex));
+		if (condFmt != null)
+			condFmt.setFormattingRanges(cellRangesAddCell(condFmt.getFormattingRanges(), row.getRowNum(), colIndex));
 	}
 
 	@Nonnull

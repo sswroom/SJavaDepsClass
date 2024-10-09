@@ -5,21 +5,19 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Properties;
 
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 
 import org.sswr.util.data.DateTimeUtil;
 import org.sswr.util.data.StringUtil;
 import org.sswr.util.io.LogTool;
-
-import com.beust.jcommander.internal.Nullable;
-
-import jakarta.annotation.Nonnull;
 
 public class SMTPEmailControl implements EmailControl
 {
@@ -56,7 +54,7 @@ public class SMTPEmailControl implements EmailControl
 		}
 	}
 
-	public boolean sendMail(@Nonnull EmailMessage msg, @Nonnull String toList, @Nullable String ccList)
+	public boolean sendMail(@Nonnull EmailMessage msg, @Nullable String toList, @Nullable String ccList)
 	{
 		Session session;
 		if (this.auth != null)
@@ -124,12 +122,13 @@ public class SMTPEmailControl implements EmailControl
 		}
 	}
 
-	public boolean validateDestAddr(String addr)
+	public boolean validateDestAddr(@Nonnull String addr)
 	{
 		return StringUtil.isEmailAddress(addr);
 	}
 
-	public String sendTestingEmail(String toAddress)
+	@Nonnull
+	public String sendTestingEmail(@Nonnull String toAddress)
 	{
 		Session session;
 		if (this.auth != null)

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -12,43 +13,41 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.DataHandler;
-import javax.annotation.Nonnull;
-import javax.mail.Address;
-import javax.mail.Flags;
-import javax.mail.Header;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import jakarta.activation.DataHandler;
+import jakarta.mail.Address;
+import jakarta.mail.Flags;
+import jakarta.mail.Header;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
 
 import org.sswr.util.data.DataTools;
 import org.sswr.util.data.DateTimeUtil;
+import org.sswr.util.data.SharedBool;
 import org.sswr.util.io.LogLevel;
 import org.sswr.util.io.LogTool;
-import org.sswr.util.net.AccessTokenProvider;
+import org.sswr.util.net.MSGraphAccessTokenProvider;
 import org.sswr.util.net.MSGraphUtil;
 import org.sswr.util.net.MSGraphUtil.AccessTokenResult;
 
+import com.microsoft.graph.core.tasks.PageIterator;
 import com.microsoft.graph.models.Attachment;
+import com.microsoft.graph.models.AttachmentCollectionResponse;
 import com.microsoft.graph.models.BodyType;
 import com.microsoft.graph.models.FileAttachment;
 import com.microsoft.graph.models.ItemBody;
 import com.microsoft.graph.models.MailFolder;
-import com.microsoft.graph.models.MessageMoveParameterSet;
+import com.microsoft.graph.models.MailFolderCollectionResponse;
+import com.microsoft.graph.models.MessageCollectionResponse;
 import com.microsoft.graph.models.Recipient;
-import com.microsoft.graph.requests.AttachmentCollectionPage;
-import com.microsoft.graph.requests.AttachmentCollectionRequest;
-import com.microsoft.graph.requests.AttachmentCollectionRequestBuilder;
-import com.microsoft.graph.requests.GraphServiceClient;
-import com.microsoft.graph.requests.MailFolderCollectionPage;
-import com.microsoft.graph.requests.MailFolderCollectionRequest;
-import com.microsoft.graph.requests.MailFolderCollectionRequestBuilder;
-import com.microsoft.graph.requests.MessageCollectionPage;
-
-import jakarta.annotation.Nullable;
-import okhttp3.Request;
+import com.microsoft.graph.serviceclient.GraphServiceClient;
+import com.microsoft.graph.users.item.messages.item.move.MovePostRequestBody;
+import com.microsoft.kiota.ApiException;
+import com.microsoft.kiota.authentication.BaseBearerTokenAuthenticationProvider;
 
 public class MSGraphEmailReader implements EmailReader
 {
@@ -61,42 +60,44 @@ public class MSGraphEmailReader implements EmailReader
 		@Nullable
 		static EmailAddress addrFromRecipient(@Nonnull Recipient rcpt)
 		{
-			com.microsoft.graph.models.EmailAddress addr = rcpt.emailAddress;
+			com.microsoft.graph.models.EmailAddress addr = rcpt.getEmailAddress();
 			if (addr == null)
 				return null;
-			return new EmailAddress(addr.name, addr.address);
+			String eaddr = addr.getAddress();
+			if (eaddr == null)
+				return null;
+			return new EmailAddress(addr.getName(), eaddr);
 		}
 
-		public GraphMessage(com.microsoft.graph.models.Message msg, EmailMessage emsg)
+		public GraphMessage(@Nonnull com.microsoft.graph.models.Message msg, @Nonnull EmailMessage emsg)
 		{
 			this.msg = msg;
 			this.emsg = emsg;
 			this.delete = false;
 		}
 
-		private static String[] arrayFromString(String s)
+		@Nonnull
+		private static String[] arrayFromString(@Nonnull String s)
 		{
-			if (s == null)
-				return null;
 			String[] ret = new String[1];
 			ret[0] = s;
 			return ret;
 		}
 
-		private static Address addressFromRecipient(Recipient rcpt)
+		private static Address addressFromRecipient(@Nonnull Recipient rcpt)
 		{
-			com.microsoft.graph.models.EmailAddress addr = rcpt.emailAddress;
+			com.microsoft.graph.models.EmailAddress addr = rcpt.getEmailAddress();
 			if (addr == null)
 				return null;
 			try
 			{
-				return new InternetAddress(addr.address, addr.name);
+				return new InternetAddress(addr.getAddress(), addr.getName());
 			}
 			catch (UnsupportedEncodingException ex)
 			{
 				try
 				{
-					return new InternetAddress(addr.address);
+					return new InternetAddress(addr.getAddress());
 				}
 				catch (AddressException ex2)
 				{
@@ -106,7 +107,8 @@ public class MSGraphEmailReader implements EmailReader
 			}
 		}
 
-		private static Address[] addressFromRecipients(List<Recipient> rcpts)
+		@Nonnull
+		private static Address[] addressFromRecipients(@Nonnull List<Recipient> rcpts)
 		{
 			List<Address> list = new ArrayList<Address>();
 			Address addr;
@@ -130,15 +132,17 @@ public class MSGraphEmailReader implements EmailReader
 			return ret;
 		}
 
-		private static String fromRecipient(Recipient rcpt)
+		@Nullable
+		private static String fromRecipient(@Nonnull Recipient rcpt)
 		{
-			com.microsoft.graph.models.EmailAddress addr = rcpt.emailAddress;
+			com.microsoft.graph.models.EmailAddress addr = rcpt.getEmailAddress();
 			if (addr == null)
 				return null;
-			return addr.address;
+			return addr.getAddress();
 		}
 		
-		private static String[] fromRecipients(List<Recipient> rcpts)
+		@Nonnull 
+		private static String[] fromRecipients(@Nonnull List<Recipient> rcpts)
 		{
 			List<String> list = new ArrayList<String>();
 			int i = 0;
@@ -160,10 +164,10 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public int getSize() throws MessagingException {
-			ItemBody body = this.msg.body;
+			ItemBody body = this.msg.getBody();
 			if (body == null)
 				throw new MessagingException("body is null");
-			String content = body.content;
+			String content = body.getContent();
 			if (content == null)
 				throw new MessagingException("content is null");
 			return content.length();
@@ -176,10 +180,10 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public String getContentType() throws MessagingException {
-			ItemBody body = this.msg.body;
+			ItemBody body = this.msg.getBody();
 			if (body == null)
 				throw new MessagingException("body is null");
-			return (body.contentType == BodyType.HTML)?"text/html":"text/plain";
+			return (body.getContentType() == BodyType.Html)?"text/html":"text/plain";
 		}
 
 		@Override
@@ -229,15 +233,18 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public Object getContent() throws IOException, MessagingException {
-			ItemBody body = this.msg.body;
+			ItemBody body = this.msg.getBody();
 			if (body == null)
 				throw new MessagingException("body is null");
+			String content = body.getContent();
+			if (content == null)
+				throw new MessagingException("body content is null");
 			if (this.emsg.getAttachmentCount() > 0)
 			{
-				return EmailUtil.createMultipart(this.emsg.getAttachments(), body.content, this.getContentType());
+				return EmailUtil.createMultipart(this.emsg.getAttachments(), content, this.getContentType());
 			}
 			else
-				return body.content;
+				return content;
 		}
 
 		@Override
@@ -262,50 +269,57 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public void writeTo(OutputStream os) throws IOException, MessagingException {
-			ItemBody body = this.msg.body;
+			ItemBody body = this.msg.getBody();
 			if (body == null)
 				throw new MessagingException("body is null");
 			List<Recipient> recipients;
 			SMTPMessage message = new SMTPMessage();
-			message.setMessageId(this.msg.id);
-			message.setContent(body.content, this.getContentType());
-			if (this.msg.sentDateTime != null)
-				message.setSentDate(this.msg.sentDateTime.toZonedDateTime());
-			message.setSubject(this.msg.subject);
-			if (this.msg.from != null)
-				message.setFrom(addrFromRecipient(this.msg.from));
+			String s;
+			OffsetDateTime d;
+			Recipient rcpt;
+			EmailAddress addr;
+			EmailAttachment att;
+			if ((s = this.msg.getId()) != null) message.setMessageId(s);
+			if ((s = body.getContent()) != null) message.setContent(s, this.getContentType());
+			if ((d = this.msg.getSentDateTime()) != null)
+				message.setSentDate(d.toZonedDateTime());
+			if ((s = this.msg.getSubject()) != null) message.setSubject(s);
+			if ((rcpt = this.msg.getFrom()) != null && (addr = addrFromRecipient(rcpt)) != null) message.setFrom(addr);
 			int i;
 			int j;
-			recipients = this.msg.toRecipients;
+			recipients = this.msg.getToRecipients();
 			if (recipients != null)
 			{
 				i = 0;
 				j = recipients.size();
 				while (i < j)
 				{
-					message.addTo(addrFromRecipient(recipients.get(i)));
+					if ((rcpt = recipients.get(i)) != null && (addr = addrFromRecipient(rcpt)) != null)
+						message.addTo(addr);
 					i++;
 				}
 			}
-			recipients = this.msg.ccRecipients;
+			recipients = this.msg.getCcRecipients();
 			if (recipients != null)
 			{
 				i = 0;
 				j = recipients.size();
 				while (i < j)
 				{
-					message.addCc(addrFromRecipient(recipients.get(i)));
+					if ((rcpt = recipients.get(i)) != null && (addr = addrFromRecipient(rcpt)) != null)
+						message.addCc(addr);
 					i++;
 				}
 			}
-			recipients = this.msg.bccRecipients;
+			recipients = this.msg.getBccRecipients();
 			if (recipients != null)
 			{
 				i = 0;
 				j = recipients.size();
 				while (i < j)
 				{
-					message.addBcc(addrFromRecipient(recipients.get(i)));
+					if ((rcpt = recipients.get(i)) != null && (addr = addrFromRecipient(rcpt)) != null)
+						message.addBcc(addr);
 					i++;
 				}
 			}
@@ -313,7 +327,8 @@ public class MSGraphEmailReader implements EmailReader
 			j = emsg.getAttachmentCount();
 			while (i < j)
 			{
-				message.addAttachment(emsg.getAttachment(i));
+				if ((att = emsg.getAttachment(i)) != null)
+					message.addAttachment(att);
 				i++;
 			}
 			if (!message.writeMessage(os))
@@ -324,15 +339,25 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public String[] getHeader(String header_name) throws MessagingException {
+			String s;
+			List<Recipient> rcpts;
 			switch (header_name.toUpperCase()) {
 				case "TO":
-					return fromRecipients(this.msg.toRecipients);
+					if ((rcpts = this.msg.getToRecipients())!= null)
+						return fromRecipients(rcpts);
+					return null;
 				case "CC":
-					return fromRecipients(this.msg.ccRecipients);
+					if ((rcpts = this.msg.getCcRecipients())!= null)
+						return fromRecipients(rcpts);
+					return null;
 				case "BCC":
-					return fromRecipients(this.msg.bccRecipients);
+					if ((rcpts = this.msg.getBccRecipients())!= null)
+						return fromRecipients(rcpts);
+					return null;
 				case "SUBJECT":
-					return arrayFromString(this.msg.subject);
+					if ((s = this.msg.getSubject()) != null)
+						return arrayFromString(s);
+					return null;
 				default:
 					return null;
 			}
@@ -370,8 +395,13 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public Address[] getFrom() throws MessagingException {
+			Recipient rcpt = this.msg.getFrom();
+			if (rcpt == null)
+			{
+				return new Address[0];
+			}
 			Address addr[] = new Address[1];
-			addr[0] = addressFromRecipient(this.msg.from);
+			addr[0] = addressFromRecipient(rcpt);
 			return addr;
 		}
 
@@ -392,17 +422,24 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public Address[] getRecipients(RecipientType type) throws MessagingException {
+			List<Recipient> rcpts;
 			if (type == RecipientType.TO)
 			{
-				return addressFromRecipients(this.msg.toRecipients);
+				if ((rcpts = this.msg.getToRecipients()) != null)
+					return addressFromRecipients(rcpts);
+				return null;
 			}
 			else if (type == RecipientType.CC)
 			{
-				return addressFromRecipients(this.msg.ccRecipients);
+				if ((rcpts = this.msg.getCcRecipients()) != null)
+					return addressFromRecipients(rcpts);
+				return null;
 			}
 			else if (type == RecipientType.BCC)
 			{
-				return addressFromRecipients(this.msg.bccRecipients);
+				if ((rcpts = this.msg.getBccRecipients()) != null)
+					return addressFromRecipients(rcpts);
+				return null;
 			}
 			else
 			{
@@ -422,7 +459,7 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public String getSubject() throws MessagingException {
-			return this.msg.subject;
+			return this.msg.getSubject();
 		}
 
 		@Override
@@ -432,9 +469,10 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public Date getSentDate() throws MessagingException {
-			if (this.msg.sentDateTime != null)
+			OffsetDateTime dt;
+			if ((dt = this.msg.getSentDateTime()) != null)
 			{
-				return DateTimeUtil.toTimestamp(this.msg.sentDateTime.toZonedDateTime());
+				return DateTimeUtil.toTimestamp(dt.toZonedDateTime());
 			}
 			return null;
 		}
@@ -446,9 +484,10 @@ public class MSGraphEmailReader implements EmailReader
 
 		@Override
 		public Date getReceivedDate() throws MessagingException {
-			if (this.msg.receivedDateTime != null)
+			OffsetDateTime dt;
+			if ((dt = this.msg.getReceivedDateTime()) != null)
 			{
-				return DateTimeUtil.toTimestamp(this.msg.receivedDateTime.toZonedDateTime());
+				return DateTimeUtil.toTimestamp(dt.toZonedDateTime());
 			}
 			return null;
 		}
@@ -463,7 +502,7 @@ public class MSGraphEmailReader implements EmailReader
 			if (flag.contains(Flags.Flag.DELETED))
 			{
 				this.delete = set;
-				addChanged(this.msg.id, this);
+				addChanged(this.msg.getId(), this);
 			}
 		}
 
@@ -484,7 +523,7 @@ public class MSGraphEmailReader implements EmailReader
 
 		public String getId()
 		{
-			return this.msg.id;
+			return this.msg.getId();
 		}
 	}
 	
@@ -537,17 +576,15 @@ public class MSGraphEmailReader implements EmailReader
 		}
 	}
 
-	private GraphServiceClient<Request> createClient()
+	private GraphServiceClient createClient()
 	{
 		updateAccessToken();
 		if (accessToken == null)
 		{
 			return null;
 		}
-		return GraphServiceClient
-				.builder()
-				.authenticationProvider(new AccessTokenProvider(accessToken.accessToken))
-				.buildClient();
+		BaseBearerTokenAuthenticationProvider authProvider = new BaseBearerTokenAuthenticationProvider(new MSGraphAccessTokenProvider(accessToken.accessToken));
+		return new GraphServiceClient(authProvider);
 	}
 
     public boolean open()
@@ -555,38 +592,43 @@ public class MSGraphEmailReader implements EmailReader
 		return true;
 	}
 
-    public boolean openFolder(String folderName)
+    public boolean openFolder(@Nonnull String folderName)
 	{
-		GraphServiceClient<Request> client = createClient();
+		GraphServiceClient client = createClient();
 		if (client == null)
 			return false;
-		List<MailFolder> folderList;
-		int i;
-		int j;
-		MailFolderCollectionPage folders;
-		MailFolder folder;
-		MailFolderCollectionRequest req = client.users(fromEmail).mailFolders().buildRequest();
-		while ((folders = req.get()) != null)
+		SharedBool found = new SharedBool();
+		found.value = false;
+		MailFolderCollectionResponse folders = client.users().byUserId(fromEmail).mailFolders().get();
+		if (folders == null)
 		{
-			folderList = folders.getCurrentPage();
-			i = 0;
-			j = folderList.size();
-			while (i < j)
-			{
-				folder = folderList.get(i);
-				if (folder.displayName != null && folder.displayName.equals(folderName))
-				{
-					this.folder = folder.id;
-					return true;
-				}
-				i++;
-			}
-			MailFolderCollectionRequestBuilder nextPage = folders.getNextPage();
-			if (nextPage == null)
-				return false;
-			req = nextPage.buildRequest();
+			this.log.logMessage("Error in getting user mail folder", LogLevel.ERROR);
+			return false;
 		}
-		return false;
+		try
+		{
+			PageIterator<MailFolder, MailFolderCollectionResponse> pageIterator = new PageIterator.Builder<MailFolder, MailFolderCollectionResponse>()
+			.client(client)
+			.collectionPage(folders)
+			.collectionPageFactory(MailFolderCollectionResponse::createFromDiscriminatorValue)
+			.processPageItemCallback(folder -> {
+				String dispName;
+				if ((dispName = folder.getDisplayName()) != null && dispName.equals(folderName))
+				{
+					this.folder = folder.getId();
+					found.value = true;
+					return false;
+				}
+				return true;
+			}).build();
+			pageIterator.iterate();
+			return found.value;
+		}
+		catch (ApiException|ReflectiveOperationException ex)
+		{
+			this.log.logException(ex);
+			return false;
+		}
 	}
 
     public void closeFolder()
@@ -614,29 +656,37 @@ public class MSGraphEmailReader implements EmailReader
 
  	public Message[] getMessages()
 	{
-		GraphServiceClient<Request> client = createClient();
+		GraphServiceClient client = createClient();
 		if (client == null)
 			return null;
-		MessageCollectionPage messages;
+		MessageCollectionResponse messages;
 		if (this.folder != null)
 		{
-			messages = client.users(fromEmail).mailFolders(this.folder).messages().buildRequest().get();
+			messages = client.users().byUserId(fromEmail).mailFolders().byMailFolderId(this.folder).messages().get();
 		}
 		else
 		{
-			messages = client.users(fromEmail).messages().buildRequest().get();
+			messages = client.users().byUserId(fromEmail).messages().get();
 		}
 		if (messages == null)
 		{
 			return null;
 		}
-		List<com.microsoft.graph.models.Message> msg = messages.getCurrentPage();
+		List<com.microsoft.graph.models.Message> msg = messages.getValue();
+		if (msg == null)
+		{
+			return null;
+		}
 		Message[] msgArr = new Message[msg.size()];
 		int i = 0;
 		int j = msg.size();
 		while (i < j)
 		{
-			msgArr[i] = new GraphMessage(msg.get(i), this.toEmailMessage(msg.get(i)));
+			EmailMessage emsg = this.toEmailMessage(msg.get(i));
+			if (emsg != null)
+			{
+				msgArr[i] = new GraphMessage(msg.get(i), emsg);
+			}
 			i++;
 		}
 		return msgArr;
@@ -644,11 +694,13 @@ public class MSGraphEmailReader implements EmailReader
 
 	public boolean moveMessageToArchive(String id)
 	{
-		GraphServiceClient<Request> client = createClient();
+		GraphServiceClient client = createClient();
 		if (client == null)
 			return false;
 		
-		com.microsoft.graph.models.Message msg = client.users(fromEmail).messages(id).move(MessageMoveParameterSet.newBuilder().withDestinationId("archive").build()).buildRequest().post();
+		MovePostRequestBody body = new MovePostRequestBody();
+		body.setDestinationId("archive");
+		com.microsoft.graph.models.Message msg = client.users().byUserId(fromEmail).messages().byMessageId(id).move().post(body);
 		if (msg != null)
 		{
 			return true;
@@ -658,73 +710,75 @@ public class MSGraphEmailReader implements EmailReader
 
 	public boolean deleteMessage(String id)
 	{
-		GraphServiceClient<Request> client = createClient();
+		GraphServiceClient client = createClient();
 		if (client == null)
 			return false;
-		com.microsoft.graph.models.Message msg = client.users(fromEmail).messages(id).buildRequest().delete();
-		if (msg != null)
-		{
-			return true;
-		}
-		return false;
+		client.users().byUserId(fromEmail).messages().byMessageId(id).delete();
+		return true;
 	}
 
 	@Nullable
 	private EmailMessage toEmailMessage(@Nonnull com.microsoft.graph.models.Message msg)
 	{
-		ItemBody body = msg.body;
+		ItemBody body = msg.getBody();
 		if (body == null)
 			return null;
-		String msgId = msg.id;
+		String msgId = msg.getId();
 		if (msgId == null)
 			return null;
-		SimpleEmailMessage email = new SimpleEmailMessage(msg.subject, body.content, body.contentType == BodyType.HTML);
-		if (msg.hasAttachments != null && msg.hasAttachments)
+		String subject = msg.getSubject();
+		String content = body.getContent();
+		Boolean b;
+		if (subject == null || content == null)
+			return null;
+		SimpleEmailMessage email = new SimpleEmailMessage(subject, content, body.getContentType() == BodyType.Html);
+		if ((b = msg.getHasAttachments()) != null && b.booleanValue())
 		{
-			GraphServiceClient<Request> client = createClient();
+			GraphServiceClient client = createClient();
 			if (client == null)
 				return null;
-			AttachmentCollectionRequest req = client.users(fromEmail).messages(msgId).attachments().buildRequest();
-			AttachmentCollectionPage page;
-			int i;
-			int j;
-			while ((page = req.get()) != null)
+			AttachmentCollectionResponse page = client.users().byUserId(fromEmail).messages().byMessageId(msgId).attachments().get();
+			if (page == null)
+				return null;
+			try
 			{
-				List<Attachment> attList = page.getCurrentPage();
-				Attachment att;
-				i = 0;
-				j = attList.size();
-				while (i < j)
-				{
-					att = attList.get(i);
+				PageIterator<Attachment, AttachmentCollectionResponse> pageIterator = new PageIterator.Builder<Attachment, AttachmentCollectionResponse>()
+				.client(client)
+				.collectionPage(page)
+				.collectionPageFactory(AttachmentCollectionResponse::createFromDiscriminatorValue)
+				.processPageItemCallback(att -> {
 					if (att instanceof FileAttachment)
 					{
+						Boolean bo;
+						OffsetDateTime dt;
 						FileAttachment fatt = (FileAttachment)att;
 						EmailAttachment eatt = new EmailAttachment();
-						eatt.isInline = fatt.isInline != null && fatt.isInline;
-						eatt.contentId = fatt.contentId;
-						eatt.fileName = fatt.name;
-						if (fatt.lastModifiedDateTime != null)
+						eatt.isInline = (bo = fatt.getIsInline()) != null && bo.booleanValue();
+						eatt.contentId = fatt.getContentId();
+						eatt.fileName = fatt.getName();
+						if ((dt = fatt.getLastModifiedDateTime()) != null)
 						{
-							eatt.modifyTime = fatt.lastModifiedDateTime.toZonedDateTime();
+							eatt.modifyTime = dt.toZonedDateTime();
 						}
-						eatt.contentType = fatt.contentType;
-						eatt.content = fatt.contentBytes;
+						eatt.contentType = fatt.getContentType();
+						eatt.content = fatt.getContentBytes();
 						email.addAttachment(eatt);
 					}
 					else
 					{
 						System.out.println(DataTools.toObjectStringWF(att));
 					}
-					i++;
-				}
-
-				AttachmentCollectionRequestBuilder nextPage = page.getNextPage();
-				if (nextPage == null)
-					break;
-				req = nextPage.buildRequest();
+					return true;
+				}).build();
+				pageIterator.iterate();
+				return email;
 			}
-		}
+			catch (ApiException|ReflectiveOperationException ex)
+			{
+				this.log.logException(ex);
+				return null;
+			}
+			}
 		
 		return email;
 	}

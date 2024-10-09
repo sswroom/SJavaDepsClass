@@ -45,7 +45,7 @@ public class ForwardHandlerFilter extends GenericFilterBean
 	}
 
 	@Override
-	public void doFilter(@Nonnull ServletRequest request, @Nonnull ServletResponse response, @Nonnull FilterChain chain) throws IOException, ServletException
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
 	{
 		if (request instanceof HttpServletRequest)
 		{

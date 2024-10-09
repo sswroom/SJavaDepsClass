@@ -36,13 +36,21 @@ public class MSGraphUtil
         {
             AccessTokenResult token = new AccessTokenResult();
             JSONBase json = JSONBase.parseJSONStr(s);
-            token.type = json.getValueString("token_type");
-            Timestamp t = DateTimeUtil.timestampNow();
-            token.expiresIn = Timestamp.from(t.toInstant().plusSeconds(json.getValueAsInt32("expires_in")));
-            token.extExpiresIn = Timestamp.from(t.toInstant().plusSeconds(json.getValueAsInt32("ext_expires_in")));
-            token.accessToken = json.getValueString("access_token");
-            return token;
-        }
+			if (json != null)
+			{
+				token.type = json.getValueString("token_type");
+				Timestamp t = DateTimeUtil.timestampNow();
+				token.expiresIn = Timestamp.from(t.toInstant().plusSeconds(json.getValueAsInt32("expires_in")));
+				token.extExpiresIn = Timestamp.from(t.toInstant().plusSeconds(json.getValueAsInt32("ext_expires_in")));
+				token.accessToken = json.getValueString("access_token");
+				return token;
+			}
+			if (log != null)
+			{
+				log.logMessage("Error in parsing access token: status = "+statusCode.value+", content = "+s, LogLevel.ERROR);
+			}
+			return null;
+		}
         if (log != null)
         {
             log.logMessage("Error in getting access token: status = "+statusCode.value+", content = "+s, LogLevel.ERROR);

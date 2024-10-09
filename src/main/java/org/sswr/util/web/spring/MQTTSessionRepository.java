@@ -47,7 +47,7 @@ public class MQTTSessionRepository implements SessionRepository<SpringSession>, 
 	}
 
 	@Override
-	public void save(@Nonnull SpringSession session) {
+	public void save(SpringSession session) {
 		synchronized (this)
 		{
 			this.sessMap.put(session.getId(), session);
@@ -61,7 +61,7 @@ public class MQTTSessionRepository implements SessionRepository<SpringSession>, 
 
 	@Override
 	@Nullable
-	public SpringSession findById(@Nonnull String id) {
+	public SpringSession findById(String id) {
 		synchronized (this)
 		{
 			return this.sessMap.get(id);
@@ -69,7 +69,7 @@ public class MQTTSessionRepository implements SessionRepository<SpringSession>, 
 	}
 
 	@Override
-	public void deleteById(@Nonnull String id) {
+	public void deleteById(String id) {
 		synchronized (this)
 		{
 			this.sessMap.remove(id);

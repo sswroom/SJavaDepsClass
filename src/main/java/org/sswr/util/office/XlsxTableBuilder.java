@@ -88,7 +88,7 @@ public class XlsxTableBuilder implements TableBuilder
 	}
 
 	@Override
-	@Nullable
+	@Nonnull
 	public byte[] build()
 	{
 		ByteArrayOutputStream stm = new ByteArrayOutputStream();
@@ -100,7 +100,7 @@ public class XlsxTableBuilder implements TableBuilder
 		catch (IOException ex)
 		{
 			ex.printStackTrace();
-			return null;
+			return new byte[0];
 		}
 	}
 		

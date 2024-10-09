@@ -7,23 +7,23 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Properties;
 
-import javax.activation.DataHandler;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.util.ByteArrayDataSource;
+import jakarta.activation.DataHandler;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.util.ByteArrayDataSource;
 
 import org.sswr.util.data.StringUtil;
 import org.sswr.util.io.LogLevel;
 import org.sswr.util.io.LogTool;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
@@ -128,8 +128,7 @@ public class AWSEmailControl implements EmailControl{
 	
 
 	@Override
-	public boolean sendMail(EmailMessage message, String toList, String ccList) {
-		if (message == null) return false;
+	public boolean sendMail(@Nonnull EmailMessage message, @Nullable String toList, @Nullable String ccList) {
 		SesClient client = SesClient.builder().httpClient(getProxyHTTPClient())
 		        .region(this.region)
 		        .build();
@@ -186,11 +185,14 @@ public class AWSEmailControl implements EmailControl{
 		{
 			wrap = new MimeBodyPart();
 			EmailAttachment att = msg.getAttachment(i);
-			ByteArrayDataSource ds = new ByteArrayDataSource(att.content, att.contentType);
-			wrap.setDataHandler(new DataHandler(ds));
-			wrap.setFileName(att.fileName);
-			wrap.setDisposition(att.isInline?"inline":"attachment");
-			mimeMsg.addBodyPart(wrap);
+			if (att != null)
+			{
+				ByteArrayDataSource ds = new ByteArrayDataSource(att.content, att.contentType);
+				wrap.setDataHandler(new DataHandler(ds));
+				wrap.setFileName(att.fileName);
+				wrap.setDisposition(att.isInline?"inline":"attachment");
+				mimeMsg.addBodyPart(wrap);
+			}
 			i++;
 		}
 
@@ -224,7 +226,7 @@ public class AWSEmailControl implements EmailControl{
 	}
 
 	@Override
-	public boolean sendBatchMail(EmailMessage message, List<String> toList) {
+	public boolean sendBatchMail(@Nonnull EmailMessage message, @Nonnull List<String> toList) {
 		boolean succ = false;
 		int i = 0;
 		int j = toList.size();
@@ -245,12 +247,13 @@ public class AWSEmailControl implements EmailControl{
 	}
 
 	@Override
-	public boolean validateDestAddr(String addr) {
+	public boolean validateDestAddr(@Nonnull String addr) {
 		return StringUtil.isEmailAddress(addr);
 	}
 
 	@Override
-	public String sendTestingEmail(String toAddress) {
+	@Nonnull
+	public String sendTestingEmail(@Nonnull String toAddress) {
 		SimpleEmailMessage msg = new SimpleEmailMessage("Testing email", "Test content", false);
 		return this.sendMail(msg, toAddress, null)?"Success":"Failed";
 	}
