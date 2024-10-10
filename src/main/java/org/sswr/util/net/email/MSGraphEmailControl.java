@@ -11,7 +11,6 @@ import org.sswr.util.data.StringUtil;
 import org.sswr.util.io.LogLevel;
 import org.sswr.util.io.LogTool;
 import org.sswr.util.net.HTTPClient;
-import org.sswr.util.net.MSGraphAccessTokenProvider;
 import org.sswr.util.net.MSGraphUtil;
 import org.sswr.util.net.RequestMethod;
 import org.sswr.util.net.MSGraphUtil.AccessTokenResult;
@@ -27,7 +26,6 @@ import com.microsoft.graph.models.UploadSession;
 import com.microsoft.graph.serviceclient.GraphServiceClient;
 import com.microsoft.graph.users.item.messages.item.attachments.createuploadsession.CreateUploadSessionPostRequestBody;
 import com.microsoft.graph.users.item.sendmail.SendMailPostRequestBody;
-import com.microsoft.kiota.authentication.BaseBearerTokenAuthenticationProvider;
 
 public class MSGraphEmailControl implements EmailControl
 {
@@ -83,8 +81,7 @@ public class MSGraphEmailControl implements EmailControl
 		{
 			return null;
 		}
-		BaseBearerTokenAuthenticationProvider authProvider = new BaseBearerTokenAuthenticationProvider(new MSGraphAccessTokenProvider(accessToken.accessToken));
-		return new GraphServiceClient(authProvider);
+		return MSGraphUtil.createClient(accessToken);
 	}
 
 	@Override

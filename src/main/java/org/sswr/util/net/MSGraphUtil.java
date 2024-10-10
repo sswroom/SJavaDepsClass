@@ -12,6 +12,9 @@ import org.sswr.util.data.SharedInt;
 import org.sswr.util.io.LogLevel;
 import org.sswr.util.io.LogTool;
 
+import com.microsoft.graph.serviceclient.GraphServiceClient;
+import com.microsoft.kiota.authentication.BaseBearerTokenAuthenticationProvider;
+
 public class MSGraphUtil
 {
     public static class AccessTokenResult
@@ -20,6 +23,13 @@ public class MSGraphUtil
         public Timestamp expiresIn;
         public Timestamp extExpiresIn;
         public String accessToken;
+    }
+
+    @Nonnull
+    public static GraphServiceClient createClient(@Nonnull AccessTokenResult accessToken)
+    {
+		BaseBearerTokenAuthenticationProvider authProvider = new BaseBearerTokenAuthenticationProvider(new MSGraphAccessTokenProvider(accessToken.accessToken));
+		return new GraphServiceClient(authProvider);
     }
 
     @Nullable

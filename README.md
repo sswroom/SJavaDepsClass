@@ -1,8 +1,10 @@
 # SJavaDepsClass
 
 # Changes:
+0.5.20241010
 - Update microsoft-graph to v6
 - Update to jakarta.mail
+- Added MSGraphUtil.createClient
 
 0.4.20241009
 - Update util version

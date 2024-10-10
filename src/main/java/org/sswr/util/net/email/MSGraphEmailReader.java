@@ -30,7 +30,6 @@ import org.sswr.util.data.DateTimeUtil;
 import org.sswr.util.data.SharedBool;
 import org.sswr.util.io.LogLevel;
 import org.sswr.util.io.LogTool;
-import org.sswr.util.net.MSGraphAccessTokenProvider;
 import org.sswr.util.net.MSGraphUtil;
 import org.sswr.util.net.MSGraphUtil.AccessTokenResult;
 
@@ -47,7 +46,6 @@ import com.microsoft.graph.models.Recipient;
 import com.microsoft.graph.serviceclient.GraphServiceClient;
 import com.microsoft.graph.users.item.messages.item.move.MovePostRequestBody;
 import com.microsoft.kiota.ApiException;
-import com.microsoft.kiota.authentication.BaseBearerTokenAuthenticationProvider;
 
 public class MSGraphEmailReader implements EmailReader
 {
@@ -583,8 +581,7 @@ public class MSGraphEmailReader implements EmailReader
 		{
 			return null;
 		}
-		BaseBearerTokenAuthenticationProvider authProvider = new BaseBearerTokenAuthenticationProvider(new MSGraphAccessTokenProvider(accessToken.accessToken));
-		return new GraphServiceClient(authProvider);
+		return MSGraphUtil.createClient(accessToken);
 	}
 
     public boolean open()
