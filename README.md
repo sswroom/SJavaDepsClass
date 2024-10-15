@@ -1,6 +1,9 @@
 # SJavaDepsClass
 
 # Changes:
+0.5.20241015
+- Fixed MSGraph email send problem
+
 0.5.20241010
 - Update microsoft-graph to v6
 - Update to jakarta.mail

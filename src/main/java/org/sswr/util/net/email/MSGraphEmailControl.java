@@ -275,7 +275,7 @@ public class MSGraphEmailControl implements EmailControl
 				return false;
 			SendMailPostRequestBody mailBody = new SendMailPostRequestBody();
 			mailBody.setMessage(graphMsg);
-			mailBody.setSaveToSentItems(null);
+			mailBody.setSaveToSentItems(false);
 			client
 				.users().byUserId(this.fromEmail)
 				.sendMail().post(mailBody);
