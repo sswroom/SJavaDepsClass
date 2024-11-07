@@ -1,6 +1,9 @@
 # SJavaDepsClass
 
 # Changes:
+0.5.20241107
+- Update util version
+
 0.5.20241015
 - Fixed MSGraph email send problem
 
