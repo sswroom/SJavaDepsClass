@@ -83,11 +83,12 @@ public class AccessLogFilter extends GenericFilterBean
 		status.thread = Thread.currentThread();
 		status.startTime = System.currentTimeMillis();
 		status.logged = false;
+		long threadId = status.thread.getId();
 		synchronized (this.threadMap)
 		{
-			if (this.threadMap.get(status.thread.getId()) == null)
+			if (this.threadMap.get(threadId) == null)
 			{
-				this.threadMap.put(status.thread.getId(), status);
+				this.threadMap.put(threadId, status);
 			}
 			else
 			{
@@ -121,7 +122,7 @@ public class AccessLogFilter extends GenericFilterBean
 				}
 				synchronized (this.threadMap)
 				{
-					this.threadMap.remove(status.thread.getId());
+					this.threadMap.remove(threadId);
 				}
 				throw ex;
 			}
@@ -137,7 +138,7 @@ public class AccessLogFilter extends GenericFilterBean
 			}
 			synchronized (this.threadMap)
 			{
-				this.threadMap.remove(status.thread.getId());
+				this.threadMap.remove(threadId);
 			}
 		}
 		else

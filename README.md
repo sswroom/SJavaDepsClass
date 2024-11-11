@@ -1,6 +1,9 @@
 # SJavaDepsClass
 
 # Changes:
+0.5.20241109
+- Remove some warnings
+
 0.5.20241107
 - Update util version
 
