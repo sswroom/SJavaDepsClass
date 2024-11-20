@@ -13,6 +13,7 @@ import org.sswr.util.io.LogTool;
 import org.sswr.util.net.HTTPClient;
 import org.sswr.util.net.MSGraphUtil;
 import org.sswr.util.net.RequestMethod;
+import org.sswr.util.net.TCPClientFactory;
 import org.sswr.util.net.MSGraphUtil.AccessTokenResult;
 
 import com.microsoft.graph.models.AttachmentItem;
@@ -205,7 +206,7 @@ public class MSGraphEmailControl implements EmailControl
 						endOfst = currOfst + this.attSplitSize;
 						if (endOfst > att.content.length)
 							endOfst = att.content.length;
-						HTTPClient cli = HTTPClient.createConnect(null, null, uploadUrl, RequestMethod.HTTP_PUT, false);
+						HTTPClient cli = HTTPClient.createConnect(new TCPClientFactory(null), null, uploadUrl, RequestMethod.HTTP_PUT, false);
 						cli.setReadTimeout(5000);
 						cli.addContentType("application/octet-stream");
 						cli.addContentLength(endOfst - currOfst);
