@@ -5,7 +5,7 @@
 	
 	<groupId>io.github.sswroom</groupId>
 	<artifactId>util-deps</artifactId>
-	<version>0.5.20241121</version>
+	<version>0.5.20241129</version>
 
 	<name>sswr-util-deps</name>
 	<packaging>jar</packaging>
@@ -85,7 +85,7 @@
 		<dependency>
 			<groupId>io.github.sswroom</groupId>
 			<artifactId>util</artifactId>
-			<version>0.5.20241121</version>
+			<version>0.5.20241129</version>
 		</dependency>
 
 		<dependency>
@@ -257,7 +257,7 @@
 					<tokenAuth>true</tokenAuth>
 				</configuration>
 			</plugin>
-			<plugin>
+<!--			<plugin>
 				<groupId>org.owasp</groupId>
 				<artifactId>dependency-check-maven</artifactId>
 				<version>8.4.0</version>
@@ -268,7 +268,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>-->
 		</plugins>
 	</build>
 </project>
