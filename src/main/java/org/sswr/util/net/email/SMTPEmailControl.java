@@ -54,7 +54,7 @@ public class SMTPEmailControl implements EmailControl
 		}
 	}
 
-	public boolean sendMail(@Nonnull EmailMessage msg, @Nullable String toList, @Nullable String ccList)
+	public boolean sendMail(@Nonnull EmailMessage msg, @Nullable String toList, @Nullable String ccList, @Nullable String bccList)
 	{
 		Session session;
 		if (this.auth != null)
@@ -67,7 +67,7 @@ public class SMTPEmailControl implements EmailControl
 		}
 		try
 		{
-			MimeMessage message = EmailUtil.createMimeMessage(session, msg, smtpFrom, toList, ccList);
+			MimeMessage message = EmailUtil.createMimeMessage(session, msg, smtpFrom, toList, ccList, bccList);
 			Transport.send(message);
 			return true;
 		}
@@ -87,7 +87,7 @@ public class SMTPEmailControl implements EmailControl
 
 	public boolean sendBatchMail(@Nonnull EmailMessage msg, @Nonnull List<String> toList)
 	{
-		return sendMail(msg, StringUtil.join(toList, ","), null);
+		return sendMail(msg, StringUtil.join(toList, ","), null, null);
 	}
 
 	public boolean isServerOnline()

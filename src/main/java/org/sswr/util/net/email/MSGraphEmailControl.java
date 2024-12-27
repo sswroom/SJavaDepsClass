@@ -86,7 +86,7 @@ public class MSGraphEmailControl implements EmailControl
 	}
 
 	@Override
-	public boolean sendMail(@Nonnull EmailMessage message, @Nullable String toList, @Nullable String ccList) {
+	public boolean sendMail(@Nonnull EmailMessage message, @Nullable String toList, @Nullable String ccList, @Nullable String bccList) {
 		Message graphMsg = new Message();
 		graphMsg.setSubject(message.getSubject());
 		ItemBody body = new ItemBody();
@@ -130,6 +130,24 @@ public class MSGraphEmailControl implements EmailControl
 				ccRecipientsList.add(ccRecipients);
 				i++;
 			}
+			graphMsg.setCcRecipients(ccRecipientsList);
+		}
+		if (bccList != null && bccList.length() > 0)
+		{
+			List<Recipient> bccRecipientsList = new ArrayList<Recipient>();
+			String []bccArr = bccList.split(",");
+			i = 0;
+			j = bccArr.length;
+			while (i < j)
+			{
+				Recipient bccRecipients = new Recipient();
+				com.microsoft.graph.models.EmailAddress emailAddress = new com.microsoft.graph.models.EmailAddress();
+				emailAddress.setAddress(bccArr[i]);
+				bccRecipients.setEmailAddress(emailAddress);
+				bccRecipientsList.add(bccRecipients);
+				i++;
+			}
+			graphMsg.setBccRecipients(bccRecipientsList);
 		}
 
 		i = 0;
@@ -294,7 +312,7 @@ public class MSGraphEmailControl implements EmailControl
 		}
 		while (i-- > 0)
 		{
-			if (!sendMail(message, toList.get(i), null))
+			if (!sendMail(message, toList.get(i), null, null))
 				return false;
 		}
 		return true;
@@ -316,7 +334,7 @@ public class MSGraphEmailControl implements EmailControl
 	@Nonnull 
 	public String sendTestingEmail(@Nonnull String toAddress) {
 		EmailMessage message = new SimpleEmailMessage("Email Testing", "This is a test email", false);
-		if (sendMail(message, toAddress, null))
+		if (sendMail(message, toAddress, null, null))
 		{
 			return "Sent";
 		}

@@ -128,12 +128,12 @@ public class AWSEmailControl implements EmailControl{
 	
 
 	@Override
-	public boolean sendMail(@Nonnull EmailMessage message, @Nullable String toList, @Nullable String ccList) {
+	public boolean sendMail(@Nonnull EmailMessage message, @Nullable String toList, @Nullable String ccList, @Nullable String bccList) {
 		SesClient client = SesClient.builder().httpClient(getProxyHTTPClient())
 		        .region(this.region)
 		        .build();
 		try{
-			this.send(client, message, toList, ccList);
+			this.send(client, message, toList, ccList, bccList);
 			client.close();
 			
 			if (this.log != null)
@@ -149,7 +149,7 @@ public class AWSEmailControl implements EmailControl{
 		}
 	}
 
-	private void send(@Nonnull SesClient client, @Nonnull EmailMessage msg, @Nullable String toList, @Nullable String ccList) throws AddressException, MessagingException, IOException {
+	private void send(@Nonnull SesClient client, @Nonnull EmailMessage msg, @Nullable String toList, @Nullable String ccList, @Nullable String bccList) throws AddressException, MessagingException, IOException {
 		Session session = Session.getDefaultInstance(new Properties());
 		MimeMessage message = new MimeMessage(session);
 
@@ -166,6 +166,11 @@ public class AWSEmailControl implements EmailControl{
 		{
 			message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(ccList));
 			if (this.log != null) log.logMessage("Email Cc: "+ccList, LogLevel.RAW);
+		}
+		if (bccList != null && bccList.length() > 0)
+		{
+			message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(bccList));
+			if (this.log != null) log.logMessage("Email Bcc: "+bccList, LogLevel.RAW);
 		}
 
 		MimeBodyPart wrap = new MimeBodyPart();
@@ -232,7 +237,7 @@ public class AWSEmailControl implements EmailControl{
 		int j = toList.size();
 		while (i < j)
 		{
-			if (this.sendMail(message, toList.get(i), null))
+			if (this.sendMail(message, toList.get(i), null, null))
 			{
 				succ = true;
 			}
@@ -255,6 +260,6 @@ public class AWSEmailControl implements EmailControl{
 	@Nonnull
 	public String sendTestingEmail(@Nonnull String toAddress) {
 		SimpleEmailMessage msg = new SimpleEmailMessage("Testing email", "Test content", false);
-		return this.sendMail(msg, toAddress, null)?"Success":"Failed";
+		return this.sendMail(msg, toAddress, null, null)?"Success":"Failed";
 	}
 }

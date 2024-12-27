@@ -324,7 +324,7 @@ public class EmailUtil
 	}
 
 	@Nonnull
-	static MimeMessage createMimeMessage(@Nonnull Session session, @Nonnull EmailMessage msg, @Nonnull String from, @Nullable String toList, @Nullable String ccList) throws MessagingException
+	static MimeMessage createMimeMessage(@Nonnull Session session, @Nonnull EmailMessage msg, @Nonnull String from, @Nullable String toList, @Nullable String ccList, @Nullable String bccList) throws MessagingException
 	{
 		MimeMessage message = new MimeMessage(session);
 		message.setSubject(msg.getSubject());
@@ -337,6 +337,10 @@ public class EmailUtil
 		if (ccList != null && ccList.length() > 0)
 		{
 			message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(ccList));
+		}
+		if (bccList != null && bccList.length() > 0)
+		{
+			message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(bccList));
 		}
 		int i;
 		int j;
