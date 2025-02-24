@@ -1,6 +1,9 @@
 # SJavaDepsClass
 
 # Changes:
+0.6.20250224
+- Update util version
+
 0.6.20250219
 - Update util version
 
