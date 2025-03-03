@@ -1,6 +1,9 @@
 # SJavaDepsClass
 
 # Changes:
+0.6.20250303
+- Added MSGraphEmailReader log
+
 0.6.20250224
 - Update util version
 

@@ -49,6 +49,13 @@ import com.microsoft.kiota.ApiException;
 
 public class MSGraphEmailReader implements EmailReader
 {
+	private static boolean debug = false;
+
+	public static void setDebug(boolean debug)
+	{
+		MSGraphEmailReader.debug = debug;
+	}
+
 	class GraphMessage extends Message
 	{
 		com.microsoft.graph.models.Message msg;
@@ -655,7 +662,10 @@ public class MSGraphEmailReader implements EmailReader
 	{
 		GraphServiceClient client = createClient();
 		if (client == null)
+		{
+			if (debug) this.log.logMessage("getMessages: createClient = null", LogLevel.ERROR);
 			return null;
+		}
 		MessageCollectionResponse messages;
 		if (this.folder != null)
 		{
@@ -667,11 +677,13 @@ public class MSGraphEmailReader implements EmailReader
 		}
 		if (messages == null)
 		{
+			if (debug) this.log.logMessage("getMessages: messages = null, folder = " + this.folder, LogLevel.ERROR);
 			return null;
 		}
 		List<com.microsoft.graph.models.Message> msg = messages.getValue();
 		if (msg == null)
 		{
+			if (debug) this.log.logMessage("getMessages: messages.value = null, folder = " + this.folder, LogLevel.ERROR);
 			return null;
 		}
 		Message[] msgArr = new Message[msg.size()];
@@ -685,6 +697,10 @@ public class MSGraphEmailReader implements EmailReader
 				msgArr[i] = new GraphMessage(msg.get(i), emsg);
 			}
 			i++;
+		}
+		if (msgArr.length == 0)
+		{
+			if (debug) this.log.logMessage("getMessages: msgArr is empty, msg = " + DataTools.toObjectStringWF(msg), LogLevel.ERROR);
 		}
 		return msgArr;
 	}
