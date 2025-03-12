@@ -1,6 +1,9 @@
 # SJavaDepsClass
 
 # Changes:
+0.6.20250312
+- Enhance MariaDB support
+
 0.6.20250305
 - Update util version
 

@@ -414,7 +414,7 @@ public class GenericSpecification<T> implements Specification<T> {
 				}
 				else if (dbType == DBType.MySQL)
 				{
-					predicates.add(builder.equal(builder.function("ST_Within", Integer.class, root.get(criteria.getKey()).as(Geometry.class), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), 1));
+					predicates.add(builder.equal(builder.function("ST_Within", Integer.class, root.get(criteria.getKey()), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), 1));
 				}
 				else if (dbType == DBType.PostgreSQL)
 				{
@@ -437,7 +437,7 @@ public class GenericSpecification<T> implements Specification<T> {
 				}
 				else if (dbType == DBType.MySQL)
 				{
-					predicates.add(builder.equal(builder.function("ST_Intersects", Integer.class, root.get(criteria.getKey()).as(Geometry.class), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), 1));
+					predicates.add(builder.equal(builder.function("ST_Intersects", Integer.class, root.get(criteria.getKey()), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), 1));
 				}
 				else if (dbType == DBType.PostgreSQL)
 				{
@@ -458,7 +458,11 @@ public class GenericSpecification<T> implements Specification<T> {
 				{
 					predicates.add(builder.lessThan(builder.function(criteria.getKey()+".STDistance", Double.class, builder.function("geometry::STGeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), (Double)criteria.getValue2()));
 				}
-				else if (dbType == DBType.MySQL || dbType == DBType.PostgreSQL)
+				else if (dbType == DBType.MySQL)
+				{
+					predicates.add(builder.lessThan(builder.function("ST_Distance", Double.class, root.get(criteria.getKey()), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), (Double)criteria.getValue2()));
+				}
+				else if (dbType == DBType.PostgreSQL)
 				{
 					predicates.add(builder.lessThan(builder.function("ST_Distance", Double.class, root.get(criteria.getKey()).as(Geometry.class), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), (Double)criteria.getValue2()));
 				}
