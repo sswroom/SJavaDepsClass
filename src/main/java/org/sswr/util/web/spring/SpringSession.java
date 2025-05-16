@@ -24,6 +24,7 @@ import org.sswr.util.data.JSONBase;
 import org.sswr.util.data.JSONBuilder;
 import org.sswr.util.data.JSONBuilder.ObjectType;
 import org.sswr.util.data.textbinenc.Base64Enc;
+import org.sswr.util.data.textbinenc.Base64Enc.B64Charset;
 import org.sswr.util.data.JSONObject;
 
 public class SpringSession implements Session {
@@ -157,8 +158,7 @@ public class SpringSession implements Session {
 		builder.objectBeginObject("attributes");
 		Set<String> names = this.getAttributeNames();
 		Iterator<String> it = names.iterator();
-		Deflater deflate = new Deflater(Deflater.BEST_COMPRESSION);
-		Base64Enc b64 = new Base64Enc(Base64Enc.B64Charset.NORMAL, true);
+		Base64Enc b64 = new Base64Enc(B64Charset.NORMAL, true);
 		while (it.hasNext())
 		{
 			String name = it.next();
@@ -173,6 +173,7 @@ public class SpringSession implements Session {
 				oos.close();
 				byte[] input = baos.toByteArray();
 				byte[] output = new byte[input.length + 5];
+				Deflater deflate = new Deflater(Deflater.BEST_COMPRESSION);
 				deflate.setInput(input);
 				deflate.finish();
 				int compSize = deflate.deflate(output, 4, output.length - 4);
@@ -214,7 +215,7 @@ public class SpringSession implements Session {
 		JSONObject attr = json.getValueObject("attributes");
 		if (attr == null) throw new IOException("attributes not found");
 		Set<String> names = attr.getObjectNames();
-		Base64Enc b64 = new Base64Enc(Base64Enc.B64Charset.NORMAL, true);
+		Base64Enc b64 = new Base64Enc(B64Charset.NORMAL, true);
 		Iterator<String> it = names.iterator();
 		while (it.hasNext())
 		{

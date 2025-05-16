@@ -1,6 +1,10 @@
 # SJavaDepsClass
 
 # Changes:
+0.2.20250516
+- Added MQTTSessionRepository.getSessions
+- Fixed SpringSession compress problem
+
 0.2.20240925
 - Compress SpringSession
 

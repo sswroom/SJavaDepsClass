@@ -2,6 +2,7 @@ package org.sswr.util.web.spring;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.zip.DataFormatException;
@@ -75,6 +76,11 @@ public class MQTTSessionRepository implements SessionRepository<SpringSession>, 
 			this.sessMap.remove(id);
 			this.publishDelete(id);
 		}
+	}
+
+	public Collection<SpringSession> getSessions()
+	{
+		return this.sessMap.values();
 	}
 
 	@Override
