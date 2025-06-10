@@ -1,6 +1,9 @@
 # SJavaDepsClass
 
 # Changes:
+0.7.20250610
+- Update Third-Party Version
+
 0.7.20250521
 - Update util version
 
