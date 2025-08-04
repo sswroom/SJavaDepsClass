@@ -196,6 +196,7 @@ public class AWSEmailControl implements EmailControl{
 				wrap.setDataHandler(new DataHandler(ds));
 				wrap.setFileName(att.fileName);
 				wrap.setDisposition(att.isInline?"inline":"attachment");
+				wrap.setContentID(att.contentId);
 				mimeMsg.addBodyPart(wrap);
 			}
 			i++;
@@ -204,30 +205,30 @@ public class AWSEmailControl implements EmailControl{
 		try {
 			if (this.log != null) log.logMessage("Attempting to send email: [" + msg.getSubject() + "] through Amazon SES using the AWS SDK for Java...", LogLevel.RAW);
 
-			 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-			 message.writeTo(outputStream);
-			 ByteBuffer buf = ByteBuffer.wrap(outputStream.toByteArray());
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			message.writeTo(outputStream);
+			ByteBuffer buf = ByteBuffer.wrap(outputStream.toByteArray());
 
-			 byte[] arr = new byte[buf.remaining()];
-			 buf.get(arr);
+			byte[] arr = new byte[buf.remaining()];
+			buf.get(arr);
 
-			 SdkBytes data = SdkBytes.fromByteArray(arr);
-			 RawMessage rawMessage = RawMessage.builder()
-					.data(data)
-					.build();
+			SdkBytes data = SdkBytes.fromByteArray(arr);
+			RawMessage rawMessage = RawMessage.builder()
+				.data(data)
+				.build();
 
-			 SendRawEmailRequest rawEmailRequest = SendRawEmailRequest.builder()
-					.rawMessage(rawMessage)
-					.build();
+			SendRawEmailRequest rawEmailRequest = SendRawEmailRequest.builder()
+				.rawMessage(rawMessage)
+				.build();
 
-			 client.sendRawEmail(rawEmailRequest);
-		 } catch (SesException e) {        	
+			client.sendRawEmail(rawEmailRequest);
+		} catch (SesException e) {        	
 			if (this.log != null)
 			{
 				log.logMessage("AWS Send Mail error", LogLevel.ERROR);
 				log.logException(e);
 			}
-		 }
+		}
 	}
 
 	@Override

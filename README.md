@@ -1,6 +1,8 @@
 # SJavaDepsClass
 
 # Changes:
+- Fix AWSEmail attachment content id
+
 0.7.20250610
 - Update Third-Party Version
 
