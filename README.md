@@ -1,7 +1,9 @@
 # SJavaDepsClass
 
 # Changes:
+0.7.20250812
 - Fix AWSEmail attachment content id
+- Added MSGraphEmailControl.setAttTimeout
 
 0.7.20250610
 - Update Third-Party Version

@@ -41,6 +41,7 @@ public class MSGraphEmailControl implements EmailControl
 	private AccessTokenResult accessToken;
 	private LogTool log;
 	private int attSplitSize;
+	private int attTimeout;
 
 	public MSGraphEmailControl(LogTool log, @Nonnull String clientId, @Nonnull String tenantId, @Nonnull String clientSecret, @Nonnull String fromEmail)
 	{
@@ -50,12 +51,18 @@ public class MSGraphEmailControl implements EmailControl
 		this.clientSecret = clientSecret;
 		this.fromEmail = fromEmail;
 		this.attSplitSize = 1048576 * 4;
+		this.attTimeout = 5000;
 		updateAccessToken();
 	}
 
 	public void setAttSplitSize(int splitSizeByte)
 	{
 		this.attSplitSize = splitSizeByte;
+	}
+
+	public void setAttTimeout(int attTimeout)
+	{
+		this.attTimeout = attTimeout;
 	}
 
 	private void updateAccessToken()
@@ -225,7 +232,7 @@ public class MSGraphEmailControl implements EmailControl
 						if (endOfst > att.content.length)
 							endOfst = att.content.length;
 						HTTPClient cli = HTTPClient.createConnect(new TCPClientFactory(null), null, uploadUrl, RequestMethod.HTTP_PUT, false);
-						cli.setReadTimeout(5000);
+						cli.setReadTimeout(this.attTimeout);
 						cli.addContentType("application/octet-stream");
 						cli.addContentLength(endOfst - currOfst);
 						cli.addHeader("Content-Range", "bytes "+currOfst+"-"+(endOfst - 1)+"/"+att.content.length);
