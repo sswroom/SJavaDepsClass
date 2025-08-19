@@ -5,7 +5,7 @@
 	
 	<groupId>io.github.sswroom</groupId>
 	<artifactId>util-deps</artifactId>
-	<version>0.7.20250812</version>
+	<version>0.8.20250819</version>
 
 	<name>sswr-util-deps</name>
 	<packaging>jar</packaging>
@@ -22,9 +22,9 @@
 		<hibernate.version>6.6.17.Final</hibernate.version>
 		<junit.jupiter.version>5.13.1</junit.jupiter.version>
 		<org.bouncycastle.version>1.81</org.bouncycastle.version>
-		<spring.data.version>3.4.6</spring.data.version>
-		<spring.security.version>6.4.6</spring.security.version>
-		<spring.web.version>6.2.7</spring.web.version>
+		<spring.data.version>3.5.3</spring.data.version>
+		<spring.security.version>6.5.3</spring.security.version>
+		<spring.web.version>6.2.10</spring.web.version>
 	</properties>
 
 	<licenses>
@@ -85,7 +85,7 @@
 		<dependency>
 			<groupId>io.github.sswroom</groupId>
 			<artifactId>util</artifactId>
-			<version>0.7.20250812</version>
+			<version>0.8.20250819</version>
 		</dependency>
 
 		<dependency>
@@ -174,7 +174,7 @@
 		<dependency>
 			<groupId>org.springframework.session</groupId>
 			<artifactId>spring-session-core</artifactId>
-			<version>3.4.3</version>
+			<version>3.4.4</version>
 		</dependency>
 
 		<dependency>
