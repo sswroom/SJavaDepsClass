@@ -5,7 +5,7 @@
 	
 	<groupId>io.github.sswroom</groupId>
 	<artifactId>util-deps</artifactId>
-	<version>0.8.20250819</version>
+	<version>0.8.20250903</version>
 
 	<name>sswr-util-deps</name>
 	<packaging>jar</packaging>
@@ -85,7 +85,7 @@
 		<dependency>
 			<groupId>io.github.sswroom</groupId>
 			<artifactId>util</artifactId>
-			<version>0.8.20250819</version>
+			<version>0.8.20250903</version>
 		</dependency>
 
 		<dependency>
@@ -174,7 +174,7 @@
 		<dependency>
 			<groupId>org.springframework.session</groupId>
 			<artifactId>spring-session-core</artifactId>
-			<version>3.4.4</version>
+			<version>3.5.2</version>
 		</dependency>
 
 		<dependency>
