@@ -1,6 +1,9 @@
 # SJavaDepsClass
 
 # Changes:
+0.8.20251111.2
+-Fix string enum conversion
+
 0.8.20251111
 -Modify to Hibernate 7 syntax
 

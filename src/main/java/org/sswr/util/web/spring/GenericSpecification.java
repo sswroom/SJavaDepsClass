@@ -82,14 +82,25 @@ public class GenericSpecification<T> implements Specification<T> {
 						root.get(criteria.getKey()), criteria.getValue().toString()));
 				break;
 			case NOT_EQUAL:
-				predicates.add(builder.notEqual(
-						root.get(criteria.getKey()).cast(criteria.getValue().getClass()), criteria.getValue()));
+				if (criteria.getValue().getClass().isEnum())
+				{
+					predicates.add(builder.notEqual(
+							root.get(criteria.getKey()), criteria.getValue()));
+				}
+				else
+				{
+					predicates.add(builder.notEqual(
+							root.get(criteria.getKey()).cast(criteria.getValue().getClass()), criteria.getValue()));
+				}
 				break;
 			case EQUAL:
 				if (criteria.getValue() == null) {
 					predicates.add(builder.isNull(
 							root.get(criteria.getKey())));
 
+				} else if (criteria.getValue().getClass().isEnum()) {
+					predicates.add(builder.equal(
+							root.get(criteria.getKey()), criteria.getValue()));
 				} else {
 					predicates.add(builder.equal(
 							root.get(criteria.getKey()).cast(criteria.getValue().getClass()), criteria.getValue()));
