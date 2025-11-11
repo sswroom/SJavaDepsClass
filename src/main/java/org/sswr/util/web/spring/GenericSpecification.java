@@ -83,7 +83,7 @@ public class GenericSpecification<T> implements Specification<T> {
 				break;
 			case NOT_EQUAL:
 				predicates.add(builder.notEqual(
-						root.get(criteria.getKey()).as(criteria.getValue().getClass()), criteria.getValue()));
+						root.get(criteria.getKey()).cast(criteria.getValue().getClass()), criteria.getValue()));
 				break;
 			case EQUAL:
 				if (criteria.getValue() == null) {
@@ -92,7 +92,7 @@ public class GenericSpecification<T> implements Specification<T> {
 
 				} else {
 					predicates.add(builder.equal(
-							root.get(criteria.getKey()).as(criteria.getValue().getClass()), criteria.getValue()));
+							root.get(criteria.getKey()).cast(criteria.getValue().getClass()), criteria.getValue()));
 				}
 				break;
 			case NOT_MATCH:
@@ -125,15 +125,15 @@ public class GenericSpecification<T> implements Specification<T> {
 				break;
 			case DATE_AFTER:
 				predicates.add(
-						builder.greaterThanOrEqualTo(root.get(criteria.getKey()).as(Timestamp.class), Timestamp.valueOf(criteria.getValue().toString())));
+						builder.greaterThanOrEqualTo(root.get(criteria.getKey()).cast(Timestamp.class), Timestamp.valueOf(criteria.getValue().toString())));
 				break;
 			case DATE_BEFORE:
 				predicates.add(
-						builder.lessThanOrEqualTo(root.get(criteria.getKey()).as(Timestamp.class), Timestamp.valueOf(criteria.getValue().toString())));
+						builder.lessThanOrEqualTo(root.get(criteria.getKey()).cast(Timestamp.class), Timestamp.valueOf(criteria.getValue().toString())));
 				break;
 			case DATE_EQUAL:
 				predicates.add(builder.equal(
-						root.get(criteria.getKey()).as(Timestamp.class), Timestamp.valueOf(criteria.getValue().toString())));
+						root.get(criteria.getKey()).cast(Timestamp.class), Timestamp.valueOf(criteria.getValue().toString())));
 				break;
 			case DATE_RANGE:
 				{
@@ -141,7 +141,7 @@ public class GenericSpecification<T> implements Specification<T> {
 					Timestamp dtFrom = dateRange[0];
 					Timestamp dtTo = dateRange[1];
 					if (dtFrom != null && dtTo != null) {
-						predicates.add((builder.between(root.get(criteria.getKey()).as(Timestamp.class), dtFrom, dtTo)));
+						predicates.add((builder.between(root.get(criteria.getKey()).cast(Timestamp.class), dtFrom, dtTo)));
 					}
 				}
 				break;
@@ -158,16 +158,16 @@ public class GenericSpecification<T> implements Specification<T> {
 							builder.or(
 									new Predicate[]{
 											builder.or(builder.and(new Predicate[]{
-													builder.greaterThanOrEqualTo(root.get(colDateFrom).as(Timestamp.class),Timestamp.valueOf(dtFrom.toString()))
-													,builder.lessThanOrEqualTo(root.get(colDateFrom).as(Timestamp.class),Timestamp.valueOf(dtTo.toString()))
+													builder.greaterThanOrEqualTo(root.get(colDateFrom).cast(Timestamp.class),Timestamp.valueOf(dtFrom.toString()))
+													,builder.lessThanOrEqualTo(root.get(colDateFrom).cast(Timestamp.class),Timestamp.valueOf(dtTo.toString()))
 											}))
 											, builder.or(builder.and(new Predicate[]{
-													builder.greaterThanOrEqualTo(root.get(colDateTo).as(Timestamp.class),Timestamp.valueOf(dtFrom.toString()))
-													,builder.lessThanOrEqualTo(root.get(colDateTo).as(Timestamp.class),Timestamp.valueOf(dtTo.toString()))
+													builder.greaterThanOrEqualTo(root.get(colDateTo).cast(Timestamp.class),Timestamp.valueOf(dtFrom.toString()))
+													,builder.lessThanOrEqualTo(root.get(colDateTo).cast(Timestamp.class),Timestamp.valueOf(dtTo.toString()))
 											}))
 											, builder.or(builder.and(new Predicate[]{
-													builder.lessThanOrEqualTo(root.get(colDateFrom).as(Timestamp.class),Timestamp.valueOf(dtFrom.toString()))
-													,builder.greaterThanOrEqualTo(root.get(colDateTo).as(Timestamp.class),Timestamp.valueOf(dtTo.toString()))
+													builder.lessThanOrEqualTo(root.get(colDateFrom).cast(Timestamp.class),Timestamp.valueOf(dtFrom.toString()))
+													,builder.greaterThanOrEqualTo(root.get(colDateTo).cast(Timestamp.class),Timestamp.valueOf(dtTo.toString()))
 											}))
 									}
 							)
@@ -195,12 +195,12 @@ public class GenericSpecification<T> implements Specification<T> {
 						switch ((SearchOperation) entry.getValue()[1]) {
 							case DATE_AFTER:
 								subPredicate.add(
-										builder.greaterThanOrEqualTo(subRoot.get(entry.getKey()).as(Timestamp.class), Timestamp.valueOf(entry.getValue()[0].toString())));
+										builder.greaterThanOrEqualTo(subRoot.get(entry.getKey()).cast(Timestamp.class), Timestamp.valueOf(entry.getValue()[0].toString())));
 	
 								break;
 							case DATE_BEFORE:
 								subPredicate.add(
-										builder.lessThanOrEqualTo(subRoot.get(entry.getKey()).as(Timestamp.class), Timestamp.valueOf(entry.getValue()[0].toString())));
+										builder.lessThanOrEqualTo(subRoot.get(entry.getKey()).cast(Timestamp.class), Timestamp.valueOf(entry.getValue()[0].toString())));
 								break;
 							case MATCH:
 	
@@ -292,12 +292,12 @@ public class GenericSpecification<T> implements Specification<T> {
 						switch ((SearchOperation) entry.getValue()[1]) {
 							case DATE_AFTER:
 								subPredicate.add(
-										builder.greaterThanOrEqualTo(subRoot.get(entry.getKey()).as(Timestamp.class), Timestamp.valueOf(entry.getValue()[0].toString())));
+										builder.greaterThanOrEqualTo(subRoot.get(entry.getKey()).cast(Timestamp.class), Timestamp.valueOf(entry.getValue()[0].toString())));
 
 								break;
 							case DATE_BEFORE:
 								subPredicate.add(
-										builder.lessThanOrEqualTo(subRoot.get(entry.getKey()).as(Timestamp.class), Timestamp.valueOf(entry.getValue()[0].toString())));
+										builder.lessThanOrEqualTo(subRoot.get(entry.getKey()).cast(Timestamp.class), Timestamp.valueOf(entry.getValue()[0].toString())));
 								break;
 							case MATCH:
 								subPredicate.add(builder.like(
@@ -314,10 +314,10 @@ public class GenericSpecification<T> implements Specification<T> {
 									subPredicate.add(builder.isNull(subRoot.get(entry.getKey())));
 								else if(entry.getValue().length >=3 )
 									subPredicate.add(builder.equal(
-											subRoot.get(entry.getKey()).get((String) entry.getValue()[2]).as(entry.getValue()[0].getClass()),
+											subRoot.get(entry.getKey()).get((String) entry.getValue()[2]).cast(entry.getValue()[0].getClass()),
 											entry.getValue()[0]));
 								else
-									subPredicate.add(builder.equal(subRoot.get(entry.getKey()).as(entry.getValue()[0].getClass()), entry.getValue()[0]));
+									subPredicate.add(builder.equal(subRoot.get(entry.getKey()).cast(entry.getValue()[0].getClass()), entry.getValue()[0]));
 								break;
 							case DATE_EQUAL:
 								break;
@@ -418,11 +418,11 @@ public class GenericSpecification<T> implements Specification<T> {
 				}
 				else if (dbType == DBType.PostgreSQL)
 				{
-					predicates.add(builder.isTrue(builder.function("ST_Within", Boolean.class, root.get(criteria.getKey()).as(Geometry.class), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid)))));
+					predicates.add(builder.isTrue(builder.function("ST_Within", Boolean.class, root.get(criteria.getKey()).cast(Geometry.class), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid)))));
 				}
 				else if (dbType == DBType.PostgreSQLESRI)
 				{
-					predicates.add(builder.isTrue(builder.function("sde.ST_Within", Boolean.class, builder.function("sde.st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).as(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid)))));
+					predicates.add(builder.isTrue(builder.function("sde.ST_Within", Boolean.class, builder.function("sde.st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).cast(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid)))));
 				}
 				else
 				{
@@ -441,11 +441,11 @@ public class GenericSpecification<T> implements Specification<T> {
 				}
 				else if (dbType == DBType.PostgreSQL)
 				{
-					predicates.add(builder.isTrue(builder.function("ST_Intersects", Boolean.class, root.get(criteria.getKey()).as(Geometry.class), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid)))));
+					predicates.add(builder.isTrue(builder.function("ST_Intersects", Boolean.class, root.get(criteria.getKey()).cast(Geometry.class), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid)))));
 				}
 				else if (dbType == DBType.PostgreSQLESRI)
 				{
-					predicates.add(builder.isTrue(builder.function("sde.st_intersects", Boolean.class, builder.function("sde.st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).as(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid)))));
+					predicates.add(builder.isTrue(builder.function("sde.st_intersects", Boolean.class, builder.function("sde.st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).cast(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid)))));
 				}
 				else
 				{
@@ -464,11 +464,11 @@ public class GenericSpecification<T> implements Specification<T> {
 				}
 				else if (dbType == DBType.PostgreSQL)
 				{
-					predicates.add(builder.lessThan(builder.function("ST_Distance", Double.class, root.get(criteria.getKey()).as(Geometry.class), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), (Double)criteria.getValue2()));
+					predicates.add(builder.lessThan(builder.function("ST_Distance", Double.class, root.get(criteria.getKey()).cast(Geometry.class), builder.function("ST_GeomFromText", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), (Double)criteria.getValue2()));
 				}
 				else if (dbType == DBType.PostgreSQLESRI)
 				{
-					predicates.add(builder.lessThan(builder.function("sde.st_distance", Double.class, builder.function("sde.st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).as(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), (Double)criteria.getValue2()));
+					predicates.add(builder.lessThan(builder.function("sde.st_distance", Double.class, builder.function("sde.st_geomfromwkb", Geometry.class, root.get(criteria.getKey()).cast(Geometry.class), builder.literal(srid)), builder.function("sde.st_geometry", Geometry.class, builder.literal((String)criteria.getValue()), builder.literal(srid))), (Double)criteria.getValue2()));
 				}
 				else
 				{

@@ -1,6 +1,9 @@
 # SJavaDepsClass
 
 # Changes:
+0.8.20251111
+-Modify to Hibernate 7 syntax
+
 0.8.20251110
 - Update util version
 
