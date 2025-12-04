@@ -31,6 +31,7 @@ import org.sswr.util.net.AccessTokenProvider;
 import org.sswr.util.net.MSGraphUtil;
 import org.sswr.util.net.MSGraphUtil.AccessTokenResult;
 
+import com.microsoft.graph.http.GraphServiceException;
 import com.microsoft.graph.models.Attachment;
 import com.microsoft.graph.models.BodyType;
 import com.microsoft.graph.models.FileAttachment;
@@ -553,10 +554,16 @@ public class MSGraphEmailReader implements EmailReader
 			msg = it.next();
 			if (msg.isDeleted())
 			{
-				if (this.archiveOnDelete)
-					this.moveMessageToArchive(msg.getId());
-				else
-					this.deleteMessage(msg.getId());
+				try
+				{
+					if (this.archiveOnDelete)
+						this.moveMessageToArchive(msg.getId());
+					else
+						this.deleteMessage(msg.getId());
+				}
+				catch (GraphServiceException ex)
+				{
+				}
 			}
 		}
 		this.changedMap.clear();

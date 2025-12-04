@@ -1,6 +1,9 @@
 # SJavaDepsClass
 
 # Changes:
+0.2.20251204
+- Ignore exception on folder delete failed
+
 0.2.20250602
 - Update util version
 
