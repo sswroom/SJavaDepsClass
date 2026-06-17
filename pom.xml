@@ -241,7 +241,7 @@
 							<goal>sign</goal>
 						</goals>
 						<configuration>
-							<keyname>0x0648FFA8</keyname>
+							<keyname>0x2BAF3042</keyname>
 							<passphraseServerId>sswroom</passphraseServerId>
 						</configuration>
 					</execution>
