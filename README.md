@@ -1,6 +1,8 @@
 # SJavaDepsClass
 
 # Changes:
+-Handle more AWS exception
+
 0.8.20251231
 -Update util version
 

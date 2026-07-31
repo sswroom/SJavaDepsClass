@@ -25,6 +25,7 @@ import org.sswr.util.io.LogLevel;
 import org.sswr.util.io.LogTool;
 
 import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.http.apache.ProxyConfiguration;
@@ -32,7 +33,6 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.ses.model.RawMessage;
 import software.amazon.awssdk.services.ses.model.SendRawEmailRequest;
-import software.amazon.awssdk.services.ses.model.SesException;
 
 public class AWSEmailControl implements EmailControl{
 	
@@ -222,7 +222,7 @@ public class AWSEmailControl implements EmailControl{
 				.build();
 
 			client.sendRawEmail(rawEmailRequest);
-		} catch (SesException e) {        	
+		} catch (SdkException e) {        	
 			if (this.log != null)
 			{
 				log.logMessage("AWS Send Mail error", LogLevel.ERROR);
