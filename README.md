@@ -1,6 +1,8 @@
 # SJavaDepsClass
 
 # Changes:
+0.9.20260814
+-Update to Spring Boot 4.0.7
 -Handle more AWS exception
 
 0.8.20251231
