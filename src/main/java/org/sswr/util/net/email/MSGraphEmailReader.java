@@ -711,14 +711,33 @@ public class MSGraphEmailReader implements EmailReader
 		if (client == null)
 			return false;
 		
-		MovePostRequestBody body = new MovePostRequestBody();
-		body.setDestinationId("archive");
-		com.microsoft.graph.models.Message msg = client.users().byUserId(fromEmail).messages().byMessageId(id).move().post(body);
-		if (msg != null)
+		com.microsoft.graph.models.Message msg;
+		try
 		{
-			return true;
+			if (this.folder != null)
+			{
+				com.microsoft.graph.users.item.mailfolders.item.messages.item.move.MovePostRequestBody body = new com.microsoft.graph.users.item.mailfolders.item.messages.item.move.MovePostRequestBody();
+				body.setDestinationId("archive");
+				msg = client.users().byUserId(fromEmail).mailFolders().byMailFolderId(this.folder).messages().byMessageId(id).move().post(body);
+			}
+			else
+			{
+				MovePostRequestBody body = new MovePostRequestBody();
+				body.setDestinationId("archive");
+				msg = client.users().byUserId(fromEmail).messages().byMessageId(id).move().post(body);
+			}
+			if (msg != null)
+			{
+				return true;
+			}
+			return false;
 		}
-		return false;
+		catch (Exception ex)
+		{
+			if (debug) 
+				this.log.logException(ex);
+			return false;
+		}
 	}
 
 	public boolean deleteMessage(String id)
