@@ -1,6 +1,8 @@
 # SJavaDepsClass
 
 # Changes:
+0.8.20260915
+-Enhance MSGraphEmailReader
 -Handle more AWS exception
 
 0.8.20251231
